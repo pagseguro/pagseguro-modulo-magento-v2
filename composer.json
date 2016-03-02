@@ -1,0 +1,26 @@
+{
+        "name": "pagseguro/magento2",
+        "type": "magento2-module",
+        "version": "1.0.0",
+        "license": [
+            "OSL-3.0",
+            "AFL-3.0"
+        ],
+        "require": {
+            "php": "~5.5.0|~5.6.0|~7.0.0",
+            "pagseguro/php": "@stable"
+        },
+        "extra": {
+          "map": [
+                [
+                    "*",
+                    "UOL/PagSeguro"
+                ]
+            ]
+        },
+        "autoload": {
+          "psr-4": {
+            "UOL\\PagSeguro\\": ""
+          }
+        }
+    }
