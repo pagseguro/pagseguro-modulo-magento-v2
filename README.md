@@ -83,5 +83,5 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
   [SPL]: http://php.net/manual/en/book.spl.php
   [cURL]: http://php.net/manual/en/book.curl.php
   [DOM]: http://php.net/manual/en/book.dom.php
-  [GitHub]: https://github.com/pagseguro/magento
+  [GitHub]: https://github.com/pagseguro/magento2
 
