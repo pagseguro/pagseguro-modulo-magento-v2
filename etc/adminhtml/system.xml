@@ -37,32 +37,37 @@
                     <label>NOME DE EXIBIÇÃO</label>
                     <tooltip>Informe o nome que deve ser apresentado para este meio de pagamento no checkout de sua loja.</tooltip>
                 </field>
-                <field id="email" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="environment" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>AMBIENTE</label>
+                    <tooltip>Define o ambiente de uso</tooltip>
+                    <source_model>UOL\PagSeguro\Model\System\Config\Environment</source_model>
+                </field>
+                <field id="email" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>E-MAIL</label>
                     <comment>Clique &lt;a href=&quot;https://pagseguro.uol.com.br/registration/registration.jhtml?ep=7&amp;tipo=cadastro#!vendedor&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt; e cadastre-se gr&#225;tis.</comment>
                 </field>
-                <field id="token" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="token" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>TOKEN</label>
                     <tooltip>Acesse sua conta PagSeguro ou Sandbox para obter um token.</tooltip>
                 </field>
-                <field id="redirect" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="redirect" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>URL DE REDIRECIONAMENTO</label>
                     <tooltip>Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve acessar sua conta PagSeguro ou Sandbox e habilitar requisições de pagamentos gerados somente via API.</tooltip>
                 </field>
-                <field id="notification" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="notification" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>URL DE NOTIFICAÇÃO</label>
                     <tooltip>Sempre que uma transa&#231;&#227;o mudar de status, o PagSeguro envia uma notifica&#231;&#227;o para sua loja ou para a URL que voc&#234; informar neste campo.</tooltip>
                 </field>
-                <field id="charset" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="charset" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>CHARSET</label>
                     <comment>Defina o charset de acordo com a codificação do seu sistema.</comment>
                     <source_model>UOL\PagSeguro\Model\System\Config\Charset</source_model>
                 </field>
-                <field id="log" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="log" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>ATIVAR LOG</label>
                     <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
                 </field>
-                <field id="log_file" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="log_file" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>DIRETÓRIO</label>
                     <tooltip>Caminho para o arquivo de log.</tooltip>
                 </field>

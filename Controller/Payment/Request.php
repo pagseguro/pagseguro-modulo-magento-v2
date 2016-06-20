@@ -46,8 +46,12 @@ class Request extends \Magento\Framework\App\Action\Action
     ) {
         parent::__construct($context);
         $this->payment = new PaymentMethod(
-            $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
-            $this->_objectManager->create('\Magento\Checkout\Model\Session')
+            $this->_objectManager
+                ->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
+            $this->_objectManager
+                ->create('\Magento\Checkout\Model\Session'),
+            $this->_objectManager
+                ->create('\Magento\Directory\Api\CountryInformationAcquirerInterface')
         );
     }
 
@@ -57,6 +61,7 @@ class Request extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        return $this->resultRedirectFactory->create()->setPath($this->payment->createPaymentRequest());
+        return $this->resultRedirectFactory->create()
+            ->setPath($this->payment->createPaymentRequest());
     }
 }

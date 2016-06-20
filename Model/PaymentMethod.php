@@ -31,7 +31,6 @@ use UOL\PagSeguro\Helper\Library;
  */
 class PaymentMethod
 {
-
     /**
      * @var \Magento\Checkout\Model\Session
      */
@@ -40,6 +39,18 @@ class PaymentMethod
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
+    
+    /**
+     *
+     * @var \PagSeguro\Domains\Requests\Payment
+     */
+    protected $_paymentRequest;
+
+    /**
+     *
+     * @var \Magento\Directory\Api\CountryInformationAcquirerInterface
+     */
+    protected $_countryInformation;
 
     /**
      * PaymentMethod constructor.
@@ -48,11 +59,14 @@ class PaymentMethod
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation
     ) {
         $this->_scopeConfig = $scopeConfigInterface;
         $this->_checkoutSession = $checkoutSession;
+        $this->_countryInformation = $countryInformation;
         $this->_library = new Library($scopeConfigInterface);
+        $this->_paymentRequest = new \PagSeguro\Domains\Requests\Payment();
     }
 
     /**
@@ -60,20 +74,37 @@ class PaymentMethod
      */
     public function createPaymentRequest()
     {
-        $paymentRequest = new \PagSeguroPaymentRequest();
+        // Currency
+        $this->_paymentRequest->setCurrency("BRL");
+        
+        // Order ID
+        $this->_paymentRequest->setReference($this->getStoreReference());
 
-        // Set the currency
-        $paymentRequest->setCurrency("BRL");
-        $paymentRequest->setReference($this->getStoreReference()); //Order ID
-        $paymentRequest->setShipping($this->getShippingInformation()); //Shipping
-        $paymentRequest->setSender($this->getSenderInformation()); //Sender
-        $paymentRequest->setItems($this->getItensInformation()); //Itens
-        $paymentRequest->setShippingType(\PagSeguroShippingType::getCodeByType('NOT_SPECIFIED')); //Shipping Type
-        $paymentRequest->setShippingCost(number_format($this->getShippingAmount(), 2, '.', '')); //Shipping Coast
+        //Shipping
+        $this->setShippingInformation();
+        $this->_paymentRequest->setShipping()->setType()
+            ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
+        $this->_paymentRequest->setShipping()->setCost()
+            ->withParameters(number_format($this->getShippingAmount(), 2, '.', '')); //Shipping Coast
+
+        // Sender
+        $this->setSenderInformation();
+
+        // Itens
+        $this->setItemsInformation();
+
+        //Redirect Url
+        $this->_paymentRequest->setRedirectUrl($this->getNotificationUrl());
+
+        // Notification Url
+        $this->_paymentRequest->setNotificationUrl($this->getRedirectUrl());
 
         try {
+            $this->_library->setEnvironment();
+            $this->_library->setCharset();
+            $this->_library->setLog();
 
-            return $paymentRequest->register(
+            return $this->_paymentRequest->register(
                 $this->_library->getPagSeguroCredentials(),
                 $this->_library->isLightboxCheckoutType()
             );
@@ -85,49 +116,61 @@ class PaymentMethod
     }
 
     /**
-     * Get information of purchased items
+     * Get information of purchased items and set in the attribute $_paymentRequest
      * @return PagSeguroItem
      */
-    private function getItensInformation()
+    private function setItemsInformation()
     {
-        $items = array();
         foreach ($this->_checkoutSession->getLastRealOrder()->getAllVisibleItems() as $product) {
-            $item = new \PagSeguroItem();
-            $item->setId($product->getId());
-            $item->setDescription(\UOL\PagSeguro\Helper\Data::fixStringLength($product->getName(), 255));
-            $item->setQuantity($product->getSimpleQtyToShip());
-            $item->setWeight(round($product->getWeight()));
-            $item->setAmount(\UOL\PagSeguro\Helper\Data::toFloat($product->getPrice()));
-            array_push($items, $item);
+            $this->_paymentRequest->addItems()->withParameters(
+                $product->getId(), //id
+                \UOL\PagSeguro\Helper\Data::fixStringLength($product->getName(), 255), //description
+                $product->getSimpleQtyToShip(), //quantity
+                \UOL\PagSeguro\Helper\Data::toFloat($product->getPrice()), //amount
+                round($product->getWeight()) //weight
+            );
         }
-        return $items;
     }
 
     /**
-     * Customer information that are sent
-     * @return PagSeguroSender
+     * Get customer information that are sent and set in the attribute $_paymentRequest
      */
-    private function getSenderInformation()
+    private function setSenderInformation()
     {
-        $sender = new \PagSeguroSender();
-        $sender->setEmail($this->_checkoutSession->getLastRealOrder()->getCustomerEmail());
-        $sender->setName($this->_checkoutSession->getLastRealOrder()->getCustomerName());
-        return $sender;
+        $senderName = $this->_checkoutSession->getLastRealOrder()->getCustomerName();
+
+        // If Guest
+        if ($senderName == __('Guest')) {
+            $address = $this->getBillingAddress();
+            $senderName = $address->getFirstname() . ' ' . $address->getLastname();
+        }
+
+        $this->_paymentRequest->setSender()->setName($senderName);
+        $this->_paymentRequest->setSender()->setEmail($this->_checkoutSession
+            ->getLastRealOrder()->getCustomerEmail());
+        $this->setSenderPhone();
+        
     }
 
     /**
-     * Get the shipping information
-     * @return PagSeguroShipping
+     * Get the shipping information and set in the attribute $_paymentRequest
      */
-    private function getShippingInformation()
+    private function setShippingInformation()
     {
         $shipping = $this->getShippingData();
+        $country = $this->_countryInformation->getCountryInfo($shipping['country_id']);
         $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
-        $street = $this->getShippingAddress($address[0], $shipping);
-        $number = $this->getShippingAddress($address[1]);
-        $complement = $this->getShippingAddress($address[2]);
-        $district = $this->getShippingAddress($address[3]);
-        return $this->setPagSeguroShipping($street, $number, $complement, $district);
+
+        $this->_paymentRequest->setShipping()->setAddress()->withParameters(
+            $this->getShippingAddress($address[0], $shipping),
+            $this->getShippingAddress($address[1]),
+            $this->getShippingAddress($address[3]),
+            \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']),
+            $shipping['city'],
+            $this->getRegionAbbreviation($shipping['region']),
+            $country->getFullNameLocale(),
+            $this->getShippingAddress($address[2])
+        );
     }
 
     /**
@@ -153,7 +196,7 @@ class PaymentMethod
     private function getShippingData()
     {
         if ($this->_checkoutSession->getLastRealOrder()->getIsVirtual()) {
-            return $this->_checkoutSession->getLastRealOrder()->getBillingAddress();
+            return $this->getBillingAddress();
         }
         return $this->_checkoutSession->getLastRealOrder()->getShippingAddress();
     }
@@ -166,50 +209,14 @@ class PaymentMethod
         return $this->_checkoutSession->getLastRealOrder()->getBaseShippingAmount();
     }
 
-    /**
-     * @param $street
-     * @param $number
-     * @param $complement
-     * @param $district
-     * @return PagSeguroShipping
-     */
-    private function setPagSeguroShipping($street, $number, $complement, $district)
-    {
-        $shipping = new \PagSeguroShipping();
-        $shipping->setAddress($this->setPagSeguroShipppingAddress($street, $number, $complement, $district));
-        return $shipping;
-    }
-
-    /**
-     * @param $street
-     * @param $number
-     * @param $complement
-     * @param $district
-     * @return \PagSeguroAddress
-     */
-    private function setPagSeguroShipppingAddress($street, $number, $complement, $district)
-    {
-        $shipping = $this->getShippingData();
-        $address = new \PagSeguroAddress();
-        $address->setCity($shipping['city']);
-        $address->setPostalCode(\UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']));
-        $address->setState($shipping['region']);
-        $address->setStreet($street);
-        $address->setNumber($number);
-        $address->setComplement($complement);
-        $address->setDistrict($district);
-
-        return $address;
-    }
-
     /***
      * @param $code
      * @return string
      */
     public function checkoutUrl($code, $serviceName)
     {
-        $connectionData = new \PagSeguroConnectionData($this->_library->getPagSeguroCredentials(), $serviceName);
-        return $connectionData->getPaymentUrl() . $connectionData->getResource('checkoutUrl') . "?code=$code";
+        $connectionData = new \PagSeguro\Resources\Connection\Data($this->_library->getPagSeguroCredentials());
+        return $connectionData->buildPaymentResponseUrl() . "?code=$code";
     }
 
     /**
@@ -221,5 +228,58 @@ class PaymentMethod
             $this->_scopeConfig->getValue('pagseguro/store/reference'),
             $this->_checkoutSession->getLastRealOrder()->getEntityId()
         );
+    }
+    
+    /**
+     * Get a brazilian region name and return the abbreviation if it exists
+     * @param string $regionName
+     * @return string
+     */
+    private function getRegionAbbreviation($regionName)
+    {
+        $regionAbbreviation = new \PagSeguro\Enum\Address();
+        return (is_string($regionAbbreviation->getType($regionName))) ? $regionAbbreviation->getType($regionName) : $regionNameme;
+    }
+    
+    /**
+     * Get the store notification url
+     * @return string
+     */
+    public function getNotificationUrl()
+    {
+        return $this->_scopeConfig->getValue('payment/pagseguro/notification');
+    }
+    
+    /**
+     * Get the store redirect url
+     * @return string
+     */
+    public function getRedirectUrl()
+    {
+        return $this->_scopeConfig->getValue('payment/pagseguro/redirect');
+    }
+    
+    /**
+     * Set the sender phone if it exist
+     */
+    private function setSenderPhone()
+    {
+        $shipping = $this->getShippingData();
+        if (! empty($shipping['telephone'])) {
+            $phone = \UOL\PagSeguro\Helper\Data::formatPhone($shipping['telephone']);
+            $this->_paymentRequest->setSender()->setPhone()->withParameters(
+                $phone['areaCode'],
+                $phone['number']
+            ); 
+        }
+    }
+    
+    /**
+     * Get the billing address data of the Order
+     * @return \Magento\Sales\Model\Order\Address|null
+     */
+    private function getBillingAddress()
+    {
+        return $this->_checkoutSession->getLastRealOrder()->getBillingAddress();
     }
 }

@@ -29,7 +29,6 @@ namespace UOL\PagSeguro\Helper;
  */
 class Library
 {
-
     /**
      *
      */
@@ -63,7 +62,10 @@ class Library
     {
         $email = $this->_scopeConfig->getValue('payment/pagseguro/email');
         $token = $this->_scopeConfig->getValue('payment/pagseguro/token');
-        return new \PagSeguroAccountCredentials($email, $token);
+        //Set the credentials
+        \PagSeguro\Configuration\Configure::setAccountCredentials($email, $token);
+
+        return \PagSeguro\Configuration\Configure::getAccountCredentials();
     }
 
     /**
@@ -83,6 +85,37 @@ class Library
      */
     private function loader()
     {
-        \PagSeguroLibrary::init();
+        \PagSeguro\Library::initialize();
+    }
+    
+    /**
+     * Set the environment configured in the PagSeguro module
+     */
+    public function setEnvironment()
+    {
+        \PagSeguro\Configuration\Configure::setEnvironment(
+            $this->_scopeConfig->getValue('payment/pagseguro/environment')
+        );
+    }
+    
+    /**
+     * Set the charset configured in the PagSeguro module
+     */
+    public function setCharset()
+    {
+        \PagSeguro\Configuration\Configure::setCharset(
+            $this->_scopeConfig->getValue('payment/pagseguro/charset')
+        );
+    }
+    
+    /**
+     * Set the log and log location configured in the PagSeguro module
+     */
+    public function setLog()
+    {
+        \PagSeguro\Configuration\Configure::setLog(
+            $this->_scopeConfig->getValue('payment/pagseguro/log'),
+            $this->_scopeConfig->getValue('payment/pagseguro/log_file')
+        );
     }
 }
