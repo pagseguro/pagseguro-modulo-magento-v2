@@ -27,7 +27,7 @@ Instalação
 -----------
 
 1. Instale via packagist 
-	- composer require esilvajr/pagseguro-magento2
+	- composer require pagseguro/magento2
 2. Execute o comando: 
 	- php bin/magento setup:upgrade
 3. Dê permissões as pastas var/ pub/
