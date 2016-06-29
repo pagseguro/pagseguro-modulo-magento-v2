@@ -60,13 +60,16 @@ class PaymentMethod
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation
+        \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
+        \Magento\Framework\Module\ModuleList $moduleList
     ) {
+     //var_dump($moduleList->getOne('UOL_PagSeguro'));exit;
         $this->_scopeConfig = $scopeConfigInterface;
         $this->_checkoutSession = $checkoutSession;
         $this->_countryInformation = $countryInformation;
-        $this->_library = new Library($scopeConfigInterface);
+        $this->_library = new Library($scopeConfigInterface, $moduleList);
         $this->_paymentRequest = new \PagSeguro\Domains\Requests\Payment();
+        
     }
 
     /**
