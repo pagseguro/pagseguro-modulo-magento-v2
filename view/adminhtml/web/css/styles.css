@@ -1,0 +1,15 @@
+.data-grid td {
+    text-align: center!important;
+}
+
+.page-wrapper {
+    background: url(../images/background.png) no-repeat;
+    -moz-background-size: 100% 60%;
+    -webkit-background-size: 100% 60%;
+    background-size: 100% 60%;
+}
+
+#conciliation-search {
+    background: #77B800!important;
+    border: 1px #639900 solid;
+}

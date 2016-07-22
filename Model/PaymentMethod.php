@@ -60,16 +60,13 @@ class PaymentMethod
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
-        \Magento\Framework\Module\ModuleList $moduleList
+        \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation
     ) {
-     //var_dump($moduleList->getOne('UOL_PagSeguro'));exit;
         $this->_scopeConfig = $scopeConfigInterface;
         $this->_checkoutSession = $checkoutSession;
         $this->_countryInformation = $countryInformation;
-        $this->_library = new Library($scopeConfigInterface, $moduleList);
+        $this->_library = new Library($scopeConfigInterface);
         $this->_paymentRequest = new \PagSeguro\Domains\Requests\Payment();
-        
     }
 
     /**
@@ -81,7 +78,7 @@ class PaymentMethod
         $this->_paymentRequest->setCurrency("BRL");
         
         // Order ID
-        $this->_paymentRequest->setReference($this->getStoreReference());
+        $this->_paymentRequest->setReference($this->getOrderStoreReference());
 
         //Shipping
         $this->setShippingInformation();
@@ -225,9 +222,9 @@ class PaymentMethod
     /**
      * @return string
      */
-    private function getStoreReference()
+    private function getOrderStoreReference()
     {
-        return \UOL\PagSeguro\Helper\Data::getStoreReference(
+        return \UOL\PagSeguro\Helper\Data::getOrderStoreReference(
             $this->_scopeConfig->getValue('pagseguro/store/reference'),
             $this->_checkoutSession->getLastRealOrder()->getEntityId()
         );
@@ -241,7 +238,7 @@ class PaymentMethod
     private function getRegionAbbreviation($regionName)
     {
         $regionAbbreviation = new \PagSeguro\Enum\Address();
-        return (is_string($regionAbbreviation->getType($regionName))) ? $regionAbbreviation->getType($regionName) : $regionNameme;
+        return (is_string($regionAbbreviation->getType($regionName))) ? $regionAbbreviation->getType($regionName) : $regionName;
     }
     
     /**

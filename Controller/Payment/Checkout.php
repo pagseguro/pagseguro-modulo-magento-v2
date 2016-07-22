@@ -29,39 +29,67 @@ use UOL\PagSeguro\Model\PaymentMethod;
  * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
  */
-class Request extends \Magento\Framework\App\Action\Action
+class Checkout extends \Magento\Framework\App\Action\Action
 {
+
+    /** @var  \Magento\Framework\View\Result\Page */
+    protected $resultPageFactory;
 
     /**
      * @var \UOL\PagSeguro\Model\PaymentMethod
      */
-    private $payment;
+    protected $payment;
+
 
     /**
-     * Request constructor.
+     * Checkout constructor.
      * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
+        $this->resultPageFactory = $resultPageFactory;
         $this->payment = new PaymentMethod(
             $this->_objectManager
                 ->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
-            $this->_objectManager
-                ->create('\Magento\Checkout\Model\Session'),
+            $this->_objectManager->create('\Magento\Checkout\Model\Session'),
             $this->_objectManager
                 ->create('\Magento\Directory\Api\CountryInformationAcquirerInterface')
         );
     }
 
     /**
-     * Redirect to payment
+     * Show payment page
      * @return \Magento\Framework\View\Result\PageFactory
      */
     public function execute()
     {
-        return $this->resultRedirectFactory->create()
-            ->setPath($this->payment->createPaymentRequest());
+        $result = $this->payment->createPaymentRequest();
+        $code = $result->getCode();
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')
+            ->setCode($code);
+        $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')
+            ->setPaymentJs($this->getPagSeguroPaymentJs());
+        $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')
+            ->setPaymentUrl($this->payment->checkoutUrl($code, 'paymentService'));
+
+        return $resultPage;
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    private function getPagSeguroPaymentJs()
+    {
+        if (\PagSeguro\Configuration\Configure::getEnvironment()->getEnvironment() == 'sandbox') {
+            return \UOL\PagSeguro\Helper\Library::SANDBOX_JS;
+        } else {
+            return \UOL\PagSeguro\Helper\Library::STANDARD_JS;
+        }
     }
 }

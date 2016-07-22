@@ -31,10 +31,10 @@ class Data
 {
 
     /**
-     * @var Array
+     * @var array
      * @enum
      */
-    private $statusList = array(
+    private static $statusList = array(
         0 => "pagseguro_iniciado",
         1 => "pagseguro_aguardando_pagamento",
         2 => "pagseguro_em_analise",
@@ -165,9 +165,19 @@ class Data
     /**
      * @return string
      */
-    public static function getStoreReference($reference, $order)
+    public static function getOrderStoreReference($reference, $order)
     {
         return $reference.$order;
+    }
+
+    /**
+     * Decrypt a reference and returns the reference string
+     * @param string $reference
+     * @return string
+     */
+    public static function getReferenceDecrypt($reference)
+    {
+        return substr($reference, 0, 7);
     }
 
     /**
@@ -175,7 +185,7 @@ class Data
      * @param string $reference
      * @return string
      */
-    public function getReferenceDecryptOrderID($reference)
+    public static function getReferenceDecryptOrderID($reference)
     {
         return str_replace(substr($reference, 0, 7), '', $reference);
     }
@@ -183,12 +193,67 @@ class Data
     /**
      * Get the name of payment status
      * @param Integer $key
-     * @return multitype:|boolean
+     * @return boolean|string
      */
-    public function getStatusFromKey($key)
+    public static function getStatusFromKey($key)
     {
-        if (array_key_exists($key, $this->statusList)) {
-            return $this->statusList[$key];
+        if (array_key_exists($key, self::$statusList)) {
+            return self::$statusList[$key];
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $status
+     * @return mixed
+     */
+    public static function getKeyFromStatus($status)
+    {
+        return array_search($status, self::$statusList);
+    }
+
+    /**
+     * Get the name to string of payment status
+     * @param Integer $key
+     * @return string|boolean
+     */
+    public static function getPaymentStatusToString($key)
+    {
+
+        if (array_key_exists($key, self::$statusList)) {
+            switch ($key) {
+                case 0:
+                    return 'Pendente';
+                    break;
+                case 1:
+                    return 'Aguardando pagamento';
+                    break;
+                case 2:
+                    return 'Em an&aacute;lise';
+                    break;
+                case 3:
+                    return 'Paga';
+                    break;
+                case 4:
+                    return 'Dispon&iacute;vel';
+                    break;
+                case 5:
+                    return 'Em disputa';
+                    break;
+                case 6:
+                    return 'Devolvida';
+                    break;
+                case 7:
+                    return 'Cancelada';
+                    break;
+                case 8:
+                    return 'Chargeback Debitado';
+                    break;
+                case 9:
+                    return 'Em Contestação';
+                    break;
+            }
         }
         return false;
     }

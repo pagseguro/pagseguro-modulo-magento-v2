@@ -42,20 +42,16 @@ class Library
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
-    
-    protected $_moduleList;
 
     /**
      * Library constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-            \Magento\Framework\Module\ModuleList $moduleList
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
     ) {
-        $this->_scopeConfig = $scopeConfigInterface;
-        $this->_moduleList = $moduleList;
         $this->loader();
+        $this->_scopeConfig = $scopeConfigInterface;
     }
 
     /**
@@ -90,10 +86,6 @@ class Library
     private function loader()
     {
         \PagSeguro\Library::initialize();
-        
-        //$moduleInfo =  $this->_objectManager->get('Magento\Framework\Module\ModuleList')->getOne('UOL_PagSeguro');
-        \PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease(\Magento\Framework\AppInterface::VERSION);
-        \PagSeguro\Library::moduleVersion()->setName($this->_moduleList->getOne('UOL_PagSeguro')['name'])->setRelease($this->_moduleList->getOne('UOL_PagSeguro')['setup_version']);
     }
     
     /**
