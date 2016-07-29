@@ -21,37 +21,35 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Adminhtml\Conciliation;
-
-use UOL\PagSeguro\Controller\Adminhtml\Conciliation;
+namespace UOL\PagSeguro\Controller\Adminhtml\Abandoned;
 
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
+use UOL\PagSeguro\Model\Transactions\Abandoned;
 
 /**
  * Class Conciliation
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Index extends \Magento\Backend\App\Action
+class Transport extends \Magento\Backend\App\Action
 {
 
     /**
-     * Result page factory
+     * Result json factory
      *
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var \Magento\Framework\Controller\Result\JsonFactory
      */
-    protected $_resultPageFactory;
+    protected $_resultJsonFactory;
 
     /**
      * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
         parent::__construct($context);
-        $this->_resultPageFactory = $resultPageFactory;
+        $this->_resultJsonFactory = $resultJsonFactory;
     }
 
     /**
@@ -59,16 +57,36 @@ class Index extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        if ($this->getRequest()->getQuery('ajax')) {
-            $this->_forward('grid');
-            return;
-        }
+        $requests = $this->getRequest()->getParams();
 
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
-        $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__('Conciliação'));
-        $resultPage->getLayout()->getBlock('adminhtml.block.pagseguro.conciliation.content')->setData('adminurl', $this->getAdminUrl());
-        return $resultPage;
+        $abandoned = new Abandoned(
+            $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+            $this->_objectManager->create('Magento\Framework\Mail\Template\TransportBuilder'),
+            $this->_objectManager->create('Magento\Backend\Model\Session'),
+            $this->_objectManager->create('Magento\Sales\Model\Order'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
+            $this->getRequest()->getParam('days')
+        );
+
+        /** @var \Magento\Framework\Controller\Result\Json $result */
+        $result = $this->_resultJsonFactory->create();
+
+        try {
+            return $result->setData([
+                'success' => true,
+                'payload' => [
+                    'data' => $abandoned->recoverTransaction($requests['data'])
+                ]
+            ]);
+        } catch (\Exception $exception) {
+            return $result->setData([
+                'success' => false,
+                'payload' => [
+                    'error' => $exception->getMessage()
+                ]
+            ]);
+        }
     }
 
     /**

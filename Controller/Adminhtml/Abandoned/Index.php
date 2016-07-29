@@ -21,7 +21,7 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Adminhtml\Conciliation;
+namespace UOL\PagSeguro\Controller\Adminhtml\Abandoned;
 
 use UOL\PagSeguro\Controller\Adminhtml\Conciliation;
 
@@ -66,8 +66,8 @@ class Index extends \Magento\Backend\App\Action
 
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__('Conciliação'));
-        $resultPage->getLayout()->getBlock('adminhtml.block.pagseguro.conciliation.content')->setData('adminurl', $this->getAdminUrl());
+        $resultPage->getConfig()->getTitle()->prepend(__('Abandonadas'));
+        $resultPage->getLayout()->getBlock('adminhtml.block.pagseguro.abandoned.content')->setData('adminurl', $this->getAdminUrl());
         return $resultPage;
     }
 

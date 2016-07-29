@@ -97,6 +97,14 @@ class Library
             $this->_scopeConfig->getValue('payment/pagseguro/environment')
         );
     }
+
+    /**
+     * Set the environment configured in the PagSeguro module
+     */
+    public function getEnvironment()
+    {
+       return $this->_scopeConfig->getValue('payment/pagseguro/environment');
+    }
     
     /**
      * Set the charset configured in the PagSeguro module

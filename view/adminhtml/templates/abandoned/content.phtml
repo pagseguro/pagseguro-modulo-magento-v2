@@ -5,13 +5,12 @@
             <thead>
             <tr>
                 <th class="data-grid-multicheck-cell">
-                        <input type="checkbox" id="conciliation-mass-select-checkbox" />
+                        <input type="checkbox" id="abandoned-mass-select-checkbox" />
                 </th>
                 <th class="data-grid-th _sortable _draggable">Data</th>
                 <th class="data-grid-th _sortable _draggable">ID Magento</th>
-                <th class="data-grid-th _sortable _draggable">ID PagSeguro</th>
-                <th class="data-grid-th _sortable _draggable">Status Magento</th>
-                <th class="data-grid-th _sortable _draggable">Status PagSeguro</th>
+                <th class="data-grid-th _sortable _draggable">Validade do Link</th>
+                <th class="data-grid-th _sortable _draggable">E-mails enviados</th>
                 <th class="data-grid-th _sortable _draggable">Ação</th>
             </tr>
             </thead>
@@ -34,8 +33,8 @@
             "pageLength": 10,
             "aaSorting": [[ 1, "desc" ]],
             "aoColumnDefs": [
-                { 'bSortable': false, 'aTargets': [ 0, 6] },
-                { "sClass": "tabela", 'aTargets': [ 1, 2, 3, 4, 5, 6 ] }
+                { 'bSortable': false, 'aTargets': [ 0, 5] },
+                { "sClass": "tabela", 'aTargets': [ 1, 2, 3, 4, 5 ] }
             ],
             // Creates paging and notifies when there is no record
             "oLanguage": {
@@ -55,52 +54,52 @@
                 }
 
                 //Disable/Enable conciliation button
-                $('[data-target="conciliation"]').on('click', function () {
+                $('[data-target="abandoned"]').on('click', function () {
                     enableOrDisable(this);
                 });
 
                 //Disable/Enable all conciliation button
-                $('#conciliation-mass-select-checkbox').on('click', function () {
+                $('#abandoned-mass-select-checkbox').on('click', function () {
                     enableOrDisable(this);
                 });
             }
         });
 
         // Search button observer
-        $('#conciliation-search').on('click', function(){
+        $('#abandoned-search').on('click', function(){
             var url = $('#adminurl').attr('data-target');
-            WS.Ajax.Conciliation.Search(url);
+            WS.Ajax.Abandoned.Search(url);
         });
 
-        // Conciliate button observer
-        $('#conciliation-conciliate').on('click', function(){
+        // Send e-mail's button observer
+        $('#abandoned-send-email').on('click', function(){
             var url = $('#adminurl').attr('data-target');
-            WS.Ajax.Conciliation.Conciliate(url);
+            WS.Ajax.Abandoned.Transport(url);
         });
 
         // Check/Uncheck all checkboxes.
-        $('#conciliation-mass-select-checkbox').on('click', function () {
+        $('#abandoned-mass-select-checkbox').on('click', function () {
             if (this.checked == true) {
-                $('[data-target="conciliation"]').prop('checked', true);
+                $('[data-target="abandoned"]').prop('checked', true);
             }
             if (this.checked == false) {
-                $('[data-target="conciliation"]').prop('checked', false);
+                $('[data-target="abandoned"]').prop('checked', false);
             }
         })
 
-        // Enable/Disable conciliation button
+        // Enable/Disable abandoned send email button
         function enableOrDisable(value) {
             if ( $(value).is(':checked') ) {
-                $('#conciliation-conciliate').removeAttr('disabled');
+                $('#abandoned-send-email').removeAttr('disabled');
             } else {
                 var hasOne = false;
-                jQuery.each($('[data-target="conciliation"]'), function(index, value) {
+                jQuery.each($('[data-target="abandoned"]'), function(index, value) {
                     if ( $(value).is(':checked') ) {
                         if (hasOne != true) hasOne = true;
                     }
                 });
                 if (hasOne === false) {
-                    $('#conciliation-conciliate').attr('disabled', 'disabled');
+                    $('#abandoned-send-email').attr('disabled', 'disabled');
                 }
             }
         }

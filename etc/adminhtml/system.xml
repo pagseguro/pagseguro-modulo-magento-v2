@@ -76,6 +76,11 @@
                     <comment>Selecione o tipo de checkout desejado.</comment>
                     <source_model>UOL\PagSeguro\Model\System\Config\Checkout</source_model>
                 </field>
+                <field id="abandoned_active" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>LISTAR TRANSAÇÕES ABANDONADAS?</label>
+                    <!--<tooltip>Deseja habilitar o módulo?</tooltip>-->
+                    <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+                </field>
             </group>
         </section>
     </system>
