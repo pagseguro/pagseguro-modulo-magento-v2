@@ -57,7 +57,8 @@ class Checkout extends \Magento\Framework\App\Action\Action
                 ->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
             $this->_objectManager->create('\Magento\Checkout\Model\Session'),
             $this->_objectManager
-                ->create('\Magento\Directory\Api\CountryInformationAcquirerInterface')
+                ->create('\Magento\Directory\Api\CountryInformationAcquirerInterface'),
+			$this->_objectManager->create('Magento\Framework\Module\ModuleList')
         );
     }
 

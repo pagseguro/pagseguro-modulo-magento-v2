@@ -21,36 +21,23 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-/**
- * Used in creating options for Sanbox|Production config value selection
- */
-namespace UOL\PagSeguro\Model\System\Config;
+namespace UOL\PagSeguro\Model\ResourceModel;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 /**
- * Class Environment
- * @package UOL\PagSeguro\Model\System\Config
+ * UOL PagSeguro Orders resource model
+ *
  */
-class Environment implements ArrayInterface
+class Orders extends AbstractDb
 {
     /**
+     * Define main table and its primary key
      *
+     * @return void
      */
-    const SANDBOX = "sandbox";
-    /**
-     *
-     */
-    const PRODUCTION = "production";
-
-    /**
-     * @return array of options
-     */
-    public function toOptionArray()
+    protected function _construct()
     {
-        return [
-            self::SANDBOX => __('Sandbox'),
-            self::PRODUCTION => __('Produção')
-        ];
+        $this->_init('pagseguro_orders', 'entity_id');
     }
 }

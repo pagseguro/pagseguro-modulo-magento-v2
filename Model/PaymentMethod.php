@@ -20,11 +20,8 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
-
 namespace UOL\PagSeguro\Model;
-
 use UOL\PagSeguro\Helper\Library;
-
 /**
  * Class PaymentMethod
  * @package UOL\PagSeguro\Model
@@ -45,13 +42,11 @@ class PaymentMethod
      * @var \PagSeguro\Domains\Requests\Payment
      */
     protected $_paymentRequest;
-
     /**
      *
      * @var \Magento\Directory\Api\CountryInformationAcquirerInterface
      */
     protected $_countryInformation;
-
     /**
      * PaymentMethod constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
@@ -60,15 +55,15 @@ class PaymentMethod
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation
+        \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
+		\Magento\Framework\Module\ModuleList $moduleList
     ) {
         $this->_scopeConfig = $scopeConfigInterface;
         $this->_checkoutSession = $checkoutSession;
         $this->_countryInformation = $countryInformation;
-        $this->_library = new Library($scopeConfigInterface);
+		$this->_library = new Library($scopeConfigInterface, $moduleList);
         $this->_paymentRequest = new \PagSeguro\Domains\Requests\Payment();
     }
-
     /**
      * @return \PagSeguroPaymentRequest
      */
@@ -79,42 +74,33 @@ class PaymentMethod
         
         // Order ID
         $this->_paymentRequest->setReference($this->getOrderStoreReference());
-
         //Shipping
         $this->setShippingInformation();
         $this->_paymentRequest->setShipping()->setType()
             ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
         $this->_paymentRequest->setShipping()->setCost()
             ->withParameters(number_format($this->getShippingAmount(), 2, '.', '')); //Shipping Coast
-
         // Sender
         $this->setSenderInformation();
-
         // Itens
         $this->setItemsInformation();
-
         //Redirect Url
-        $this->_paymentRequest->setRedirectUrl($this->getNotificationUrl());
-
+        $this->_paymentRequest->setRedirectUrl($this->getRedirectUrl());
         // Notification Url
-        $this->_paymentRequest->setNotificationUrl($this->getRedirectUrl());
-
+        $this->_paymentRequest->setNotificationUrl($this->getNotificationUrl());
         try {
             $this->_library->setEnvironment();
             $this->_library->setCharset();
             $this->_library->setLog();
-
             return $this->_paymentRequest->register(
                 $this->_library->getPagSeguroCredentials(),
                 $this->_library->isLightboxCheckoutType()
             );
-
         } catch (PagSeguroServiceException $ex) {
             $this->logger->debug($ex->getMessage());
             $this->getCheckoutRedirectUrl();
         }
     }
-
     /**
      * Get information of purchased items and set in the attribute $_paymentRequest
      * @return PagSeguroItem
@@ -131,36 +117,31 @@ class PaymentMethod
             );
         }
     }
-
     /**
      * Get customer information that are sent and set in the attribute $_paymentRequest
      */
     private function setSenderInformation()
     {
         $senderName = $this->_checkoutSession->getLastRealOrder()->getCustomerName();
-
         // If Guest
         if ($senderName == __('Guest')) {
             $address = $this->getBillingAddress();
             $senderName = $address->getFirstname() . ' ' . $address->getLastname();
         }
-
         $this->_paymentRequest->setSender()->setName($senderName);
         $this->_paymentRequest->setSender()->setEmail($this->_checkoutSession
             ->getLastRealOrder()->getCustomerEmail());
         $this->setSenderPhone();
         
     }
-
     /**
      * Get the shipping information and set in the attribute $_paymentRequest
      */
     private function setShippingInformation()
     {
         $shipping = $this->getShippingData();
-        $country = $this->_countryInformation->getCountryInfo($shipping['country_id']);
+		$country = $this->getCountryName($shipping['country_id']);
         $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
-
         $this->_paymentRequest->setShipping()->setAddress()->withParameters(
             $this->getShippingAddress($address[0], $shipping),
             $this->getShippingAddress($address[1]),
@@ -168,11 +149,10 @@ class PaymentMethod
             \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']),
             $shipping['city'],
             $this->getRegionAbbreviation($shipping['region']),
-            $country->getFullNameLocale(),
+            $country,
             $this->getShippingAddress($address[2])
         );
     }
-
     /**
      * @param $address
      * @param bool $shipping
@@ -188,7 +168,6 @@ class PaymentMethod
         }
         return null;
     }
-
     /**
      * Get the shipping Data of the Order
      * @return object $orderParams - Return parameters, of shipping of order
@@ -200,7 +179,6 @@ class PaymentMethod
         }
         return $this->_checkoutSession->getLastRealOrder()->getShippingAddress();
     }
-
     /**
      * @return mixed
      */
@@ -208,7 +186,6 @@ class PaymentMethod
     {
         return $this->_checkoutSession->getLastRealOrder()->getBaseShippingAmount();
     }
-
     /***
      * @param $code
      * @return string
@@ -218,7 +195,6 @@ class PaymentMethod
         $connectionData = new \PagSeguro\Resources\Connection\Data($this->_library->getPagSeguroCredentials());
         return $connectionData->buildPaymentResponseUrl() . "?code=$code";
     }
-
     /**
      * @return string
      */
@@ -281,5 +257,18 @@ class PaymentMethod
     private function getBillingAddress()
     {
         return $this->_checkoutSession->getLastRealOrder()->getBillingAddress();
+    }
+
+	/**
+     * Get the country name based on the $countryId
+     * 
+     * @param string $countryId
+     * @return string
+     */
+    private function getCountryName($countryId)
+    {
+        return (!empty($countryId)) ?
+            $this->_countryInformation->getCountryInfo($countryId)->getFullNameLocale() :
+            $countryId;
     }
 }

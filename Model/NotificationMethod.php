@@ -24,7 +24,8 @@
 namespace UOL\PagSeguro\Model;
 
 use UOL\PagSeguro\Helper\Data;
-use \UOL\PagSeguro\Helper\Library;
+use UOL\PagSeguro\Helper\Library;
+use Magento\Sales\Model\ResourceModel\Grid;
 
 class NotificationMethod
 {
@@ -41,26 +42,31 @@ class NotificationMethod
      * @var \Magento\Sales\Api\OrderRepositoryInterface
      */
     private $order;
+    /**
+     * @var Magento\Sales\Model\ResourceModel\Grid;
+     */
+    protected $_grid;
 
     /**
      * Notification constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
-     * @param \Magento\Checkout\Model\Session $session
      * @param \Magento\Sales\Api\OrderRepositoryInterface $order
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-        \Magento\Checkout\Model\Session $session,
         \Magento\Sales\Api\OrderRepositoryInterface $order,
-        \Magento\Sales\Api\Data\OrderStatusHistoryInterface $history
+        \Magento\Sales\Api\Data\OrderStatusHistoryInterface $history,
+        \Magento\Framework\Module\ModuleList $moduleList,
+        \Magento\Framework\Model\ResourceModel\Db\Context $context
     ) {
         $this->library = new Library(
             $scopeConfigInterface,
-            $session
+            $moduleList
         );
         $this->data = new Data();
         $this->order = $order;
         $this->history = $history;
+        $this->_grid = new Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
     }
 
     /**
@@ -78,7 +84,10 @@ class NotificationMethod
      */
     private function updateOrderStatus($payload)
     {
-        $transaction = $this->getTransaction($payload['code']);
+        $this->library->setEnvironment();
+        $this->library->setCharset();
+        $this->library->setLog();
+        $transaction = $this->getTransaction();
         $order = $this->order->get(
             $this->data->getReferenceDecryptOrderID(
                 $transaction->getReference()
@@ -86,17 +95,24 @@ class NotificationMethod
         );
 
         $status = $this->data->getStatusFromKey(
-            $transaction->getStatus()->getValue()
+            $transaction->getStatus()
         );
 
         if (!$this->compareStatus($status, $order->getStatus())) {
             $history = array (
-                'status'=>$this->history->setStatus($status),
-                'comment'=>$this->history->setComment('PagSeguro Notification')
+                'status' => $this->history->setStatus($status),
+                'comment' => $this->history->setComment('PagSeguro Notification')
             );
+            $transactionCode = $transaction->getCode();
+            $orderId = $order->getId();
+
             $order->setStatus($status);
             $order->setStatusHistories($history);
             $order->save();
+            
+            $this->updateSalesOrderGridTransactionCode($orderId, $transactionCode);
+            $this->updatePagSeguroOrdersTransactionCode($orderId, $transactionCode);
+            
         }
         return true;
     }
@@ -121,11 +137,10 @@ class NotificationMethod
      * @throws \Exception
      * @throws \PagSeguroServiceException
      */
-    private function getTransaction($code)
+    private function getTransaction()
     {
-        return \PagSeguroNotificationService::checkTransaction(
-            $this->library->getPagSeguroCredentials(),
-            $code
+        return \PagSeguro\Services\Transactions\Notification::check(
+            $this->library->getPagSeguroCredentials()
         );
     }
 
@@ -141,5 +156,33 @@ class NotificationMethod
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Update the sales_order_grid table transaction code
+     * @param int $orderId
+     * @param string $transactionCode
+     */
+    private function updateSalesOrderGridTransactionCode($orderId, $transactionCode) 
+    {
+        $this->_grid->getConnection()->query(
+            "UPDATE sales_order_grid
+            SET transaction_code='$transactionCode'
+            WHERE entity_id=$orderId"
+        );
+    }
+    
+    /**
+     * Update the pagseguro_orders table transaction code
+     * @param int $orderId
+     * @param string $transactionCode
+     */
+    private function updatePagSeguroOrdersTransactionCode($orderId, $transactionCode) 
+    {
+        $this->_grid->getConnection()->query(
+            "UPDATE pagseguro_orders
+            SET transaction_code='$transactionCode'
+            WHERE order_id=$orderId"
+        );
     }
 }

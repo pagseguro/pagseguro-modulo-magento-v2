@@ -20,9 +20,7 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
-
 namespace UOL\PagSeguro\Helper;
-
 /**
  * Class Library
  * @package UOL\PagSeguro\Helper
@@ -37,23 +35,26 @@ class Library
      *
      */
     const SANDBOX_JS = "https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js";
-
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
-
+	/**
+     * @var \Magento\Framework\Module\ModuleList
+     */
+	protected $_moduleList;
     /**
      * Library constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
+		\Magento\Framework\Module\ModuleList $moduleList
     ) {
+		$this->_moduleList = $moduleList;
         $this->loader();
         $this->_scopeConfig = $scopeConfigInterface;
     }
-
     /**
      * Get the access credential
      * @return PagSeguroAccountCredentials
@@ -64,10 +65,8 @@ class Library
         $token = $this->_scopeConfig->getValue('payment/pagseguro/token');
         //Set the credentials
         \PagSeguro\Configuration\Configure::setAccountCredentials($email, $token);
-
         return \PagSeguro\Configuration\Configure::getAccountCredentials();
     }
-
     /**
      * @return bool
      */
@@ -79,13 +78,15 @@ class Library
         }
         return false;
     }
-
     /**
      * Load library vendor
      */
     private function loader()
     {
         \PagSeguro\Library::initialize();
+		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease(\Magento\Framework\AppInterface::VERSION);
+        \PagSeguro\Library::moduleVersion()->setName($this->_moduleList->getOne('UOL_PagSeguro')['name'])
+			->setRelease($this->_moduleList->getOne('UOL_PagSeguro')['setup_version']);
     }
     
     /**
@@ -97,7 +98,6 @@ class Library
             $this->_scopeConfig->getValue('payment/pagseguro/environment')
         );
     }
-
     /**
      * Set the environment configured in the PagSeguro module
      */
@@ -127,3 +127,4 @@ class Library
         );
     }
 }
+
