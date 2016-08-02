@@ -12,6 +12,7 @@ var Modal = {
                 title: title,
                 content: content,
                 clickableOverlay: true,
+
             });
         });
     }
@@ -37,33 +38,39 @@ var WS = {
                     showLoader: true,
                 }).success(function(response) {
 
-                    var t = jQuery('#pagseguro-datatable').DataTable();
+                    if (response.success) {
 
-                    //Cleans up the table
-                    t.clear().draw();
+                        var t = jQuery('#pagseguro-datatable').DataTable();
 
-                    //Check the array for data, if not empty insert data else clear the table.
-                    if (response.payload.data.length > 0) {
-                        // Create a new table row for all array positions
-                        response.payload.data.forEach(function(item){
-                            t.row.add( [
-                                "<input type='checkbox' data-target='conciliation' data-block='"+item.details+"'/>",
-                                item.date,
-                                item.magento_id,
-                                item.pagseguro_id,
-                                item.magento_status,
-                                item.pagseguro_status,
-                                '<a href="'+url+'/sales/order/view/order_id/'+item.order_id+'/key/'+window.FORM_KEY+'" target="_blank">Ver detalhes</a>'
-                            ] );
-                            //Adjust column width
-                            t.columns.adjust().draw(false);
-                        });
+                        //Cleans up the table
+                        t.clear().draw();
+
+                        //Check the array for data, if not empty insert data else clear the table.
+                        if (response.payload.data.length > 0) {
+                            // Create a new table row for all array positions
+                            response.payload.data.forEach(function(item){
+                                t.row.add( [
+                                    "<input type='checkbox' data-target='conciliation' data-block='"+item.details+"'/>",
+                                    item.date,
+                                    item.magento_id,
+                                    item.pagseguro_id,
+                                    item.magento_status,
+                                    item.pagseguro_status,
+                                    '<a href="'+url+'/sales/order/view/order_id/'+item.order_id+'/key/'+window.FORM_KEY+'" target="_blank">Ver detalhes</a>'
+                                ] );
+                                //Adjust column width
+                                t.columns.adjust().draw(false);
+                            });
+                        } else {
+                            //Alert
+                            Modal.Load('Conciliação', 'Sem resultados para o período solicitado.');
+                        }
                     } else {
                         //Alert
-                        Modal.Load('Conciliação', 'Sem resultados para o período solicitado.');
+                        Modal.Load('Conciliação', 'Não foi possível executar esta ação. Tente novamente mais tarde.');
                     }
-
                 });
+
             },
             'Conciliate' : function(url)
             {
@@ -88,14 +95,20 @@ var WS = {
                     showLoader: true,
                 }).success(function(response) {
 
-                    if (response.success == true) {
-                        //Alert
-                        Modal.Load('Conciliação', 'Transações conciliadas com sucesso!');
-                    }
+                    if (response.success) {
 
-                    if (response.success == false) {
+                        if (response.success == true) {
+                            //Alert
+                            Modal.Load('Conciliação', 'Transações conciliadas com sucesso!');
+                        }
+
+                        if (response.success == false) {
+                            //Alert
+                            Modal.Load('Conciliação', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
+                        }
+                    } else {
                         //Alert
-                        Modal.Load('Conciliação', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
+                        Modal.Load('Conciliação', 'Não foi possível executar esta ação. Tente novamente mais tarde.');
                     }
                 });
             }
@@ -115,29 +128,35 @@ var WS = {
                     showLoader: true,
                 }).success(function (response) {
 
-                    var t = jQuery('#pagseguro-datatable').DataTable();
+                    if (response.success) {
 
-                    //Cleans up the table
-                    t.clear().draw();
+                        var t = jQuery('#pagseguro-datatable').DataTable();
 
-                    //Check the array for data, if not empty insert data else clear the table.
-                    if (response.payload.data.length > 0) {
-                        // Create a new table row for all array positions
-                        response.payload.data.forEach(function (item) {
-                            t.row.add([
-                                "<input type='checkbox' data-target='abandoned' data-block='" + item.details + "'/>",
-                                item.date,
-                                item.magento_id,
-                                item.validate,
-                                item.sent,
-                                '<a href="'+url+'/sales/order/view/order_id/'+item.order_id+'/key/'+window.FORM_KEY+'" target="_blank">Ver detalhes</a>'
-                            ]);
-                            //Adjust column width
-                            t.columns.adjust().draw(false);
-                        });
+                        //Cleans up the table
+                        t.clear().draw();
+
+                        //Check the array for data, if not empty insert data else clear the table.
+                        if (response.payload.data.length > 0) {
+                            // Create a new table row for all array positions
+                            response.payload.data.forEach(function (item) {
+                                t.row.add([
+                                    "<input type='checkbox' data-target='abandoned' data-block='" + item.details + "'/>",
+                                    item.date,
+                                    item.magento_id,
+                                    item.validate,
+                                    item.sent,
+                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a>'
+                                ]);
+                                //Adjust column width
+                                t.columns.adjust().draw(false);
+                            });
+                        } else {
+                            //Alert
+                            Modal.Load('Abandonadas', 'Sem resultados para o período solicitado.');
+                        }
                     } else {
                         //Alert
-                        Modal.Load('Abandonadas', 'Sem resultados para o período solicitado.');
+                        Modal.Load('Abandonadas', 'Não foi possível executar esta ação. Tente novamente mais tarde.');
                     }
 
                 });
@@ -165,14 +184,19 @@ var WS = {
                     showLoader: true,
                 }).success(function(response) {
 
-                    if (response.success == true) {
-                        //Alert
-                        Modal.Load('Abandonadas', 'Código de recuperação enviado com sucesso!');
-                    }
+                    if (response.success) {
 
-                    if (response.success == false) {
+                        if (response.success == true) {
+                            //Alert
+                            Modal.Load('Abandonadas', 'Código de recuperação enviado com sucesso!');
+                        }
+                        if (response.success == false) {
+                            //Alert
+                            Modal.Load('Abandonadas', 'Não foi possível executar esta ação. Utilize a recuperação de transações primeiro ou tente novamente mais tarde.');
+                        }
+                    } else {
                         //Alert
-                        Modal.Load('Abandonadas', 'Não foi possível executar esta ação. Utilize a recuperação de transações primeiro ou tente novamente mais tarde.');
+                        Modal.Load('Abandonadas', 'Não foi possível executar esta ação. Tente novamente mais tarde.');
                     }
                 });
             }

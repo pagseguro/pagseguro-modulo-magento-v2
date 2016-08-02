@@ -96,6 +96,6 @@ class Request extends \Magento\Backend\App\Action
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Conciliation');
+        return $this->_authorization->isAllowed('UOL_PagSeguro::Abandoned');
     }
 }

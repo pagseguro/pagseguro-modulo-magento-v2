@@ -1,10 +1,8 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
 <acl>
     <resources>
-        <resource id="UOL_PagSeguro::Conciliation" title="Conciliation" sortOrder="10">
-            <resource id="UOL_PagSeguro::Conciliation_save" title="Save test" sortOrder="10" />
-            <resource id="UOL_PagSeguro::Conciliation_delete" title="Delete test" sortOrder="20" />
-        </resource>
+        <resource id="UOL_PagSeguro::Conciliation" title="Conciliation" sortOrder="10" />
+        <resource id="UOL_PagSeguro::Abandoned" title="Abandoned" sortOrder="20" />
     </resources>
 </acl>
 </config>

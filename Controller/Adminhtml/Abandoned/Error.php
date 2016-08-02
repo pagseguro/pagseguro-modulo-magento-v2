@@ -32,7 +32,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class Conciliation
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Index extends \Magento\Backend\App\Action
+class Error extends \Magento\Backend\App\Action
 {
 
     /**
@@ -59,13 +59,9 @@ class Index extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        if (!$this->_isAccessible())
-            return $this->_redirect('pagseguro/abandoned/error');
-
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->_resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->prepend(__('Abandonadas'));
-        $resultPage->getLayout()->getBlock('adminhtml.block.pagseguro.abandoned.content')->setData('adminurl', $this->getAdminUrl());
         return $resultPage;
     }
 
@@ -79,18 +75,9 @@ class Index extends \Magento\Backend\App\Action
         return $this->_authorization->isAllowed('UOL_PagSeguro::Abandoned');
     }
 
-
-    /**
-     * Check if abandoned is available in config
-     *
-     * @return mixed
-     */
     private function _isAccessible()
     {
-        //Get instanceof \Magento\Framework\App\Config\ScopeConfigInterface
-        $scopeConfig = $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface');
-
-        return $scopeConfig->getValue('payment/pagseguro/abandoned_active');
+        return $this->_scopeConfig->getValue('payment/pagseguro/abandoned_active');
     }
 
     /**

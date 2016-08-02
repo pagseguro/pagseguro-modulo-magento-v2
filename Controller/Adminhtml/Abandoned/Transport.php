@@ -96,25 +96,6 @@ class Transport extends \Magento\Backend\App\Action
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Conciliation');
-    }
-
-    /**
-     * Generate Admin Url
-     *
-     * @return string
-     */
-    private function getAdminUrl()
-    {
-        //Get objects
-        $configReader = $this->_objectManager->create('Magento\Framework\App\DeploymentConfig\Reader');
-        $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
-
-        // Load config
-        $config = $configReader->load();
-        // Get front name
-        $adminSuffix = $config['backend']['frontName'];
-
-        return sprintf("%s%s", $storeManager->getStore()->getBaseUrl(), $adminSuffix);
+        return $this->_authorization->isAllowed('UOL_PagSeguro::Abandoned');
     }
 }

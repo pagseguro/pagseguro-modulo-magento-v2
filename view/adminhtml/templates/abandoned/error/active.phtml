@@ -1,0 +1,17 @@
+<script type="text/javascript">
+    require(["jquery", "datatables", "public"],function($) {
+        $(document).ready(function(){
+            //Disable checkbox
+            $("#abandoned-mass-select-checkbox").attr('disabled', 'disabled');
+            //Disable buttons
+            $("#abandoned-days").attr('disabled', 'disabled');
+            $("#abandoned-search").attr('disabled', 'disabled');
+            // Disable table
+            $("#pagseguro-datatable").css('pointer-events', 'none');
+            $("#pagseguro-datatable").css('opacity', '0.5');
+        });
+    });
+</script>
+<div class="col-m-12">
+    <div class="bg-danger abandoned-error">Erro: A consulta de transações abandonadas está desativada.</div>
+</div>

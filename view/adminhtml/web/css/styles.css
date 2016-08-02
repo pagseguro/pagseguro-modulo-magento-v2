@@ -9,7 +9,15 @@
     background-size: 100% 60%;
 }
 
-#conciliation-search {
+#conciliation-search, #abandoned-search {
     background: #77B800!important;
     border: 1px #639900 solid;
 }
+
+.abandoned-error {
+    height: 100px;
+    text-align: center;
+    padding: 40px;
+    margin-bottom: 20px;
+}
+
