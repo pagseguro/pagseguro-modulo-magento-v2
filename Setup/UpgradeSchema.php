@@ -23,22 +23,45 @@
 
 namespace UOL\PagSeguro\Setup;
  
-use Magento\Framework\Setup\InstallSchemaInterface;
+use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\DB\Ddl\Table;
  
-class InstallSchema implements InstallSchemaInterface
+class UpgradeSchema implements UpgradeSchemaInterface
 {
     /**
      * Pagseguro orders table name
      */
     const PAGSEGURO_ORDERS = 'pagseguro_orders';
     
-    public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
+    public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
- 
+        
+        //No previous version found, installation, InstallSchema was just executed
+        if(!$context->getVersion()) {
+        }
+        
+        //code to upgrade to 2.0.1
+        if (version_compare($context->getVersion(), '2.0.1') < 0) {
+            $this->createPagSeguroOrdersTable($setup);
+            $this->integratePagSeguroAndOrdersGrid($setup);
+            $this->cleanUiBookmark($setup);
+        }
+        
+        $setup->endSetup();
+        
+    }
+    
+    /**
+     * Create the pagseguro_orders table in the DB
+     * 
+     * @param Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @return void
+     */
+    private function createPagSeguroOrdersTable($setup) 
+    {
         // Get pagseguro orders table
         $tableName = $setup->getTable(self::PAGSEGURO_ORDERS);
         // Check if the table already exists
@@ -104,11 +127,6 @@ class InstallSchema implements InstallSchemaInterface
                 ->setOption('charset', 'utf8');
             $setup->getConnection()->createTable($table);
         }
-        $setup->endSetup();
-        
-        $this->integratePagSeguroAndOrdersGrid($setup);
-
-        $this->cleanUiBookmark($setup);
     }
     
     /**
@@ -119,8 +137,6 @@ class InstallSchema implements InstallSchemaInterface
      */
     private function integratePagSeguroAndOrdersGrid($setup)
     {
-        $setup->startSetup();
-
         //add transaction code column
         $setup->getConnection()
             ->addColumn(
@@ -144,8 +160,6 @@ class InstallSchema implements InstallSchemaInterface
                     'comment' => 'PagSeguro Environment'
                 ]
             );
-
-        $setup->endSetup();
     }
 
     /**
@@ -157,9 +171,7 @@ class InstallSchema implements InstallSchemaInterface
      */
     private function cleanUiBookmark($setup)
     {
-        $setup->startSetup();
         $setup->getConnection()
             ->delete('ui_bookmark', "namespace='sales_order_grid'");
-        $setup->endSetup();
     }
 }
