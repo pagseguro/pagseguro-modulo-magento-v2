@@ -4,9 +4,9 @@
 
 .page-wrapper {
     background: url(../images/background.png) no-repeat;
-    -moz-background-size: 100% 60%;
-    -webkit-background-size: 100% 60%;
-    background-size: 100% 60%;
+    -moz-background-size: 100% 40%;
+    -webkit-background-size: 100% 40%;
+    background-size: 100% 40%;
 }
 
 #conciliation-search, #abandoned-search {

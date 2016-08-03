@@ -59,7 +59,18 @@ class Index extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        if (!$this->_isAccessible())
+
+        /** @var \UOL\PagSeguro\Helper\Abandoned $abandonedHelper */
+        $abandonedHelper = $this->_objectManager->create('UOL\PagSeguro\Helper\Abandoned');
+        /** @var \UOL\PagSeguro\Helper\Auth $authHelper */
+        $authHelper = $this->_objectManager->create('UOL\PagSeguro\Helper\Auth');
+
+        /** Check for credentials **/
+        if (!$authHelper->hasCredentials())
+            return $this->_redirect('pagseguro/credentials/error');
+
+        /** Check if abandoned is already active**/
+        if (!$abandonedHelper->isActive())
             return $this->_redirect('pagseguro/abandoned/error');
 
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
@@ -79,20 +90,6 @@ class Index extends \Magento\Backend\App\Action
         return $this->_authorization->isAllowed('UOL_PagSeguro::Abandoned');
     }
 
-
-    /**
-     * Check if abandoned is available in config
-     *
-     * @return mixed
-     */
-    private function _isAccessible()
-    {
-        //Get instanceof \Magento\Framework\App\Config\ScopeConfigInterface
-        $scopeConfig = $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface');
-
-        return $scopeConfig->getValue('payment/pagseguro/abandoned_active');
-    }
-
     /**
      * Generate Admin Url
      *
@@ -100,15 +97,20 @@ class Index extends \Magento\Backend\App\Action
      */
     private function getAdminUrl()
     {
-        //Get objects
+        /** @var \Magento\Framework\App\DeploymentConfig\Reader $configReader */
         $configReader = $this->_objectManager->create('Magento\Framework\App\DeploymentConfig\Reader');
+        /** @var \Magento\Store\Model\StoreManagerInterface $storeManager */
         $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
 
-        // Load config
+        /** Load config */
         $config = $configReader->load();
-        // Get front name
+        /** Get front name */
         $adminSuffix = $config['backend']['frontName'];
 
-        return sprintf("%s%s", $storeManager->getStore()->getBaseUrl(), $adminSuffix);
+        return sprintf(
+            "%s%s",
+            $storeManager->getStore()->getBaseUrl(),
+            $adminSuffix
+        );
     }
 }

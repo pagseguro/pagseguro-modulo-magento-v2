@@ -21,18 +21,16 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Adminhtml\Conciliation;
-
-use UOL\PagSeguro\Controller\Adminhtml\Conciliation;
+namespace UOL\PagSeguro\Controller\Adminhtml\Credentials;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
 /**
- * Class Conciliation
- * @package UOL\PagSeguro\Controller\Adminhtml
+ * Class UOL\PagSeguro\Controller\Adminhtml\Credentials\Error
+ * @package UOL\PagSeguro\Controller\Adminhtml\Credentials
  */
-class Index extends \Magento\Backend\App\Action
+class Error extends \Magento\Backend\App\Action
 {
 
     /**
@@ -59,17 +57,9 @@ class Index extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        /** @var \UOL\PagSeguro\Helper\Auth $authHelper */
-        $authHelper = $this->_objectManager->create('UOL\PagSeguro\Helper\Auth');
-
-        /** Check for credentials **/
-        if (!$authHelper->hasCredentials())
-            return $this->_redirect('pagseguro/credentials/error');
-
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__('Conciliação'));
-        $resultPage->getLayout()->getBlock('adminhtml.block.pagseguro.conciliation.content')->setData('adminurl', $this->getAdminUrl());
+        $resultPage->getConfig()->getTitle()->prepend(__('PagSeguro'));
         return $resultPage;
     }
 
@@ -80,30 +70,6 @@ class Index extends \Magento\Backend\App\Action
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Conciliation');
-    }
-
-    /**
-     * Generate Admin Url
-     *
-     * @return string
-     */
-    private function getAdminUrl()
-    {
-        /** @var \Magento\Framework\App\DeploymentConfig\Reader $configReader */
-        $configReader = $this->_objectManager->create('Magento\Framework\App\DeploymentConfig\Reader');
-        /** @var \Magento\Store\Model\StoreManagerInterface $storeManager */
-        $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
-
-        /** Load config */
-        $config = $configReader->load();
-        /** Get front name */
-        $adminSuffix = $config['backend']['frontName'];
-
-        return sprintf(
-            "%s%s",
-            $storeManager->getStore()->getBaseUrl(),
-            $adminSuffix
-        );
+        return $this->_authorization->isAllowed('UOL_PagSeguro::Credentials');
     }
 }
