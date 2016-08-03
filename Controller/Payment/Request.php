@@ -26,11 +26,17 @@ namespace UOL\PagSeguro\Controller\Payment;
 use UOL\PagSeguro\Model\PaymentMethod;
 
 /**
- * Class Checkout
+ * Class Request
+ *
  * @package UOL\PagSeguro\Controller\Payment
  */
 class Request extends \Magento\Framework\App\Action\Action
 {
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $_checkoutSession;
 
     /**
      * @var \UOL\PagSeguro\Model\PaymentMethod
@@ -39,30 +45,47 @@ class Request extends \Magento\Framework\App\Action\Action
 
     /**
      * Request constructor.
+     *
      * @param \Magento\Framework\App\Action\Context $context
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context
     ) {
         parent::__construct($context);
+
+        $this->_checkoutSession = $this->_objectManager
+            ->create('\Magento\Checkout\Model\Session');
+
         $this->payment = new PaymentMethod(
             $this->_objectManager
                 ->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
-            $this->_objectManager
-                ->create('\Magento\Checkout\Model\Session'),
+            $this->_checkoutSession,
             $this->_objectManager
                 ->create('\Magento\Directory\Api\CountryInformationAcquirerInterface'),
-			$this->_objectManager->create('Magento\Framework\Module\ModuleList')
+            $this->_objectManager->create('Magento\Framework\Module\ModuleList')
         );
     }
 
     /**
      * Redirect to payment
+     *
      * @return \Magento\Framework\View\Result\PageFactory
      */
     public function execute()
     {
-        return $this->resultRedirectFactory->create()
-            ->setPath($this->payment->createPaymentRequest());
+        try {
+            return $this->resultRedirectFactory->create()->setPath($this->payment->createPaymentRequest());
+        } catch (\Exception $exception) {
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
+                $this->_checkoutSession->getLastRealOrder()->getId()
+            );
+            /** change payment status in magento */
+            $order->addStatusToHistory('pagseguro_cancelada', null, true);
+            /** save order */
+            $order->save();
+
+            return $this->_redirect('pagseguro/payment/failure');
+        }
     }
 }
