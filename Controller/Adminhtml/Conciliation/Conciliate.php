@@ -24,8 +24,7 @@
 namespace UOL\PagSeguro\Controller\Adminhtml\Conciliation;
 
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
-use UOL\PagSeguro\Model\Transactions\Conciliation;
+use UOL\PagSeguro\Model\Transactions\ConciliationMethod;
 
 /**
  * Class Conciliation
@@ -63,8 +62,9 @@ class Conciliate extends \Magento\Backend\App\Action
 
         $requests = $this->getRequest()->getParams();
 
-        $conciliation = new Conciliation(
+        $conciliation = new ConciliationMethod(
               $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+              $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
               $this->_objectManager->create('Magento\Backend\Model\Session'),
               $this->_objectManager->create('Magento\Sales\Model\Order'),
               $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),

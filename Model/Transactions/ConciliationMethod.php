@@ -29,7 +29,7 @@ use UOL\PagSeguro\Helper\Data;
  *
  * @package UOL\PagSeguro\Model\Transactions
  */
-class Conciliation
+class ConciliationMethod
 {
 
     /**
@@ -51,6 +51,11 @@ class Conciliation
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     private $_scopeConfig;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Grid
+     */
+    private $_salesGrid;
 
     /**
      * @var \Magento\Backend\Model\Session
@@ -83,6 +88,7 @@ class Conciliation
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
+        \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Backend\Model\Session $session,
         \Magento\Sales\Model\Order $order,
         \UOL\PagSeguro\Helper\Library $library,
@@ -98,6 +104,8 @@ class Conciliation
         $this->_crypt = $crypt;
         //load days by di
         $this->_days = $days;
+        // create new instanceof \Magento\Sales\Model\ResourceModel\Grid(
+        $this->_salesGrid = new \Magento\Sales\Model\ResourceModel\Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
     }
 
     /**
@@ -123,6 +131,9 @@ class Conciliation
                 $order->addStatusToHistory(Data::getStatusFromKey($config->pagseguro_status), null, true);
                 // save order
                 $order->save();
+
+                $this->updateSalesOrderGridTransactionCode($config->order_id, $config->pagseguro_id);
+                $this->updatePagSeguroOrdersTransactionCode($config->order_id, $config->pagseguro_id);
                 unset($order);
             }
             return true;
@@ -300,5 +311,35 @@ class Conciliation
     private function getStoreReference()
     {
         return $this->_scopeConfig->getValue('pagseguro/store/reference');
+    }
+
+    /**
+     * Update the sales_order_grid table transaction code
+     *
+     * @param int $orderId
+     * @param string $transactionCode
+     */
+    private function updateSalesOrderGridTransactionCode($orderId, $transactionCode)
+    {
+        $this->_salesGrid->getConnection()->query(
+            "UPDATE sales_order_grid
+            SET transaction_code='$transactionCode'
+            WHERE entity_id=$orderId"
+        );
+    }
+
+    /**
+     * Update the pagseguro_orders table transaction code
+     *
+     * @param int $orderId
+     * @param string $transactionCode
+     */
+    private function updatePagSeguroOrdersTransactionCode($orderId, $transactionCode)
+    {
+        $this->_salesGrid->getConnection()->query(
+            "UPDATE pagseguro_orders
+            SET transaction_code='$transactionCode'
+            WHERE order_id=$orderId"
+        );
     }
 }

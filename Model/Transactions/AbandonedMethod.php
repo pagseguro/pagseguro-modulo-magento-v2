@@ -29,7 +29,7 @@ use Magento\Store\Model\ScopeInterface;
  *
  * @package UOL\PagSeguro\Model\Transactions
  */
-class Abandoned
+class AbandonedMethod
 {
 
     /**
@@ -56,6 +56,11 @@ class Abandoned
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     private $_scopeConfig;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Grid
+     */
+    private $_salesGrid;
 
     /**
      * @var \Magento\Backend\Model\Session
@@ -89,6 +94,7 @@ class Abandoned
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
+        \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Backend\Model\Session $session,
         \Magento\Sales\Model\Order $order,
         \UOL\PagSeguro\Helper\Library $library,
@@ -105,6 +111,8 @@ class Abandoned
         $this->_crypt = $crypt;
         //load days by di
         $this->_days = $days;
+        // create new instanceof \Magento\Sales\Model\ResourceModel\Grid(
+        $this->_salesGrid = new \Magento\Sales\Model\ResourceModel\Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
     }
 
     /**
@@ -130,6 +138,11 @@ class Abandoned
 
                 // Send email
                 $this->sendEmail($order, $config->recovery_code);
+
+                //increment sent
+                $sent = current($this->getSent($config->order_id));
+                $sent++;
+                $this->setSent($config->order_id, $sent);
             }
             return true;
         } catch (\Exception $exception) {
@@ -179,7 +192,7 @@ class Abandoned
             'date'             => date("d/m/Y H:i:s", strtotime($order->getCreatedAt())),
             'magento_id'       => sprintf('#%s', $order->getIncrementId()),
             'validate'         => $this->abandonedIntervalToDate($order),
-            'sent'             => 0,
+            'sent'             => current($this->getSent($order->getId())),
             'order_id'         => $order->getId(),
             'details'          => $this->_crypt->encrypt('!QAWRRR$HU%W34tyh59yh544%', json_encode([
                 'order_id' => $order->getId(),
@@ -362,5 +375,28 @@ class Abandoned
     private function getStoreReference()
     {
         return $this->_scopeConfig->getValue('pagseguro/store/reference');
+    }
+
+    /**
+     * Get quantity of email was sent
+     *
+     * @param int $orderId
+     * @return array
+     */
+    private function getSent($orderId)
+    {
+        return $this->_salesGrid->getConnection()->query(
+            "SELECT sent FROM pagseguro_orders
+            WHERE order_id=$orderId"
+        )->fetch();
+    }
+
+    private function setSent($orderId, $sent)
+    {
+        $this->_salesGrid->getConnection()->query(
+            "UPDATE pagseguro_orders
+              SET sent={$sent}
+              WHERE order_id={$orderId}"
+        );
     }
 }

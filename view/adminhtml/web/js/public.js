@@ -173,8 +173,6 @@ var WS = {
                     var tr = jQuery(value).parent().parent();
                     // push row data to an array of rows
                     data[index] = jQuery(value).attr('data-block');
-                    // remove this row
-                    //t.row( tr ).remove().draw();
                 });
 
                 jQuery.ajax( {
@@ -187,8 +185,14 @@ var WS = {
                     if (response.success) {
 
                         if (response.success == true) {
-                            //Alert
+
+                            //Cleans up the table
+                            t.clear().draw();
+
+                            WS.Ajax.Abandoned.Search(url);
+
                             Modal.Load('Abandonadas', 'Código de recuperação enviado com sucesso!');
+
                         }
                         if (response.success == false) {
                             //Alert

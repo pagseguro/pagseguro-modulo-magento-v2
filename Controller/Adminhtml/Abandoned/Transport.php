@@ -24,7 +24,7 @@
 namespace UOL\PagSeguro\Controller\Adminhtml\Abandoned;
 
 use Magento\Backend\App\Action\Context;
-use UOL\PagSeguro\Model\Transactions\Abandoned;
+use UOL\PagSeguro\Model\Transactions\AbandonedMethod;
 
 /**
  * Class Conciliation
@@ -59,9 +59,10 @@ class Transport extends \Magento\Backend\App\Action
     {
         $requests = $this->getRequest()->getParams();
 
-        $abandoned = new Abandoned(
+        $abandoned = new AbandonedMethod(
             $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
             $this->_objectManager->create('Magento\Framework\Mail\Template\TransportBuilder'),
+            $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
             $this->_objectManager->create('Magento\Backend\Model\Session'),
             $this->_objectManager->create('Magento\Sales\Model\Order'),
             $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
