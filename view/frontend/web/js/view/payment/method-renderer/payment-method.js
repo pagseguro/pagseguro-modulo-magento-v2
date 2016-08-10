@@ -62,7 +62,9 @@ define(
                     'method': self.getCode()
                 })).done(function () {
                         $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                            if (window.checkoutConfig.payment.pagseguro.isLightbox) {
+                            if (window.checkoutConfig.payment.pagseguro.isDirect) {
+                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.direct);
+                            } else if (window.checkoutConfig.payment.pagseguro.isLightbox){
                                 $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
                             } else {
                                 $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);

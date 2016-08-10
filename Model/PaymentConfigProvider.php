@@ -59,10 +59,12 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
         $config = [
             'payment' => [
                 self::PAYMENT_METHOD_PAGSEGURO_CODE => [
+                    'isDirect'   => $this->method->isDirectCheckout(),
                     'isLightbox' => $this->method->isLightboxCheckoutType(),
-                    'checkout' => [
+                    'checkout'   => [
                         'lightbox' => $this->method->getLightboxCheckoutPaymentUrl(),
-                        'standard' => $this->method->getStandardCheckoutPaymentUrl()
+                        'standard' => $this->method->getStandardCheckoutPaymentUrl(),
+                        'direct'   => $this->method->getDirectCheckoutPaymentUrl()
                     ]
                 ]
             ]

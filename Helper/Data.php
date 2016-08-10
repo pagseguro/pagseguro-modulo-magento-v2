@@ -276,4 +276,28 @@ class Data
         }
         return ['areaCode' => $ddd, 'number' => $phone];
     }
+
+    /**
+     * Remove especial characters and keep only numbers of the $document and
+     * returns it and his type
+     *
+     * @param string $document
+     * @return array
+     * @throws Exception Invalid document
+     */
+    public function validateDocument($document)
+    {
+        $document = preg_replace('/[^0-9]/', '', $document);
+        switch (strlen($document)) {
+            case 14:
+                return ['document' => $document, 'type' => 'cnpj'];
+                break;
+            case 11:
+                return ['document' => $document, 'type' => 'cpf'];
+                break;
+            default:
+                throw new \Exception('Invalid document');
+                break;
+        }
+    }
 }

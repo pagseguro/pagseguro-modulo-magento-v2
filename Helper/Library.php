@@ -36,6 +36,15 @@ class Library
      */
     const SANDBOX_JS = "https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js";
     /**
+     *
+     */
+    const DIRECT_PAYMENT_URL = "https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js";
+    /**
+     *
+     */
+    const DIRECT_PAYMENT_URL_SANDBOX= "https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js";
+
+    /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
@@ -125,6 +134,27 @@ class Library
             $this->_scopeConfig->getValue('payment/pagseguro/log'),
             $this->_scopeConfig->getValue('payment/pagseguro/log_file')
         );
+    }
+
+    public function getSession()
+    {
+        try {
+            $session = \PagSeguro\Services\Session::create(
+                $this->getPagSeguroCredentials()
+            );
+            return $session->getResult();
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function getDirectPaymentUrl()
+    {
+        if ($this->getEnvironment() == 'sandbox') {
+            return Library::DIRECT_PAYMENT_URL_SANDBOX;
+        } else {
+            return Library::DIRECT_PAYMENT_URL;
+        }
     }
 }
 
