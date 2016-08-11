@@ -109,7 +109,7 @@ class BoletoMethod
 
     public function setSenderDocument($document)
     {
-        $this->_paymentRequest->setSender()->setDocument()->withParameters('cpf', $document);
+        $this->_paymentRequest->setSender()->setDocument()->withParameters($document['type'], $document['number']);
     }
 
     /**

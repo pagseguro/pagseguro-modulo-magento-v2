@@ -86,8 +86,7 @@ class Boleto extends \Magento\Framework\App\Action\Action
                 $this->_objectManager->create('Magento\Framework\Module\ModuleList')
             );
 
-            $helperData->validateDocument($senderDocument);
-            $boleto->setSenderDocument($senderDocument);
+            $boleto->setSenderDocument($helperData->formatDocument($senderDocument));
             $boleto->setSenderHash($senderHash);
 
             $response = $boleto->createPaymentRequest();
