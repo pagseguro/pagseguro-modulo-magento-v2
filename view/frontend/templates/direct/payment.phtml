@@ -105,30 +105,39 @@
                     </div>
                     <div class="tab-pane fade" id="tab2default">
                         <div class="col-md-8 col-md-offset-3">
-                            <p>Escolha seu banco abaixo onde deverá fazer o pagamento online.</p>
+
                             <form>
-                                <fieldset class="form-group">
+                                <!-- Text input-->
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label" for="card_cod">CPF/CNPJ</label>
+                                    <div class="col-md-4">
+                                        <input id="document-debit" name="document" type="text" placeholder="" class="form-control input-md">
+
+                                    </div>
+                                </div>
+                                <p>Escolha seu banco abaixo onde deverá fazer o pagamento online.</p>
+                                <fieldset id="bankList" class="form-group">
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                                            <input type="radio" name="bank" id="optionsRadios1" value="1" checked>
                                             Itaú
                                         </label>
                                     </div>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                                            <input type="radio" name="bank" id="optionsRadios2" value="2">
                                             Bradesco
                                         </label>
                                     </div>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                                            <input type="radio" name="bank" id="optionsRadios2" value="3">
                                             Santander
                                         </label>
                                     </div>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                                            <input type="radio" name="bank" id="optionsRadios2" value="4">
                                             Banco do Brasil
                                         </label>
                                     </div>
@@ -137,7 +146,7 @@
                         </div>
                         <!-- Text input-->
                         <div class="form-group row has-btn">
-                            <button class="btn btn-block btn-primary" id="payment-etf"> Pagar com débito online </button>
+                            <button class="btn btn-block btn-primary" id="payment-debit"> Pagar com débito online </button>
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab3default">
@@ -148,7 +157,7 @@
                                 <div class="form-group row">
                                     <label class="col-md-4 control-label" for="card_cod">CPF/CNPJ</label>
                                     <div class="col-md-4">
-                                        <input id="document" name="document" type="text" placeholder="" class="form-control input-md">
+                                        <input id="document-boleto" name="document" type="text" placeholder="" class="form-control input-md">
 
                                     </div>
                                 </div>
@@ -182,27 +191,44 @@
 
             $("#tabs").tabs();
 
+            function loadElements(service, bank = false)
+            {
+
+                $("#payment-"+service).trigger('processStart');
+
+                var data = new Array();
+                data['url'] = $('#adminurl').attr('data-target');
+                data['orderId'] = $('#order').attr('data-target');
+                data['sessionCode'] = $('#session-code').attr('data-target');
+                data['document'] = $('#document-'+service).val();
+
+                if (bank) {
+                    var bankId = $("#bankList input[type='radio']:checked");
+                    if (bankId.length > 0) {
+                        data['bank'] = bankId.val();
+                    }
+                }
+                return data;
+            }
+
             $('#payment-boleto').on('click', function(){
-//                $(this).attr('disabled', 'disabled');
-//                $("#tabs").attr('disabled', 'disabled');
-
-//                $(this).trigger('processStart');
-                var url = $('#adminurl').attr('data-target');
-                var id = $('#order').attr('data-target');
-                var sessionCode = $('#session-code').attr('data-target');
-                var document = $('#document').val();
-
-                PagSeguroDirectPayment.setSessionId(sessionCode);
+                var el = loadElements('boleto');
+                PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
-
                 setTimeout(function () {
-                    WS.Ajax.Direct.Boleto.Payment(url, id, hash, document);
+                    WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
                 }, 5000);
 
             });
 
-
+            $('#payment-debit').on('click', function(){
+                var el = loadElements('debit', true);
+                PagSeguroDirectPayment.setSessionId(el.sessionCode);
+                var hash = PagSeguroDirectPayment.getSenderHash();
+                setTimeout(function () {
+                    WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
+                }, 5000);
+            });
         }
     );
-
 </script>

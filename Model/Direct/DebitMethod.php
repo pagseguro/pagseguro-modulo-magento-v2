@@ -27,7 +27,7 @@ use UOL\PagSeguro\Helper\Library;
  * Class PaymentMethod
  * @package UOL\PagSeguro\Model
  */
-class BoletoMethod
+class DebitMethod
 {
     /**
      * @var \Magento\Checkout\Model\Session
@@ -63,7 +63,7 @@ class BoletoMethod
         $this->_order = $order;
         $this->_countryInformation = $countryInformation;
 		$this->_library = new Library($scopeConfigInterface, $moduleList);
-        $this->_paymentRequest = new \PagSeguro\Domains\Requests\DirectPayment\Boleto();
+        $this->_paymentRequest = new \PagSeguro\Domains\Requests\DirectPayment\OnlineDebit();
     }
     /**
      * @return \PagSeguroPaymentRequest
@@ -103,6 +103,16 @@ class BoletoMethod
     }
 
     /**
+     * Set bank name
+     *
+     * @param $name
+     */
+    public function setBankName($name)
+    {
+        $this->_paymentRequest->setBankName(htmlentities($name));
+    }
+
+    /**
      * Set sender hash
      *
      * @param $hash
@@ -137,6 +147,7 @@ class BoletoMethod
             );
         }
     }
+
     /**
      * Get customer information that are sent and set in the attribute $_paymentRequest
      */

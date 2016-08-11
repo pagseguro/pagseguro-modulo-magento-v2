@@ -46,9 +46,27 @@ var WS = {
                         window.location.href = response.payload.redirect;
                     });
                 }
+            },
+            'OnlineDebit': {
+
+                'Payment' : function (url, id, hash, document, bank) {
+
+                    jQuery.ajax({
+                        url: url + 'pagseguro/direct/debit',
+                        data: {
+                            form_key: window.FORM_KEY,
+                            order_id: id,
+                            sender_hash : hash,
+                            sender_document : document,
+                            bank_name:bank
+                        },
+                        type: 'POST',
+                        showLoader: true,
+                    }).success(function (response) {
+                        window.location.href = response.payload.redirect;
+                    });
+                }
             }
         }
     }
 }
-
-

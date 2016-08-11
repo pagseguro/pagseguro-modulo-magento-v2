@@ -23,14 +23,21 @@
 
 namespace UOL\PagSeguro\Controller\Direct;
 
-use UOL\PagSeguro\Model\Direct\BoletoMethod;
+use UOL\PagSeguro\Model\Direct\DebitMethod;
 
 /**
  * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
  */
-class Boleto extends \Magento\Framework\App\Action\Action
+class Debit extends \Magento\Framework\App\Action\Action
 {
+
+    private $bankList = array(
+        1 => 'itau',
+        2 => 'bradesco',
+        3 => 'santander',
+        4 => 'bancodobrasil'
+    );
 
     /** @var  \Magento\Framework\View\Result\Page */
     protected $resultJsonFactory;
@@ -64,6 +71,10 @@ class Boleto extends \Magento\Framework\App\Action\Action
 
         $orderEntity = $this->getRequest()->getParam('order_id');
         $senderHash = $this->getRequest()->getParam('sender_hash');
+        $bankName = $this->getRequest()->getParam('bank_name');
+        if (filter_var($bankName, FILTER_VALIDATE_INT)) {
+            $bankName = $this->bankList[$bankName];
+        }
         $senderDocument = $this->getRequest()->getParam('sender_document');
 
         /** @var \UOL\PagSeguro\Helper\Data $helperData */
@@ -79,19 +90,18 @@ class Boleto extends \Magento\Framework\App\Action\Action
         $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
 
         try {
-            $boleto = new BoletoMethod(
+            $debit = new DebitMethod(
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
                 $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderEntity),
                 $this->_objectManager->create('Magento\Directory\Api\CountryInformationAcquirerInterface'),
                 $this->_objectManager->create('Magento\Framework\Module\ModuleList')
             );
 
-            $boleto->setSenderDocument($helperData->formatDocument($senderDocument));
-            $boleto->setSenderHash($senderHash);
+            $debit->setSenderDocument($helperData->formatDocument($senderDocument));
+            $debit->setBankName($bankName);
+            $debit->setSenderHash($senderHash);
 
-            $response = $boleto->createPaymentRequest();
-
-            $this->changeOrderHistory($orderEntity, 'pagseguro_aguardando_pagamento');
+            $response = $debit->createPaymentRequest();
 
             return $result->setData([
                 'success' => true,
@@ -107,8 +117,14 @@ class Boleto extends \Magento\Framework\App\Action\Action
             ]);
 
         } catch (\Exception $exception) {
-
-            $this->changeOrderHistory($orderEntity, 'pagseguro_cancelada');
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
+                $orderEntity
+            );
+            /** change payment status in magento */
+            $order->addStatusToHistory('pagseguro_cancelada', null, true);
+            /** save order */
+            $order->save();
 
             return $result->setData([
                 'success' => false,
@@ -118,17 +134,5 @@ class Boleto extends \Magento\Framework\App\Action\Action
                 ]
             ]);
         }
-    }
-
-    private function changeOrderHistory($orderId, $status)
-    {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-            $orderId
-        );
-        /** change payment status in magento */
-        $order->addStatusToHistory($status, null, true);
-        /** save order */
-        $order->save();
     }
 }
