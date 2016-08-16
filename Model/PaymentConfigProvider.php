@@ -52,6 +52,8 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
     }
 
     /**
+     * Get payment config
+     *
      * @return array
      */
     public function getConfig()

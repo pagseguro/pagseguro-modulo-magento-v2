@@ -95,17 +95,25 @@ class ConciliationMethod
         \UOL\PagSeguro\Helper\Crypt $crypt,
         $days = null
     ) {
-        //load magento dependencies by di
+        /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var  \Magento\Backend\Model\Session  _session */
         $this->_session = $session;
+        /** @var \Magento\Sales\Model\Order _order */
         $this->_order = $order;
-        //load helpers by di
+        /** @var \UOL\PagSeguro\Helper\Library _library */
         $this->_library = $library;
+        /** @var \UOL\PagSeguro\Helper\Crypt _crypt */
         $this->_crypt = $crypt;
-        //load days by di
+        /** @var int _days */
         $this->_days = $days;
-        // create new instanceof \Magento\Sales\Model\ResourceModel\Grid(
-        $this->_salesGrid = new \Magento\Sales\Model\ResourceModel\Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
+        /** @var \Magento\Sales\Model\ResourceModel\Grid _salesGrid */
+        $this->_salesGrid = new \Magento\Sales\Model\ResourceModel\Grid(
+            $context,
+            'pagseguro_orders',
+            'sales_order_grid',
+            'order_id'
+        );
     }
 
     /**

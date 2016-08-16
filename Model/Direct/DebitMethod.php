@@ -20,11 +20,14 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
+
 namespace UOL\PagSeguro\Model\Direct;
 
 use UOL\PagSeguro\Helper\Library;
+use PagSeguro\Domains\Requests\DirectPayment\OnlineDebit;
+
 /**
- * Class PaymentMethod
+ * Class DebitMethod
  * @package UOL\PagSeguro\Model
  */
 class DebitMethod
@@ -33,6 +36,7 @@ class DebitMethod
      * @var \Magento\Checkout\Model\Session
      */
     protected $_checkoutSession;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -43,15 +47,20 @@ class DebitMethod
      * @var \PagSeguro\Domains\Requests\Payment
      */
     protected $_paymentRequest;
+
     /**
      *
      * @var \Magento\Directory\Api\CountryInformationAcquirerInterface
      */
     protected $_countryInformation;
+
     /**
-     * PaymentMethod constructor.
+     * DebitMethod constructor.
+     *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
-     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation
+     * @param \Magento\Framework\Module\ModuleList $moduleList
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
@@ -59,14 +68,20 @@ class DebitMethod
         \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
 		\Magento\Framework\Module\ModuleList $moduleList
     ) {
+        /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var \Magento\Sales\Model\Order _order */
         $this->_order = $order;
+        /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _countryInformation */
         $this->_countryInformation = $countryInformation;
-		$this->_library = new Library($scopeConfigInterface, $moduleList);
-        $this->_paymentRequest = new \PagSeguro\Domains\Requests\DirectPayment\OnlineDebit();
+        /** @var \UOL\PagSeguro\Helper\Library _library */
+        $this->_library = new Library($scopeConfigInterface, $moduleList);
+        /** @var \PagSeguro\Domains\Requests\DirectPayment\OnlineDebit _paymentRequest */
+        $this->_paymentRequest = new OnlineDebit();
     }
     /**
-     * @return \PagSeguroPaymentRequest
+     * @return string
+     * @throws \Exception
      */
     public function createPaymentRequest()
     {
@@ -74,7 +89,7 @@ class DebitMethod
         $this->_paymentRequest->setCurrency("BRL");
         // Order ID
         $this->_paymentRequest->setReference($this->getOrderStoreReference());
-        //Shipping
+        // Shipping
         $this->setShippingInformation();
         $this->_paymentRequest->setShipping()->setType()
             ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
@@ -84,7 +99,7 @@ class DebitMethod
         $this->setSenderInformation();
         // Itens
         $this->setItemsInformation();
-        //Redirect Url
+        // Redirect Url
         $this->_paymentRequest->setRedirectUrl($this->getRedirectUrl());
         // Notification Url
         $this->_paymentRequest->setNotificationUrl($this->getNotificationUrl());
@@ -96,8 +111,8 @@ class DebitMethod
             return $this->_paymentRequest->register(
                 $this->_library->getPagSeguroCredentials()
             );
-        } catch (PagSeguroServiceException $ex) {
-            $this->logger->debug($ex->getMessage());
+        } catch (\Exception $exception) {
+            $this->logger->debug($exception->getMessage());
             $this->getCheckoutRedirectUrl();
         }
     }
@@ -205,6 +220,8 @@ class DebitMethod
     }
 
     /**
+     * Get shipping address
+     *
      * @param $address
      * @param bool $shipping
      * @return array|null
@@ -219,8 +236,10 @@ class DebitMethod
         }
         return null;
     }
+
     /**
      * Get the shipping Data of the Order
+     *
      * @return object $orderParams - Return parameters, of shipping of order
      */
     private function getShippingData()
@@ -232,6 +251,8 @@ class DebitMethod
     }
 
     /**
+     * Get shipping amount from magento order
+     *
      * @return mixed
      */
     private function getShippingAmount()
@@ -240,6 +261,8 @@ class DebitMethod
     }
 
     /**
+     * Get store reference in magento core_config_data
+     *
      * @return string
      */
     private function getOrderStoreReference()
@@ -252,17 +275,21 @@ class DebitMethod
 
     /**
      * Get a brazilian region name and return the abbreviation if it exists
+     *
      * @param string $regionName
      * @return string
      */
     private function getRegionAbbreviation($regionName)
     {
         $regionAbbreviation = new \PagSeguro\Enum\Address();
-        return (is_string($regionAbbreviation->getType($regionName))) ? $regionAbbreviation->getType($regionName) : $regionName;
+        return (is_string($regionAbbreviation->getType($regionName))) ?
+            $regionAbbreviation->getType($regionName) :
+            $regionName;
     }
 
     /**
      * Get the store notification url
+     *
      * @return string
      */
     public function getNotificationUrl()
@@ -272,6 +299,7 @@ class DebitMethod
 
     /**
      * Get the store redirect url
+     *
      * @return string
      */
     public function getRedirectUrl()
@@ -282,6 +310,7 @@ class DebitMethod
 
     /**
      * Get the billing address data of the Order
+     *
      * @return \Magento\Sales\Model\Order\Address|null
      */
     private function getBillingAddress()

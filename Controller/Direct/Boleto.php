@@ -62,8 +62,11 @@ class Boleto extends \Magento\Framework\App\Action\Action
     public function execute()
     {
 
+        /** @var $_POST['order_id'] $orderEntity */
         $orderEntity = $this->getRequest()->getParam('order_id');
+        /** @var $_POST['sender_hash'] $senderHash */
         $senderHash = $this->getRequest()->getParam('sender_hash');
+        /** @var $_POST['sender_document'] $senderDocument */
         $senderDocument = $this->getRequest()->getParam('sender_document');
 
         /** @var \UOL\PagSeguro\Helper\Data $helperData */
@@ -79,6 +82,7 @@ class Boleto extends \Magento\Framework\App\Action\Action
         $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
 
         try {
+            /** @var \UOL\PagSeguro\Model\Direct\BoletoMethod $boleto */
             $boleto = new BoletoMethod(
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
                 $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderEntity),
@@ -89,6 +93,7 @@ class Boleto extends \Magento\Framework\App\Action\Action
             $boleto->setSenderDocument($helperData->formatDocument($senderDocument));
             $boleto->setSenderHash($senderHash);
 
+            /** @var \PagSeguro\Parsers\Transaction\Boleto\Response $response */
             $response = $boleto->createPaymentRequest();
 
             $this->changeOrderHistory($orderEntity, 'pagseguro_aguardando_pagamento');
@@ -120,6 +125,12 @@ class Boleto extends \Magento\Framework\App\Action\Action
         }
     }
 
+    /**
+     * Change the magento order status
+     *
+     * @param $orderId
+     * @param $status
+     */
     private function changeOrderHistory($orderId, $status)
     {
         /** @var \Magento\Sales\Model\Order $order */

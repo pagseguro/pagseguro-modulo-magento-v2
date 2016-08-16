@@ -20,11 +20,14 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
+
 namespace UOL\PagSeguro\Model\Direct;
 
 use UOL\PagSeguro\Helper\Library;
+use PagSeguro\Domains\Requests\DirectPayment\Boleto;
+
 /**
- * Class PaymentMethod
+ * Class BoletoMethod
  * @package UOL\PagSeguro\Model
  */
 class BoletoMethod
@@ -33,6 +36,7 @@ class BoletoMethod
      * @var \Magento\Checkout\Model\Session
      */
     protected $_checkoutSession;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -43,15 +47,21 @@ class BoletoMethod
      * @var \PagSeguro\Domains\Requests\Payment
      */
     protected $_paymentRequest;
+
     /**
      *
      * @var \Magento\Directory\Api\CountryInformationAcquirerInterface
      */
     protected $_countryInformation;
+
+
     /**
-     * PaymentMethod constructor.
+     * BoletoMethod constructor.
+     *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
-     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation
+     * @param \Magento\Framework\Module\ModuleList $moduleList
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
@@ -59,14 +69,23 @@ class BoletoMethod
         \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
 		\Magento\Framework\Module\ModuleList $moduleList
     ) {
+        /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var \Magento\Sales\Model\Order _order */
         $this->_order = $order;
+        /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _countryInformation */
         $this->_countryInformation = $countryInformation;
+        /** @var \UOL\PagSeguro\Helper\Library _library */
 		$this->_library = new Library($scopeConfigInterface, $moduleList);
-        $this->_paymentRequest = new \PagSeguro\Domains\Requests\DirectPayment\Boleto();
+        /** @var \PagSeguro\Domains\Requests\DirectPayment\Boleto _paymentRequest */
+        $this->_paymentRequest = new Boleto();
     }
+
     /**
-     * @return \PagSeguroPaymentRequest
+     * Create a new pagseguro direct payment request
+     *
+     * @return string
+     * @throws \Exception
      */
     public function createPaymentRequest()
     {
@@ -96,8 +115,8 @@ class BoletoMethod
             return $this->_paymentRequest->register(
                 $this->_library->getPagSeguroCredentials()
             );
-        } catch (PagSeguroServiceException $ex) {
-            $this->logger->debug($ex->getMessage());
+        } catch (\Exception $exception) {
+            $this->logger->debug($exception->getMessage());
             $this->getCheckoutRedirectUrl();
         }
     }
@@ -194,6 +213,8 @@ class BoletoMethod
     }
 
     /**
+     * Get shipping address
+     *
      * @param $address
      * @param bool $shipping
      * @return array|null
@@ -210,6 +231,7 @@ class BoletoMethod
     }
     /**
      * Get the shipping Data of the Order
+     *
      * @return object $orderParams - Return parameters, of shipping of order
      */
     private function getShippingData()
@@ -221,6 +243,8 @@ class BoletoMethod
     }
 
     /**
+     * Get shipping amount from magento order
+     *
      * @return mixed
      */
     private function getShippingAmount()
@@ -229,6 +253,8 @@ class BoletoMethod
     }
 
     /**
+     * Get store reference from magento core_config_data
+     *
      * @return string
      */
     private function getOrderStoreReference()
@@ -241,17 +267,21 @@ class BoletoMethod
 
     /**
      * Get a brazilian region name and return the abbreviation if it exists
+     *
      * @param string $regionName
      * @return string
      */
     private function getRegionAbbreviation($regionName)
     {
         $regionAbbreviation = new \PagSeguro\Enum\Address();
-        return (is_string($regionAbbreviation->getType($regionName))) ? $regionAbbreviation->getType($regionName) : $regionName;
+        return (is_string($regionAbbreviation->getType($regionName))) ?
+            $regionAbbreviation->getType($regionName) :
+            $regionName;
     }
 
     /**
      * Get the store notification url
+     *
      * @return string
      */
     public function getNotificationUrl()
@@ -261,6 +291,7 @@ class BoletoMethod
 
     /**
      * Get the store redirect url
+     *
      * @return string
      */
     public function getRedirectUrl()
@@ -271,6 +302,7 @@ class BoletoMethod
 
     /**
      * Get the billing address data of the Order
+     *
      * @return \Magento\Sales\Model\Order\Address|null
      */
     private function getBillingAddress()

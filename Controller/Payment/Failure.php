@@ -32,17 +32,12 @@ use UOL\PagSeguro\Model\PaymentMethod;
 class Failure extends \Magento\Framework\App\Action\Action
 {
 
-    /** @var  \Magento\Framework\View\Result\Page */
-    protected $resultPageFactory;
-
-    /**
-     * @var \UOL\PagSeguro\Model\PaymentMethod
-     */
-    protected $payment;
-
+    /** @var \Magento\Framework\View\Result\PageFactory */
+    protected $_resultPageFactory;
 
     /**
      * Checkout constructor.
+     * 
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
@@ -51,16 +46,19 @@ class Failure extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
+        /** @var  \Magento\Framework\View\Result\PageFactory _resultPageFactory*/
+        $this->_resultPageFactory = $resultPageFactory;
     }
 
     /**
-     * Show payment page
+     * Show failure page
+     *
      * @return \Magento\Framework\View\Result\PageFactory
      */
     public function execute()
     {
-        $resultPage = $this->resultPageFactory->create();
+        /** @var  \Magento\Framework\View\Result\PageFactory $resultPage*/
+        $resultPage = $this->_resultPageFactory->create();
         return $resultPage;
     }
 }

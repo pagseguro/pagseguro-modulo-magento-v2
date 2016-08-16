@@ -20,7 +20,9 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
+
 namespace UOL\PagSeguro\Helper;
+
 /**
  * Class Library
  * @package UOL\PagSeguro\Helper
@@ -92,8 +94,13 @@ class Library
      */
     private function loader()
     {
+        /** @var \Magento\Framework\App\ObjectManager $objectManager */
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
+        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+
         \PagSeguro\Library::initialize();
-		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease(\Magento\Framework\AppInterface::VERSION);
+		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease($productMetadata->getVersion());
         \PagSeguro\Library::moduleVersion()->setName($this->_moduleList->getOne('UOL_PagSeguro')['name'])
 			->setRelease($this->_moduleList->getOne('UOL_PagSeguro')['setup_version']);
     }
@@ -136,6 +143,13 @@ class Library
         );
     }
 
+
+    /**
+     * Get session
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public function getSession()
     {
         try {
@@ -148,6 +162,11 @@ class Library
         }
     }
 
+    /**
+     * Get direct payment url
+     *
+     * @return string
+     */
     public function getDirectPaymentUrl()
     {
         if ($this->getEnvironment() == 'sandbox') {

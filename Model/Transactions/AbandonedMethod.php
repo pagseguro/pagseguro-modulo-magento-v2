@@ -23,6 +23,7 @@
 
 namespace UOL\PagSeguro\Model\Transactions;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Sales\Model\ResourceModel\Grid;
 
 /**
  * Class Conciliation
@@ -101,18 +102,27 @@ class AbandonedMethod
         \UOL\PagSeguro\Helper\Crypt $crypt,
         $days = null
     ) {
-        //load magento dependencies by di
+        /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var  \Magento\Backend\Model\Session  _session */
         $this->_session = $session;
+        /** @var \Magento\Sales\Model\Order _order */
         $this->_order = $order;
+        /** @var \Magento\Framework\Mail\Template\TransportBuilder _transportBuilder */
         $this->_transportBuilder = $transportBuilder;
-        //load helpers by di
+        /** @var \UOL\PagSeguro\Helper\Library _library */
         $this->_library = $library;
+        /** @var \UOL\PagSeguro\Helper\Crypt _crypt */
         $this->_crypt = $crypt;
-        //load days by di
+        /** @var int _days */
         $this->_days = $days;
-        // create new instanceof \Magento\Sales\Model\ResourceModel\Grid(
-        $this->_salesGrid = new \Magento\Sales\Model\ResourceModel\Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
+        /** @var \Magento\Sales\Model\ResourceModel\Grid _salesGrid */
+        $this->_salesGrid = new Grid(
+            $context,
+            'pagseguro_orders',
+            'sales_order_grid',
+            'order_id'
+        );
     }
 
     /**
@@ -126,7 +136,6 @@ class AbandonedMethod
 
         try {
             foreach ($data as $transaction) {
-
                 // decrypt data from ajax
                 $config = $this->_crypt->decrypt('!QAWRRR$HU%W34tyh59yh544%', $transaction);
                 // sanitize special chars for url format
@@ -135,10 +144,8 @@ class AbandonedMethod
                 $config = json_decode($config);
                 // load order by id
                 $order = $this->_order->load($config->order_id);
-
                 // Send email
                 $this->sendEmail($order, $config->recovery_code);
-
                 //increment sent
                 $sent = current($this->getSent($config->order_id));
                 $sent++;
@@ -157,16 +164,16 @@ class AbandonedMethod
      */
     public function requestAbandonedTransactions()
     {
-
         //load payments by date
         $this->getPagSeguroAbandoned();
-
         if ($this->_PagSeguroPaymentList->getTransactions()) {
             foreach ($this->_PagSeguroPaymentList->getTransactions() as $payment) {
 
                 $order = \UOL\PagSeguro\Helper\Data::getReferenceDecryptOrderID($payment->getReference());
                 $order = $this->_order->load($order);
-                if ($this->getStoreReference() == \UOL\PagSeguro\Helper\Data::getReferenceDecrypt($payment->getReference())) {
+                if ($this->getStoreReference() == \UOL\PagSeguro\Helper\Data::getReferenceDecrypt(
+                    $payment->getReference())
+                ) {
                     if (!is_null($this->_session->getData('store_id'))) {
                         array_push($this->_arrayPayments, $this->build($payment, $order));
                     }
@@ -320,7 +327,8 @@ class AbandonedMethod
 
     /**
      * Converts a day interval to date.
-     * @param DateTime $orderCreatedAt
+     *
+     * @param \DateTime $order
      * @return string
      */
     private function abandonedIntervalToDate($order)
@@ -334,6 +342,7 @@ class AbandonedMethod
 
     /**
      * Build a URL for recovery a PagSeguroTransaction
+     *
      * @param string $recoveryCode
      * @return URI
      */
@@ -391,6 +400,13 @@ class AbandonedMethod
         )->fetch();
     }
 
+
+    /**
+     * Increments a sent for a order in pagseguro_orders table.
+     *
+     * @param $orderId
+     * @param $sent
+     */
     private function setSent($orderId, $sent)
     {
         $this->_salesGrid->getConnection()->query(
