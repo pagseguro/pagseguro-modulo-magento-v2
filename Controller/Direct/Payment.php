@@ -21,67 +21,63 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Payment;
+namespace UOL\PagSeguro\Controller\Direct;
 
 use UOL\PagSeguro\Model\PaymentMethod;
 
 /**
- * Class Request
- *
+ * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
  */
-class Request extends \Magento\Framework\App\Action\Action
+class Payment extends \Magento\Framework\App\Action\Action
 {
 
-    /** @var \Magento\Framework\View\Result\PageFactory */
-    protected $_resultRedirectFactory;
-    
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    private $_checkoutSession;
+    /** @var  \Magento\Framework\View\Result\Page */
+    protected $_resultPageFactory;
+
+    /** @var \Magento\Checkout\Model\Session */
+    protected $_checkoutSession;
+
+    /** @var \UOL\PagSeguro\Helper\Library */
+    protected $_library;
 
     /**
-     * @var \UOL\PagSeguro\Model\PaymentMethod
-     */
-    private $_payment;
-
-    /**
-     * Request constructor.
-     *
+     * Checkout constructor.
      * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
-
-        /** @var \Magento\Framework\Controller\Result\RedirectFactory _resultPageFactory*/
-        $this->_resultRedirectFactory = $resultRedirectFactory;
-
+        /** @var  _resultPageFactory */
+        $this->_resultPageFactory = $resultPageFactory;
         /** @var \Magento\Checkout\Model\Session _checkoutSession */
         $this->_checkoutSession = $this->_objectManager->create('\Magento\Checkout\Model\Session');
-
-        /** @var \UOL\PagSeguro\Model\PaymentMethod payment */
-        $this->_payment = new PaymentMethod(
-            $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
-            $this->_checkoutSession,
-            $this->_objectManager->create('\Magento\Directory\Api\CountryInformationAcquirerInterface'),
-            $this->_objectManager->create('Magento\Framework\Module\ModuleList')
-        );
+        /** @var  _library */
+        $this->_library = $this->_objectManager->create('\UOL\PagSeguro\Helper\Library');
     }
 
     /**
-     * Redirect to payment
-     *
-     * @return \Magento\Framework\Controller\Result\Redirect
+     * Show payment page
+     * @return \Magento\Framework\View\Result\PageFactory
      */
     public function execute()
     {
+        $resultPage = $this->_resultPageFactory->create();
+        $resultPage->getLayout()->getBlock('pagseguro.direct.payment')->setData('order', $this->_checkoutSession->getLastRealOrder()->getId());
         try {
-            return $this->_resultRedirectFactory->create()->setPath($this->_payment->createPaymentRequest());
-        } catch (\Exception $exception) {
+            $this->_library->setEnvironment();
+            $resultPage->getLayout()->getBlock('pagseguro.direct.payment')->setData(
+                'sessionCode',
+                $this->_library->getSession()
+            );
+            $resultPage->getLayout()->getBlock('pagseguro.direct.payment')->setData(
+                'paymentUrl',
+                $this->_library->getDirectPaymentUrl()
+            );
+        } catch (\Exception $exc) {
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
                 $this->_checkoutSession->getLastRealOrder()->getId()
@@ -90,7 +86,9 @@ class Request extends \Magento\Framework\App\Action\Action
             $order->addStatusToHistory('pagseguro_cancelada', null, true);
             /** save order */
             $order->save();
+
             return $this->_redirect('pagseguro/payment/failure');
         }
+        return $resultPage;
     }
 }

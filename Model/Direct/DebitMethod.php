@@ -20,16 +20,17 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
-namespace UOL\PagSeguro\Model;
+
+namespace UOL\PagSeguro\Model\Direct;
 
 use UOL\PagSeguro\Helper\Library;
-use PagSeguro\Domains\Requests\Payment;
+use PagSeguro\Domains\Requests\DirectPayment\OnlineDebit;
 
 /**
- * Class PaymentMethod
+ * Class DebitMethod
  * @package UOL\PagSeguro\Model
  */
-class PaymentMethod
+class DebitMethod
 {
     /**
      * @var \Magento\Checkout\Model\Session
@@ -54,38 +55,41 @@ class PaymentMethod
     protected $_countryInformation;
 
     /**
-     * PaymentMethod constructor.
+     * DebitMethod constructor.
+     *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
-     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation
+     * @param \Magento\Framework\Module\ModuleList $moduleList
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Sales\Model\Order $order,
         \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
 		\Magento\Framework\Module\ModuleList $moduleList
     ) {
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
-        /** @var  _checkoutSession */
-        $this->_checkoutSession = $checkoutSession;
-        /** @var \Magento\Checkout\Model\Session _countryInformation */
+        /** @var \Magento\Sales\Model\Order _order */
+        $this->_order = $order;
+        /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _countryInformation */
         $this->_countryInformation = $countryInformation;
-        /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _library */
-		$this->_library = new Library($scopeConfigInterface, $moduleList);
-        /** @var  \Magento\Framework\Module\ModuleList _paymentRequest */
-        $this->_paymentRequest = new Payment();
+        /** @var \UOL\PagSeguro\Helper\Library _library */
+        $this->_library = new Library($scopeConfigInterface, $moduleList);
+        /** @var \PagSeguro\Domains\Requests\DirectPayment\OnlineDebit _paymentRequest */
+        $this->_paymentRequest = new OnlineDebit();
     }
     /**
-     * @return \PagSeguroPaymentRequest
+     * @return string
+     * @throws \Exception
      */
     public function createPaymentRequest()
     {
         // Currency
         $this->_paymentRequest->setCurrency("BRL");
-        
         // Order ID
         $this->_paymentRequest->setReference($this->getOrderStoreReference());
-        //Shipping
+        // Shipping
         $this->setShippingInformation();
         $this->_paymentRequest->setShipping()->setType()
             ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
@@ -95,7 +99,7 @@ class PaymentMethod
         $this->setSenderInformation();
         // Itens
         $this->setItemsInformation();
-        //Redirect Url
+        // Redirect Url
         $this->_paymentRequest->setRedirectUrl($this->getRedirectUrl());
         // Notification Url
         $this->_paymentRequest->setNotificationUrl($this->getNotificationUrl());
@@ -103,23 +107,52 @@ class PaymentMethod
             $this->_library->setEnvironment();
             $this->_library->setCharset();
             $this->_library->setLog();
+
             return $this->_paymentRequest->register(
-                $this->_library->getPagSeguroCredentials(),
-                $this->_library->isLightboxCheckoutType()
+                $this->_library->getPagSeguroCredentials()
             );
-        } catch (PagSeguroServiceException $ex) {
-            $this->logger->debug($ex->getMessage());
+        } catch (\Exception $exception) {
+            $this->logger->debug($exception->getMessage());
             $this->getCheckoutRedirectUrl();
         }
     }
+
+    /**
+     * Set bank name
+     *
+     * @param $name
+     */
+    public function setBankName($name)
+    {
+        $this->_paymentRequest->setBankName(htmlentities($name));
+    }
+
+    /**
+     * Set sender hash
+     *
+     * @param $hash
+     */
+    public function setSenderHash($hash)
+    {
+        $this->_paymentRequest->setSender()->setHash(htmlentities($hash));
+    }
+
+    /**
+     * Set sender document
+     *
+     * @param $document
+     */
+    public function setSenderDocument($document)
+    {
+        $this->_paymentRequest->setSender()->setDocument()->withParameters($document['type'], $document['number']);
+    }
+
     /**
      * Get information of purchased items and set in the attribute $_paymentRequest
-     *
-     * @return PagSeguroItem
      */
     private function setItemsInformation()
     {
-        foreach ($this->_checkoutSession->getLastRealOrder()->getAllVisibleItems() as $product) {
+        foreach ($this->_order->getAllVisibleItems() as $product) {
             $this->_paymentRequest->addItems()->withParameters(
                 $product->getId(), //id
                 \UOL\PagSeguro\Helper\Data::fixStringLength($product->getName(), 255), //description
@@ -129,23 +162,42 @@ class PaymentMethod
             );
         }
     }
+
     /**
      * Get customer information that are sent and set in the attribute $_paymentRequest
      */
     private function setSenderInformation()
     {
-        $senderName = $this->_checkoutSession->getLastRealOrder()->getCustomerName();
-        // If Guest
+        $senderName = $this->_order->getCustomerName();
+
         if ($senderName == __('Guest')) {
             $address = $this->getBillingAddress();
             $senderName = $address->getFirstname() . ' ' . $address->getLastname();
         }
         $this->_paymentRequest->setSender()->setName($senderName);
-        $this->_paymentRequest->setSender()->setEmail($this->_checkoutSession
-            ->getLastRealOrder()->getCustomerEmail());
+
+        $email = $this->_order->getCustomerEmail();
+        $email = "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
+        $this->_paymentRequest->setSender()->setEmail($email);
         $this->setSenderPhone();
-        
+
     }
+
+    /**
+     * Set the sender phone if it exist
+     */
+    private function setSenderPhone()
+    {
+        $shipping = $this->getShippingData();
+        if (! empty($shipping['telephone'])) {
+            $phone = \UOL\PagSeguro\Helper\Data::formatPhone($shipping['telephone']);
+            $this->_paymentRequest->setSender()->setPhone()->withParameters(
+                $phone['areaCode'],
+                $phone['number']
+            );
+        }
+    }
+
     /**
      * Get the shipping information and set in the attribute $_paymentRequest
      */
@@ -154,10 +206,11 @@ class PaymentMethod
         $shipping = $this->getShippingData();
 		$country = $this->getCountryName($shipping['country_id']);
         $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
+
         $this->_paymentRequest->setShipping()->setAddress()->withParameters(
             $this->getShippingAddress($address[0], $shipping),
             $this->getShippingAddress($address[1]),
-            $this->getShippingAddress($address[3]),
+            $this->getShippingAddress($address[0]),
             \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']),
             $shipping['city'],
             $this->getRegionAbbreviation($shipping['region']),
@@ -165,6 +218,7 @@ class PaymentMethod
             $this->getShippingAddress($address[2])
         );
     }
+
     /**
      * Get shipping address
      *
@@ -190,36 +244,24 @@ class PaymentMethod
      */
     private function getShippingData()
     {
-        if ($this->_checkoutSession->getLastRealOrder()->getIsVirtual()) {
+        if ($this->_order->getIsVirtual()) {
             return $this->getBillingAddress();
         }
-        return $this->_checkoutSession->getLastRealOrder()->getShippingAddress();
+        return $this->_order->getShippingAddress();
     }
 
     /**
-     * Get shipping amount from session
+     * Get shipping amount from magento order
      *
      * @return mixed
      */
     private function getShippingAmount()
     {
-        return $this->_checkoutSession->getLastRealOrder()->getBaseShippingAmount();
+        return $this->_order->getBaseShippingAmount();
     }
 
     /**
-     * Get checkout url
-     *
-     * @param $code
-     * @return string
-     */
-    public function checkoutUrl($code, $serviceName)
-    {
-        $connectionData = new \PagSeguro\Resources\Connection\Data($this->_library->getPagSeguroCredentials());
-        return $connectionData->buildPaymentResponseUrl() . "?code=$code";
-    }
-
-    /**
-     * Get store reference from magento core_config_data table
+     * Get store reference in magento core_config_data
      *
      * @return string
      */
@@ -227,10 +269,10 @@ class PaymentMethod
     {
         return \UOL\PagSeguro\Helper\Data::getOrderStoreReference(
             $this->_scopeConfig->getValue('pagseguro/store/reference'),
-            $this->_checkoutSession->getLastRealOrder()->getEntityId()
+            $this->_order->getEntityId()
         );
     }
-    
+
     /**
      * Get a brazilian region name and return the abbreviation if it exists
      *
@@ -240,9 +282,11 @@ class PaymentMethod
     private function getRegionAbbreviation($regionName)
     {
         $regionAbbreviation = new \PagSeguro\Enum\Address();
-        return (is_string($regionAbbreviation->getType($regionName))) ? $regionAbbreviation->getType($regionName) : $regionName;
+        return (is_string($regionAbbreviation->getType($regionName))) ?
+            $regionAbbreviation->getType($regionName) :
+            $regionName;
     }
-    
+
     /**
      * Get the store notification url
      *
@@ -252,7 +296,7 @@ class PaymentMethod
     {
         return $this->_scopeConfig->getValue('payment/pagseguro/notification');
     }
-    
+
     /**
      * Get the store redirect url
      *
@@ -262,22 +306,8 @@ class PaymentMethod
     {
         return $this->_scopeConfig->getValue('payment/pagseguro/redirect');
     }
-    
-    /**
-     * Set the sender phone if it exist
-     */
-    private function setSenderPhone()
-    {
-        $shipping = $this->getShippingData();
-        if (! empty($shipping['telephone'])) {
-            $phone = \UOL\PagSeguro\Helper\Data::formatPhone($shipping['telephone']);
-            $this->_paymentRequest->setSender()->setPhone()->withParameters(
-                $phone['areaCode'],
-                $phone['number']
-            ); 
-        }
-    }
-    
+
+
     /**
      * Get the billing address data of the Order
      *
@@ -285,12 +315,12 @@ class PaymentMethod
      */
     private function getBillingAddress()
     {
-        return $this->_checkoutSession->getLastRealOrder()->getBillingAddress();
+        return $this->_order->getBillingAddress();
     }
 
 	/**
      * Get the country name based on the $countryId
-     * 
+     *
      * @param string $countryId
      * @return string
      */

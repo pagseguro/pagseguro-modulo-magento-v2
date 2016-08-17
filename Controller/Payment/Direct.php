@@ -21,38 +21,40 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Notification;
+namespace UOL\PagSeguro\Controller\Direct;
 
 /**
  * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
  */
-class Response extends \Magento\Framework\App\Action\Action
+class Payment extends \Magento\Framework\App\Action\Action
 {
 
+    /** @var \Magento\Framework\View\Result\PageFactory */
+    protected $_resultPageFactory;
+
     /**
-     * Response constructor.
+     * Checkout constructor.
      * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
+        /** @var \Magento\Framework\View\Result\PageFactory _resultPageFactory */
+        $this->_resultPageFactory = $resultPageFactory;
     }
 
     /**
-     * Update a order
+     * Show payment page
      * @return \Magento\Framework\View\Result\PageFactory
      */
     public function execute()
     {
-        $nofitication = new \UOL\PagSeguro\Model\NotificationMethod(
-            $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
-            $this->_objectManager->create('\Magento\Sales\Api\OrderRepositoryInterface'),
-            $this->_objectManager->create('\Magento\Sales\Api\Data\OrderStatusHistoryInterface'),
-            $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
-            $this->_objectManager->create('\Magento\Framework\Model\ResourceModel\Db\Context')
-        );
-        $nofitication->init();
+        /** @var \Magento\Framework\View\Result\PageFactory $resultPage */
+        $resultPage = $this->_resultPageFactory->create();
+        return $resultPage;
     }
 }

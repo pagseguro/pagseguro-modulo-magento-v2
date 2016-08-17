@@ -21,7 +21,7 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Payment;
+namespace UOL\PagSeguro\Controller\Direct;
 
 use UOL\PagSeguro\Model\PaymentMethod;
 
@@ -29,15 +29,14 @@ use UOL\PagSeguro\Model\PaymentMethod;
  * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
  */
-class Failure extends \Magento\Framework\App\Action\Action
+class Success extends \Magento\Framework\App\Action\Action
 {
 
-    /** @var \Magento\Framework\View\Result\PageFactory */
+    /** @var  \Magento\Framework\View\Result\Page */
     protected $_resultPageFactory;
 
     /**
      * Checkout constructor.
-     * 
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
@@ -46,19 +45,36 @@ class Failure extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
-        /** @var  \Magento\Framework\View\Result\PageFactory _resultPageFactory*/
+
+        /** @var  _resultPageFactory */
         $this->_resultPageFactory = $resultPageFactory;
     }
 
     /**
-     * Show failure page
-     *
+     * Show payment page
      * @return \Magento\Framework\View\Result\PageFactory
      */
     public function execute()
     {
-        /** @var  \Magento\Framework\View\Result\PageFactory $resultPage*/
+
+        /** @var \UOL\PagSeguro\Helper\Crypt $crypt */
+        $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
+        /** @var $_POST['payment'] $data */
+        $data = base64_decode($this->getRequest()->getParam('payment'));
+
+        $payment = unserialize($crypt->decrypt('A3c$#g5R', $data));
+        
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $this->_objectManager->create('Magento\Sales\Model\Order')->load($payment[1]);
+        
+        /** @var \Magento\Framework\View\Result\PageFactory $resultPage */
         $resultPage = $this->_resultPageFactory->create();
+        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setPaymentLink(
+            $payment[0]
+        );
+        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setOrderId($order->getIncrementId());
+        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setCanViewOrder(true);
+
         return $resultPage;
     }
 }

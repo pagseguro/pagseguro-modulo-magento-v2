@@ -276,4 +276,29 @@ class Data
         }
         return ['areaCode' => $ddd, 'number' => $phone];
     }
+
+    /**
+    * Remove especial characters and keep only numbers of the $document and
+    * returns it and his type. If it is not a CPF or CNPJ size, 
+    * throws an exception
+    *
+    * @param string $document
+    * @return array
+    * @throws Exception Invalid document
+    */
+   public function formatDocument($document)
+   {
+       $document = preg_replace('/[^0-9]/', '', $document);
+       switch (strlen($document)) {
+           case 14:
+               return ['number' => $document, 'type' => 'cnpj'];
+               break;
+           case 11:
+               return ['number' => $document, 'type' => 'cpf'];
+               break;
+           default:
+               throw new \Exception('Invalid document');
+               break;
+       }
+   }
 }

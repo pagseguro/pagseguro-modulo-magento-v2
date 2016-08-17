@@ -20,7 +20,9 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
+
 namespace UOL\PagSeguro\Helper;
+
 /**
  * Class Library
  * @package UOL\PagSeguro\Helper
@@ -35,6 +37,15 @@ class Library
      *
      */
     const SANDBOX_JS = "https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js";
+    /**
+     *
+     */
+    const DIRECT_PAYMENT_URL = "https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js";
+    /**
+     *
+     */
+    const DIRECT_PAYMENT_URL_SANDBOX= "https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js";
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -83,12 +94,19 @@ class Library
      */
     private function loader()
     {
+
+        /** @var \Magento\Framework\App\ObjectManager $objectManager */
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+        /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
+
+
         \PagSeguro\Library::initialize();
-		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease(\Magento\Framework\AppInterface::VERSION);
+		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease($productMetadata->getVersion());
         \PagSeguro\Library::moduleVersion()->setName($this->_moduleList->getOne('UOL_PagSeguro')['name'])
 			->setRelease($this->_moduleList->getOne('UOL_PagSeguro')['setup_version']);
     }
-    
+
     /**
      * Set the environment configured in the PagSeguro module
      */
@@ -105,7 +123,7 @@ class Library
     {
        return $this->_scopeConfig->getValue('payment/pagseguro/environment');
     }
-    
+
     /**
      * Set the charset configured in the PagSeguro module
      */
@@ -115,7 +133,7 @@ class Library
             $this->_scopeConfig->getValue('payment/pagseguro/charset')
         );
     }
-    
+
     /**
      * Set the log and log location configured in the PagSeguro module
      */
@@ -126,5 +144,37 @@ class Library
             $this->_scopeConfig->getValue('payment/pagseguro/log_file')
         );
     }
-}
 
+
+    /**
+     * Get session
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getSession()
+    {
+        try {
+            $session = \PagSeguro\Services\Session::create(
+                $this->getPagSeguroCredentials()
+            );
+            return $session->getResult();
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Get direct payment url
+     *
+     * @return string
+     */
+    public function getDirectPaymentUrl()
+    {
+        if ($this->getEnvironment() == 'sandbox') {
+            return Library::DIRECT_PAYMENT_URL_SANDBOX;
+        } else {
+            return Library::DIRECT_PAYMENT_URL;
+        }
+    }
+}

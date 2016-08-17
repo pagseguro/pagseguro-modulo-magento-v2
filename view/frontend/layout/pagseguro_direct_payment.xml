@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" src_type="url" />
+        <css src="UOL_PagSeguro::css/font-awesome.min.css"/>
+        <css src="UOL_PagSeguro::css/styles.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="UOL\PagSeguro\Block\Payment\Checkout" name="pagseguro.direct.payment" template="UOL_PagSeguro::direct/payment.phtml"/>
+        </referenceContainer>
+    </body>
+</page>
