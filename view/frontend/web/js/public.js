@@ -42,7 +42,6 @@ var WS = {
                         type: 'POST',
                         showLoader: true,
                     }).success(function (response) {
-                        console.log(response);
                         window.location.href = response.payload.redirect;
                     });
                 }

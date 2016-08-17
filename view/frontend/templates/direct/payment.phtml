@@ -1,181 +1,140 @@
-
-<div>
-    <h2>Formas de pagamento</h2>
-</div>
-<div class="panel with-nav-tabs panel-default">
-    <div id="tabs" class="panel-heading">
-
-            <ul class="nav nav-tabs">
-                <li class="active">
-                    <a href="#tab1default" data-toggle="tab">
-                        <i class="fa fa-credit-card fa-4x"></i>
-                        <span>Cartão de Crédito</span>
-                        <span class="btn btn-primary"> selecione </span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#tab2default" data-toggle="tab">
-                        <i class="fa fa-money fa-4x"></i>
-                        <span>Débito Online</span>
-                        <span class="btn btn-primary"> selecione </span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#tab3default" data-toggle="tab">
-                        <i class="fa fa-barcode fa-4x"></i>
-                        <span>Boleto</span>
-                        <span class="btn btn-primary"> selecione </span>
-                    </a>
-                </li>
-            </ul>
-            <div class="panel-body">
-                <div class="tab-content">
-                    <div class="tab-pane fade" id="tab1default">
-
-                        <div class="col-md-8 col-md-offset-3">
-                            <form>
-
-
-                                <!-- Text input-->
-                                <div class="form-group row">
-                                    <label class="col-md-4 control-label" for="card_num">Número do cartão</label>
-                                    <div class="col-md-4">
-                                        <input id="card_num" name="card_num" type="text" placeholder="" class="form-control input-md" required="">
-
-                                    </div>
-                                </div>
-
-                                <!-- Text input-->
-                                <div class="form-group row">
-                                    <label class="col-md-4 control-label" for="card_holder_name">Nome impresso no cartão</label>
-                                    <div class="col-md-4">
-                                        <input id="card_holder_name" name="card_holder_name" type="text" placeholder="" class="form-control input-md" required="">
-
-                                    </div>
-                                </div>
-
-                                <!-- Select Basic -->
-                                <div class="form-group row">
-                                    <label class="col-md-4 control-label" for="card_validate">Validade</label>
-                                    <div class="col-md-2">
-                                        <select id="card_validate" name="card_validate" class="form-control">
-                                            <option value="" disabled selected>Mês</option>
-                                            <option value="01">01</option>
-                                            <option value="02">02</option>
-                                            <option value="03">03</option>
-                                            <option value="04">04</option>
-                                            <option value="05">05</option>
-                                            <option value="06">06</option>
-                                            <option value="07">07</option>
-                                            <option value="08">08</option>
-                                            <option value="09">09</option>
-                                            <option value="10">10</option>
-                                            <option value="11">11</option>
-                                            <option value="12">12</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select id="card_validate" name="card_validate" class="form-control">
-                                            <option value="" disabled selected>Ano</option>
-                                            <?php for ($i = 2016; $i < 2035; $i++): ?>
-                                            <option value="<?=$i;?>"><?=$i;?></option>
-                                            <?php endfor; ?>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Text input-->
-                                <div class="form-group row">
-                                    <label class="col-md-4 control-label" for="card_cod">Código de segurança</label>
-                                    <div class="col-md-4">
-                                        <input id="card_cod" name="card_cod" type="text" placeholder="" class="form-control input-md">
-
-                                    </div>
-                                </div>
-
-
-                            </form>
-                        </div>
-                        <!-- Text input-->
-                        <div class="form-group row has-btn">
-
-                            <button class="btn btn-block btn-primary" id="payment-credit-card"> Pagar com cartão de crédito </button>
-
+<section class="wrapper">
+    <h2 class="title-payment">Formas de pagamento</h2>
+    <h4 class="method-payment">Escolha o método</h4>
+    <nav class="tabs-pagseguro clearfix" id="tabs-payment">
+        <ul class="items clearfix">
+            <li class="item --active">
+                <a class="action js-tab-action" href="#credit-card">
+                    <i class="fa fa-credit-card fa-4x"></i>
+                    <span class="name">Cartão de Crédito</span>
+                </a>
+            </li><!-- /.item -->
+            <li class="item">
+                <a class="action js-tab-action" href="#debit-online">
+                    <i class="fa fa-money fa-4x"></i>
+                    <span class="name">Débito Online</span>
+                </a>
+            </li><!-- /.item -->
+            <li class="item">
+                <a class="action js-tab-action" href="#bilet">
+                    <i class="fa fa-barcode fa-4x"></i>
+                    <span class="name">Boleto</span>
+                </a>
+            </li><!-- /.item -->
+        </ul><!-- /.items -->
+    </nav><!-- /.tabs-payment -->
+    <div class="tabs-content">
+        <div class="item-tab --current" id="credit-card">
+            <h3 class="title-tab">Cartão de Crédito</h3>
+            <form class="form-horizontal clearfix" name="form-credit">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 control-label" for="card_num">Número do cartão</label>
+                    <div class="col-xs-12 col-sm-10">
+                        <input class="form-control" id="card_num" name="card_num" type="text" required>
+                    </div>
+                </div><!-- /.form-group -->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 control-label" for="card_holder_name">Nome impresso no cartão</label>
+                    <div class="col-xs-12 col-sm-10">
+                        <input class="form-control" id="card_holder_name" name="card_holder_name" type="text" required>
+                    </div>
+                </div><!-- /.form-group -->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 control-label" for="card_validate">Validade</label>
+                    <div class="col-xs-12 col-sm-10">
+                        <div class="row form-inline-childs">
+                            <div class="col-xs-12 col-sm-6">
+                                <select class="form-control" id="card_validate" name="card_validate">
+                                    <option value="" disabled selected>Mês</option>
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <select id="card_validate" name="card_validate" class="form-control">
+                                    <option value="" disabled selected>Ano</option>
+                                    <?php for ($i = 2016; $i < 2035; $i++): ?>
+                                    <option value="<?=$i;?>"><?=$i;?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="tab2default">
-                        <div class="col-md-8 col-md-offset-3">
-
-                            <form>
-                                <!-- Text input-->
-                                <div class="form-group row">
-                                    <label class="col-md-4 control-label" for="card_cod">CPF/CNPJ</label>
-                                    <div class="col-md-4">
-                                        <input id="document-debit" name="document" type="text" placeholder="" class="form-control input-md">
-
-                                    </div>
-                                </div>
-                                <p>Escolha seu banco abaixo onde deverá fazer o pagamento online.</p>
-                                <fieldset id="bankList" class="form-group">
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="bank" id="optionsRadios1" value="1" checked>
-                                            Itaú
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="bank" id="optionsRadios2" value="2">
-                                            Bradesco
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="bank" id="optionsRadios2" value="3">
-                                            Santander
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="bank" id="optionsRadios2" value="4">
-                                            Banco do Brasil
-                                        </label>
-                                    </div>
-                                </fieldset>
-                            </form>
-                        </div>
-                        <!-- Text input-->
-                        <div class="form-group row has-btn">
-                            <button class="btn btn-block btn-primary" id="payment-debit"> Pagar com débito online </button>
-                        </div>
+                </div><!-- /.form-group -->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 control-label" for="card_cod">Código de segurança</label>
+                    <div class="col-xs-12 col-sm-10">
+                        <input class="form-control" id="card_cod" name="card_cod" type="text">
                     </div>
-                    <div class="tab-pane fade" id="tab3default">
-                        <div class="col-md-8 col-md-offset-3">
-
-                            <form>
-                                <!-- Text input-->
-                                <div class="form-group row">
-                                    <label class="col-md-4 control-label" for="card_cod">CPF/CNPJ</label>
-                                    <div class="col-md-4">
-                                        <input id="document-boleto" name="document" type="text" placeholder="" class="form-control input-md">
-
-                                    </div>
-                                </div>
-                            </form>
-
-                            <p>Imprima o boleto e pague no banco</p>
-                            <p>ou pague pela internet utilizando o código de barras do boleto</p>
-                            <p>o prazo de validade do boleto é de 1 dia útil</p>
-                        </div>
-                        <!-- Text input-->
-                        <div class="form-group row has-btn">
-                            <button class="btn btn-block btn-primary" id="payment-boleto"> Pagar com boleto</button>
-                        </div>
+                </div><!-- /.form-group -->
+                <button class="btn-pagseguro --align-right" id="payment-credit-card">Concluir</button>
+            </form>
+        </div><!-- /.item-tab#credit-card -->
+        <div class="item-tab" id="debit-online">
+            <h3 class="title-tab">Débito On-line</h3>
+            <form class="form-horizontal clearfix" name="form-debit">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
+                    <div class="col-xs-12 col-sm-10">
+                        <input class="form-control" id="document-debit" name="document" type="text">
+                    </div>
+                </div><!-- /.form-group -->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 control-label">Escolha seu banco abaixo onde deverá fazer o pagamento online.</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="bank" id="optionsRadios1" value="1" checked>
+                            Itaú
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="bank" id="optionsRadios2" value="2">
+                            Bradesco
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-sm-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="bank" id="optionsRadios2" value="3">
+                            Santander
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="bank" id="optionsRadios2" value="4">
+                            Banco do Brasil
+                        </label>
+                    </div>
+                </div><!-- /.form-group -->
+                <button class="btn-pagseguro --align-right" id="payment-debit">Concluir</button>
+            </form>
+        </div><!-- /.item-tab#debit-online -->
+        <div class="item-tab" id="bilet">
+            <h3 class="title-tab">Boleto</h3>
+            <form class="form-horizontal clearfix" name="form-bilit">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
+                    <div class="col-xs-12 col-sm-10">
+                        <input class="form-control" id="document-boleto" name="document" type="text">
                     </div>
                 </div>
-            </div>
-    </div>
-</div>
+                <button class="btn-pagseguro --align-right" id="payment-boleto">Concluir</button>
+            </form>
+            <ul class="list-warning">
+                <li>Imprima o boleto e pague no banco</li>
+                <li>Ou pague pela internet utilizando o código de barras do boleto</li>
+                <li>o prazo de validade do boleto é de 1 dia útil</li>
+            </ul>
+        </div><!-- /.item-tab#bilet -->
+    </div><!-- /.tabs-content-->
+</section><!-- /.wrapper -->
+
 <input type="hidden" id="adminurl" data-target="<?=$this->getBaseUrl(); ?>"/>
 <input type="hidden" id="order" data-target="<?=$this->getOrder(); ?>"/>
 <input type="hidden" id="session-code" data-target="<?=$this->getData('sessionCode'); ?>"/>
@@ -184,12 +143,30 @@
 <script type="text/javascript">
     require([
             'jquery',
-            'jquery/ui',
             "public"
         ],
-        function($, tabs) {
+        function($) {
+            ;(function tabsPagseguro($, undefined){
+                var $action = $('.js-tab-action');
+                $action.on('click', function(e){
+                    e.preventDefault();
+                    var $itemtTab = $(this).parent('.item');
+                    var isActive = $itemtTab.hasClass('--active');
 
-            $("#tabs").tabs();
+                    if(!isActive) {
+                        var $newTabId = $($(this).attr('href'));
+                        $('#tabs-payment .item.--active').removeClass('--active'); //remove class the old tab selected
+                        $('.item-tab.--current').removeClass('--current');
+
+                        //add new tab selected
+                        $itemtTab.addClass('--active');
+                        $newTabId.addClass('--current');
+                    } else {
+                        return false;
+                    }
+                });
+            }($));
+
 
             function loadElements(service, bank = false)
             {

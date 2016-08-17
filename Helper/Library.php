@@ -92,12 +92,17 @@ class Library
      */
     private function loader()
     {
+
+        //Updated to use object manager
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+
         \PagSeguro\Library::initialize();
-		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease(\Magento\Framework\AppInterface::VERSION);
+		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease($productMetadata->getVersion());
         \PagSeguro\Library::moduleVersion()->setName($this->_moduleList->getOne('UOL_PagSeguro')['name'])
 			->setRelease($this->_moduleList->getOne('UOL_PagSeguro')['setup_version']);
     }
-    
+
     /**
      * Set the environment configured in the PagSeguro module
      */
@@ -114,7 +119,7 @@ class Library
     {
        return $this->_scopeConfig->getValue('payment/pagseguro/environment');
     }
-    
+
     /**
      * Set the charset configured in the PagSeguro module
      */
@@ -124,7 +129,7 @@ class Library
             $this->_scopeConfig->getValue('payment/pagseguro/charset')
         );
     }
-    
+
     /**
      * Set the log and log location configured in the PagSeguro module
      */
@@ -157,4 +162,3 @@ class Library
         }
     }
 }
-

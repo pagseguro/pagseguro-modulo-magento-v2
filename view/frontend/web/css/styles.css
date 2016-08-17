@@ -744,6 +744,19 @@ output {
     line-height: 1.42857143;
     color: #555555;
 }
+
+
+/*==================================================================
+    Custom form control to replace styles magento input
+==================================================================*/
+input[type="text"],
+input[type="password"],
+input[type="url"],
+input[type="tel"],
+input[type="search"],
+input[type="number"],
+input[type="datetime"],
+input[type="email"],
 .form-control {
     display: block;
     width: 100%;
@@ -755,13 +768,26 @@ output {
     background-color: #ffffff;
     background-image: none;
     border: 1px solid #cccccc;
-    border-radius: 4px;
+    /*border-radius: 4px;*/
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+
+select {
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    appearance: menulist;
+
+}
+/*==================================================================
+    //end inputs
+==================================================================*/
+
+
+
 .form-control:focus {
     border-color: #66afe9;
     outline: 0;
@@ -1523,120 +1549,209 @@ a.badge:focus {
     position: fixed;
 }
 
-#tabs {
-    background: transparent;
-    border: none;
+/*==================================================================
+    Set to default box sizing for all elements
+==================================================================*/
+*,
+*::before,
+*::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
-#tabs .ui-tabs-nav {
-    height: 183px;
+/*==================================================================
+    Tabs Components Styles
+==================================================================*/
+.title-payment {
 
 }
-#tabs .ui-tabs-nav li {
-    display: inline-block;
-    float: none;
-    top: 0px;
-    margin: 0em;
-    padding-bottom: 0px;
+
+.method-payment {
+
 }
 
-#tabs .ui-widget-header {
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #c0c0c0;
-    -moz-border-radius: 0px;
-    -webkit-border-radius: 0px;
-    border-radius: 0px;
-    text-align: center;
+/* tabs */
+.tabs-pagseguro {
+    width: 100%;
 }
 
-#tabs .tab-content form{
-    padding: 20px;
-}
+    .tabs-pagseguro > .items {
+        width: 100%;
+    }
+
+    .tabs-pagseguro > .items  > .item {
+        position: relative;
+        float: left;
+        width: 33.33%;
+        /* borders */
+        border-color: #827e7e;
+        border-top-style: solid;
+        border-top-width: 1px;
+    }
+    @media (max-width: 767px){
+        .tabs-pagseguro > .items  > .item {
+            height: 125px;
+        }
+    }
+
+    .tabs-pagseguro > .items  > .item:first-child {
+        border-left-style: solid;
+        border-left-width: 1.5px;
+    }
+
+    .tabs-pagseguro > .items  > .item:nth-child(2) {
+        border-left-style: solid;
+        border-left-width: 1.5px;
+        border-right-style: solid;
+        border-right-width: 1.5px;
+    }
+
+    .tabs-pagseguro > .items  > .item:last-child {
+        border-right-style: solid;
+        border-right-width: 1.5px;
+    }
+
+    /* init item active */
+    .tabs-pagseguro > .items  > .item.--active > .action {
+        color: #FFF;
+        background-color: #4F7743;
+    }
 
 
-.has-btn {
-    text-align: center;
-}
+    .tabs-pagseguro > .items  > .item.--active > .action::after {
+        bottom: -15px; /* subtract the height unit this element */
+        opacity: 1;
+        border-top-color: #4F7743;
+    }
+    /* end item active */
 
-#tabs .ui-tabs-nav .ui-state-default {
-    background: transparent;
-    border: none;
-    height: 180px;
-    text-align: center;
-}
-#tabs .ui-tabs-nav .ui-state-active {
-    background: #fff;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    -moz-border-radius: 0px;
-    -webkit-border-radius: 0px;
-    border-radius: 0px;
-    padding-bottom: 4px!important;
-}
-#tabs .ui-tabs-nav .ui-state-default a {
-    color: #c0c0c0;
-    outline: none;
-}
-#tabs .ui-tabs-nav .ui-state-active a {
-    color: #459e00;
-    outline: none;
-    text-align: center!important;
-}
+    .tabs-pagseguro > .items  > .item  > .action {
+        padding: .75em 1em;
+        height: 100%;
+    }
 
-.btn {
-    border-width: 0;
-    font-size: 16px;
-    text-transform: lowercase;
-    text-decoration: none;
-    border-radius: 0;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
-    transition: all 0.1s ease-in;
-}
+    .tabs-pagseguro > .items  > .item > .action::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 0px;
+        height: 0px;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid #827e7e;
 
-.btn {
-    display: inline-block;
-    margin-bottom: 0;
-    font-weight: bold;
-    text-align: center;
+        /* style of animation */
+        opacity: 0;
+        bottom: -5px;
+        transition: all .25s linear;
+    }
+
+
+    /* action tab + btn-pagseguro */
+    .tabs-pagseguro > .items  > .item  > .action,
+    .btn-pagseguro {
+        text-align: center;
+        display: block;
+        background-color: transparent;
+        -webkit-transition: all 0.25s linear;
+        -moz-transition: all 0.25s linear;
+        transition: all 0.25s linear;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action {
+        color: #827e7e;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action:hover,
+    .tabs-pagseguro > .items  > .item  > .action:focus,
+    a.btn-pagseguro:hover,
+    a.btn-pagseguro:focus {
+        text-decoration: none;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action:hover,
+    .tabs-pagseguro > .items  > .item  > .action:focus,
+    .btn-pagseguro:hover,
+    .btn-pagseguro:focus {
+        color: #FFF;
+        background-color: #4F7743;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action > .fa {
+        display: block;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action > .name {
+        display: block;
+        margin-top: .5em;
+    }
+
+/* tabs content */
+.tabs-content {
+    padding: 1em;
+}
+    .title-tab {
+        margin-bottom: 1em;
+    }
+    .tabs-content > .item-tab {
+        /* active tab current */
+        display: none;
+        width: 100%;
+    }
+
+    .tabs-content > .item-tab.--current {
+        display: block;
+    }
+
+/* btn-pagseguro */
+button:not(.primary),
+.btn-pagseguro {
+    color: #4F7743;
+    font-size: 1.2em;
+    white-space: nowrap;
     vertical-align: middle;
+    outline: inherit;
+    cursor: pointer;
+    padding: 1em 2em;
+    background: none;
+    background-image: none;
+    border: 1px solid #4F7743;
+    border-radius: 0px;
+    /* fix native magento style - box-shadow */
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
-    cursor: pointer;
-    background-image: none;
-    border: 1px solid transparent;
-    white-space: nowrap;
-    padding: 10px 10px;
-    font-size: 14px;
-    line-height: 1.42857;
-    border-radius: 0;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
+    .btn-pagseguro.--align-right {
+        float: right;
+        margin-top: 1.5em;
+    }
 
-.btn-primary {
-    color: #fff;
-    background-color: #459E00;
-    border-color: #459E00;
-}
+    .btn-pagseguro:hover,
+    .btn-pagseguro:focus {
+        /* fix native magento style - border hover button */
+        border: 1px solid #4F7743;
+    }
 
-.btn-primary:hover {
-    color: #fff;
-    background-color: #459E00;
-    border-color: #459E00;
-}
-
-#tabs span {
-    margin: 10px 0!important;
-    clear: both;
-}
-
-#tabs span:after{content:""; display:block; clear:both}
-
-#tabs i {
-    clear: both;
+/* list warning */
+.list-warning {
     display: block;
-    margin-bottom: 7px!important;
+    margin-top: 2em;
+    width: 100%;
+}
+
+
+@media (max-width: 767px) {
+
+    /* form inline custom config */
+    .form-inline-childs > div{
+        margin-bottom: 15px;
+    }
 }
