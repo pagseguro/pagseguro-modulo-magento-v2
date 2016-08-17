@@ -33,6 +33,9 @@ use UOL\PagSeguro\Model\PaymentMethod;
 class Request extends \Magento\Framework\App\Action\Action
 {
 
+    /** @var \Magento\Framework\View\Result\PageFactory */
+    protected $_resultRedirectFactory;
+    
     /**
      * @var \Magento\Checkout\Model\Session
      */
@@ -41,7 +44,7 @@ class Request extends \Magento\Framework\App\Action\Action
     /**
      * @var \UOL\PagSeguro\Model\PaymentMethod
      */
-    private $payment;
+    private $_payment;
 
     /**
      * Request constructor.
@@ -49,19 +52,22 @@ class Request extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Action\Context $context
      */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
     ) {
         parent::__construct($context);
 
-        $this->_checkoutSession = $this->_objectManager
-            ->create('\Magento\Checkout\Model\Session');
+        /** @var \Magento\Framework\Controller\Result\RedirectFactory _resultPageFactory*/
+        $this->_resultRedirectFactory = $resultRedirectFactory;
 
-        $this->payment = new PaymentMethod(
-            $this->_objectManager
-                ->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
+        /** @var \Magento\Checkout\Model\Session _checkoutSession */
+        $this->_checkoutSession = $this->_objectManager->create('\Magento\Checkout\Model\Session');
+
+        /** @var \UOL\PagSeguro\Model\PaymentMethod payment */
+        $this->_payment = new PaymentMethod(
+            $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
             $this->_checkoutSession,
-            $this->_objectManager
-                ->create('\Magento\Directory\Api\CountryInformationAcquirerInterface'),
+            $this->_objectManager->create('\Magento\Directory\Api\CountryInformationAcquirerInterface'),
             $this->_objectManager->create('Magento\Framework\Module\ModuleList')
         );
     }
@@ -69,12 +75,12 @@ class Request extends \Magento\Framework\App\Action\Action
     /**
      * Redirect to payment
      *
-     * @return \Magento\Framework\View\Result\PageFactory
+     * @return \Magento\Framework\Controller\Result\Redirect
      */
     public function execute()
     {
         try {
-            return $this->resultRedirectFactory->create()->setPath($this->payment->createPaymentRequest());
+            return $this->_resultRedirectFactory->create()->setPath($this->_payment->createPaymentRequest());
         } catch (\Exception $exception) {
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
@@ -84,7 +90,6 @@ class Request extends \Magento\Framework\App\Action\Action
             $order->addStatusToHistory('pagseguro_cancelada', null, true);
             /** save order */
             $order->save();
-
             return $this->_redirect('pagseguro/payment/failure');
         }
     }

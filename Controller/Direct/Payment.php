@@ -33,17 +33,13 @@ class Payment extends \Magento\Framework\App\Action\Action
 {
 
     /** @var  \Magento\Framework\View\Result\Page */
-    protected $resultPageFactory;
+    protected $_resultPageFactory;
 
-    /**
-     * @var \UOL\PagSeguro\Model\PaymentMethod
-     */
-    protected $payment;
+    /** @var \Magento\Checkout\Model\Session */
+    protected $_checkoutSession;
 
-    protected $checkoutSession;
-
-    protected $library;
-
+    /** @var \UOL\PagSeguro\Helper\Library */
+    protected $_library;
 
     /**
      * Checkout constructor.
@@ -55,14 +51,12 @@ class Payment extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
-
-        $this->checkoutSession = $this->_objectManager
-            ->create('\Magento\Checkout\Model\Session');
-
-        $this->library = $this->_objectManager
-            ->create('\UOL\PagSeguro\Helper\Library');
-
+        /** @var  _resultPageFactory */
+        $this->_resultPageFactory = $resultPageFactory;
+        /** @var \Magento\Checkout\Model\Session _checkoutSession */
+        $this->_checkoutSession = $this->_objectManager->create('\Magento\Checkout\Model\Session');
+        /** @var  _library */
+        $this->_library = $this->_objectManager->create('\UOL\PagSeguro\Helper\Library');
     }
 
     /**
@@ -71,24 +65,22 @@ class Payment extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-
-
-        $resultPage = $this->resultPageFactory->create();
-        $resultPage->getLayout()->getBlock('pagseguro.direct.payment')->setData('order', $this->checkoutSession->getLastRealOrder()->getId());
+        $resultPage = $this->_resultPageFactory->create();
+        $resultPage->getLayout()->getBlock('pagseguro.direct.payment')->setData('order', $this->_checkoutSession->getLastRealOrder()->getId());
         try {
-            $this->library->setEnvironment();
+            $this->_library->setEnvironment();
             $resultPage->getLayout()->getBlock('pagseguro.direct.payment')->setData(
                 'sessionCode',
-                $this->library->getSession()
+                $this->_library->getSession()
             );
             $resultPage->getLayout()->getBlock('pagseguro.direct.payment')->setData(
                 'paymentUrl',
-                $this->library->getDirectPaymentUrl()
+                $this->_library->getDirectPaymentUrl()
             );
         } catch (\Exception $exc) {
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-                $this->checkoutSession->getLastRealOrder()->getId()
+                $this->_checkoutSession->getLastRealOrder()->getId()
             );
             /** change payment status in magento */
             $order->addStatusToHistory('pagseguro_cancelada', null, true);

@@ -23,8 +23,6 @@
 
 namespace UOL\PagSeguro\Controller\Direct;
 
-use UOL\PagSeguro\Model\PaymentMethod;
-
 /**
  * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
@@ -32,14 +30,8 @@ use UOL\PagSeguro\Model\PaymentMethod;
 class Payment extends \Magento\Framework\App\Action\Action
 {
 
-    /** @var  \Magento\Framework\View\Result\Page */
-    protected $resultPageFactory;
-
-    /**
-     * @var \UOL\PagSeguro\Model\PaymentMethod
-     */
-    protected $payment;
-
+    /** @var \Magento\Framework\View\Result\PageFactory */
+    protected $_resultPageFactory;
 
     /**
      * Checkout constructor.
@@ -51,15 +43,8 @@ class Payment extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
-//        $this->payment = new PaymentMethod(
-//            $this->_objectManager
-//                ->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
-//            $this->_objectManager->create('\Magento\Checkout\Model\Session'),
-//            $this->_objectManager
-//                ->create('\Magento\Directory\Api\CountryInformationAcquirerInterface'),
-//			$this->_objectManager->create('Magento\Framework\Module\ModuleList')
-//        );
+        /** @var \Magento\Framework\View\Result\PageFactory _resultPageFactory */
+        $this->_resultPageFactory = $resultPageFactory;
     }
 
     /**
@@ -68,16 +53,8 @@ class Payment extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-//        $result = $this->payment->createPaymentRequest();
-//        $code = $result->getCode();
-        $resultPage = $this->resultPageFactory->create();
-//        $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')
-//            ->setCode($code);
-//        $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')
-//            ->setPaymentJs($this->getPagSeguroPaymentJs());
-//        $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')
-//            ->setPaymentUrl($this->payment->checkoutUrl($code, 'paymentService'));
-
+        /** @var \Magento\Framework\View\Result\PageFactory $resultPage */
+        $resultPage = $this->_resultPageFactory->create();
         return $resultPage;
     }
 }

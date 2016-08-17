@@ -33,17 +33,7 @@ class Success extends \Magento\Framework\App\Action\Action
 {
 
     /** @var  \Magento\Framework\View\Result\Page */
-    protected $resultPageFactory;
-
-    /**
-     * @var \UOL\PagSeguro\Model\PaymentMethod
-     */
-    protected $payment;
-
-    protected $checkoutSession;
-
-    protected $library;
-
+    protected $_resultPageFactory;
 
     /**
      * Checkout constructor.
@@ -55,14 +45,9 @@ class Success extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
 
-        $this->checkoutSession = $this->_objectManager
-            ->create('\Magento\Checkout\Model\Session');
-
-        $this->library = $this->_objectManager
-            ->create('\UOL\PagSeguro\Helper\Library');
-
+        /** @var  _resultPageFactory */
+        $this->_resultPageFactory = $resultPageFactory;
     }
 
     /**
@@ -72,25 +57,24 @@ class Success extends \Magento\Framework\App\Action\Action
     public function execute()
     {
 
-        /** @var UOL\PagSeguro\Helper\Crypt $crypt */
+        /** @var \UOL\PagSeguro\Helper\Crypt $crypt */
         $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
+        /** @var $_POST['payment'] $data */
         $data = base64_decode($this->getRequest()->getParam('payment'));
 
         $payment = unserialize($crypt->decrypt('A3c$#g5R', $data));
-
+        
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $this->_objectManager->create('Magento\Sales\Model\Order')->load($payment[1]);
-//        var_dump($order->getIncrementId(), $order->getId());die();
-
-        $resultPage = $this->resultPageFactory->create();
+        
+        /** @var \Magento\Framework\View\Result\PageFactory $resultPage */
+        $resultPage = $this->_resultPageFactory->create();
         $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setPaymentLink(
             $payment[0]
         );
-
         $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setOrderId($order->getIncrementId());
-
         $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setCanViewOrder(true);
 
-//        var_dump($payment, $payment[1]); die;
         return $resultPage;
     }
 }

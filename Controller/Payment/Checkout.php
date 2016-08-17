@@ -69,8 +69,9 @@ class Checkout extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $result = $this->payment->createPaymentRequest();
-        $code = $result->getCode();
+
         $resultPage = $this->resultPageFactory->create();
+        $code = $result->getCode();
         $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')
             ->setCode($code);
         $resultPage->getLayout()->getBlock('pagseguro.payment.checkout')

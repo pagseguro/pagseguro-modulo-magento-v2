@@ -1563,14 +1563,6 @@ a.badge:focus {
 /*==================================================================
     Tabs Components Styles
 ==================================================================*/
-.title-payment {
-
-}
-
-.method-payment {
-
-}
-
 /* tabs */
 .tabs-pagseguro {
     width: 100%;
@@ -1588,6 +1580,8 @@ a.badge:focus {
         border-color: #827e7e;
         border-top-style: solid;
         border-top-width: 1px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
     }
     @media (max-width: 767px){
         .tabs-pagseguro > .items  > .item {
@@ -1747,6 +1741,18 @@ button:not(.primary),
     width: 100%;
 }
 
+/* total value */
+.credit-total > .control-label {
+    font-size: 1.4em;
+}
+
+.credit-total > div > span {
+    font-size: 1.15em;
+    line-height: 34px;
+    display: block;
+    padding-top: 5px; /* diferece font-size value at label */
+}
+
 
 @media (max-width: 767px) {
 
@@ -1754,4 +1760,8 @@ button:not(.primary),
     .form-inline-childs > div{
         margin-bottom: 15px;
     }
+}
+
+.display-none {
+    display: none;
 }

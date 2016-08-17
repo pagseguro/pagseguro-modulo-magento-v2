@@ -20,7 +20,9 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
+
 namespace UOL\PagSeguro\Helper;
+
 /**
  * Class Library
  * @package UOL\PagSeguro\Helper
@@ -93,9 +95,11 @@ class Library
     private function loader()
     {
 
-        //Updated to use object manager
+        /** @var \Magento\Framework\App\ObjectManager $objectManager */
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+        /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
+
 
         \PagSeguro\Library::initialize();
 		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease($productMetadata->getVersion());
@@ -141,6 +145,13 @@ class Library
         );
     }
 
+
+    /**
+     * Get session
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public function getSession()
     {
         try {
@@ -153,6 +164,11 @@ class Library
         }
     }
 
+    /**
+     * Get direct payment url
+     *
+     * @return string
+     */
     public function getDirectPaymentUrl()
     {
         if ($this->getEnvironment() == 'sandbox') {

@@ -27,21 +27,25 @@ use UOL\PagSeguro\Helper\Data;
 use UOL\PagSeguro\Helper\Library;
 use Magento\Sales\Model\ResourceModel\Grid;
 
+/**
+ * Class NotificationMethod
+ * @package UOL\PagSeguro\Model
+ */
 class NotificationMethod
 {
 
     /**
      * @var \UOL\PagSeguro\Helper\Library
      */
-    private $library;
+    private $_library;
     /**
      * @var \UOL\PagSeguro\Helper\Data
      */
-    private $data;
+    private $_helperData;
     /**
      * @var \Magento\Sales\Api\OrderRepositoryInterface
      */
-    private $order;
+    private $_order;
     /**
      * @var Magento\Sales\Model\ResourceModel\Grid;
      */
@@ -59,49 +63,51 @@ class NotificationMethod
         \Magento\Framework\Module\ModuleList $moduleList,
         \Magento\Framework\Model\ResourceModel\Db\Context $context
     ) {
-        $this->library = new Library(
+        //dependency injection
+        $this->_order = $order;
+        $this->_history = $history;
+        // create required objects
+        $this->_library = new Library(
             $scopeConfigInterface,
             $moduleList
         );
-        $this->data = new Data();
-        $this->order = $order;
-        $this->history = $history;
+        $this->_helperData = new Data();
         $this->_grid = new Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
     }
 
     /**
-     * @param $post
+     * Initialize a notification
      */
-    public function init($post)
+    public function init()
     {
-        $this->updateOrderStatus($this->payload($post));
+        $this->updateOrderStatus();
     }
 
     /**
      * Update status in Magento2 Order
-     * @param $payload
+     *
      * @return bool
      */
-    private function updateOrderStatus($payload)
+    private function updateOrderStatus()
     {
-        $this->library->setEnvironment();
-        $this->library->setCharset();
-        $this->library->setLog();
+        $this->_library->setEnvironment();
+        $this->_library->setCharset();
+        $this->_library->setLog();
         $transaction = $this->getTransaction();
-        $order = $this->order->get(
-            $this->data->getReferenceDecryptOrderID(
+        $order = $this->_order->get(
+            $this->_helperData->getReferenceDecryptOrderID(
                 $transaction->getReference()
             )
         );
 
-        $status = $this->data->getStatusFromKey(
+        $status = $this->_helperData->getStatusFromKey(
             $transaction->getStatus()
         );
 
         if (!$this->compareStatus($status, $order->getStatus())) {
             $history = array (
-                'status' => $this->history->setStatus($status),
-                'comment' => $this->history->setComment('PagSeguro Notification')
+                'status' => $this->_history->setStatus($status),
+                'comment' => $this->_history->setComment('PagSeguro Notification')
             );
             $transactionCode = $transaction->getCode();
             $orderId = $order->getId();
@@ -140,7 +146,7 @@ class NotificationMethod
     private function getTransaction()
     {
         return \PagSeguro\Services\Transactions\Notification::check(
-            $this->library->getPagSeguroCredentials()
+            $this->_library->getPagSeguroCredentials()
         );
     }
 

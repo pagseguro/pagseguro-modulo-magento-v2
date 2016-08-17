@@ -89,10 +89,13 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
             $scopeConfig,
             $logger
         );
-        $this->cart = $cart;
+        /** @var \Magento\Checkout\Model\Cart _cart */
+        $this->_cart = $cart;
     }
 
     /**
+     * Check if checkout type is direct
+     *
      * @return bool
      */
     public function isDirectCheckout()
@@ -104,6 +107,8 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
+     * Check if checkout type is lightbox
+     *
      * @return bool
      */
     public function isLightboxCheckoutType()
@@ -115,26 +120,32 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
+     * Get lightbox checkout payment url
+     *
      * @return url
      */
     public function getLightboxCheckoutPaymentUrl()
     {
-        return $this->cart->getQuote()->getStore()->getUrl("pagseguro/payment/checkout/");
+        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/checkout/");
     }
 
     /**
+     * Get standard checkout payment url
+     *
      * @return url
      */
     public function getStandardCheckoutPaymentUrl()
     {
-        return $this->cart->getQuote()->getStore()->getUrl("pagseguro/payment/request/");
+        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/request/");
     }
 
     /**
+     * Get direct checkout payment url
+     *
      * @return url
      */
     public function getDirectCheckoutPaymentUrl()
     {
-        return $this->cart->getQuote()->getStore()->getUrl("pagseguro/direct/payment");
+        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/direct/payment");
     }
 }

@@ -25,9 +25,11 @@ namespace UOL\PagSeguro\Model;
 
 use Magento\Framework\Model\AbstractModel;
 
+
 /**
- * UOL PagSeguro model for pagseguro_orders table
- *
+ * Class Orders
+ * Model for pagseguro_orders table
+ * @package UOL\PagSeguro\Model
  */
 class Orders extends AbstractModel
 {

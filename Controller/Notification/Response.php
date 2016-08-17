@@ -53,6 +53,6 @@ class Response extends \Magento\Framework\App\Action\Action
             $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
             $this->_objectManager->create('\Magento\Framework\Model\ResourceModel\Db\Context')
         );
-        $nofitication->init($this->getRequest()->getParams());
+        $nofitication->init();
     }
 }

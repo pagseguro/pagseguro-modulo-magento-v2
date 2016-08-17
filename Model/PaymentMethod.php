@@ -21,7 +21,10 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 namespace UOL\PagSeguro\Model;
+
 use UOL\PagSeguro\Helper\Library;
+use PagSeguro\Domains\Requests\Payment;
+
 /**
  * Class PaymentMethod
  * @package UOL\PagSeguro\Model
@@ -32,6 +35,7 @@ class PaymentMethod
      * @var \Magento\Checkout\Model\Session
      */
     protected $_checkoutSession;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -42,11 +46,13 @@ class PaymentMethod
      * @var \PagSeguro\Domains\Requests\Payment
      */
     protected $_paymentRequest;
+
     /**
      *
      * @var \Magento\Directory\Api\CountryInformationAcquirerInterface
      */
     protected $_countryInformation;
+
     /**
      * PaymentMethod constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
@@ -58,11 +64,16 @@ class PaymentMethod
         \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
 		\Magento\Framework\Module\ModuleList $moduleList
     ) {
+        /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var  _checkoutSession */
         $this->_checkoutSession = $checkoutSession;
+        /** @var \Magento\Checkout\Model\Session _countryInformation */
         $this->_countryInformation = $countryInformation;
+        /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _library */
 		$this->_library = new Library($scopeConfigInterface, $moduleList);
-        $this->_paymentRequest = new \PagSeguro\Domains\Requests\Payment();
+        /** @var  \Magento\Framework\Module\ModuleList _paymentRequest */
+        $this->_paymentRequest = new Payment();
     }
     /**
      * @return \PagSeguroPaymentRequest
@@ -103,6 +114,7 @@ class PaymentMethod
     }
     /**
      * Get information of purchased items and set in the attribute $_paymentRequest
+     *
      * @return PagSeguroItem
      */
     private function setItemsInformation()
@@ -154,6 +166,8 @@ class PaymentMethod
         );
     }
     /**
+     * Get shipping address
+     *
      * @param $address
      * @param bool $shipping
      * @return array|null
@@ -168,8 +182,10 @@ class PaymentMethod
         }
         return null;
     }
+
     /**
      * Get the shipping Data of the Order
+     *
      * @return object $orderParams - Return parameters, of shipping of order
      */
     private function getShippingData()
@@ -179,14 +195,20 @@ class PaymentMethod
         }
         return $this->_checkoutSession->getLastRealOrder()->getShippingAddress();
     }
+
     /**
+     * Get shipping amount from session
+     *
      * @return mixed
      */
     private function getShippingAmount()
     {
         return $this->_checkoutSession->getLastRealOrder()->getBaseShippingAmount();
     }
-    /***
+
+    /**
+     * Get checkout url
+     *
      * @param $code
      * @return string
      */
@@ -195,7 +217,10 @@ class PaymentMethod
         $connectionData = new \PagSeguro\Resources\Connection\Data($this->_library->getPagSeguroCredentials());
         return $connectionData->buildPaymentResponseUrl() . "?code=$code";
     }
+
     /**
+     * Get store reference from magento core_config_data table
+     *
      * @return string
      */
     private function getOrderStoreReference()
@@ -208,6 +233,7 @@ class PaymentMethod
     
     /**
      * Get a brazilian region name and return the abbreviation if it exists
+     *
      * @param string $regionName
      * @return string
      */
@@ -219,6 +245,7 @@ class PaymentMethod
     
     /**
      * Get the store notification url
+     *
      * @return string
      */
     public function getNotificationUrl()
@@ -228,6 +255,7 @@ class PaymentMethod
     
     /**
      * Get the store redirect url
+     *
      * @return string
      */
     public function getRedirectUrl()
@@ -252,6 +280,7 @@ class PaymentMethod
     
     /**
      * Get the billing address data of the Order
+     *
      * @return \Magento\Sales\Model\Order\Address|null
      */
     private function getBillingAddress()

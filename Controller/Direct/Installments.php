@@ -23,15 +23,15 @@
 
 namespace UOL\PagSeguro\Controller\Direct;
 
-use UOL\PagSeguro\Model\Direct\BoletoMethod;
+use UOL\PagSeguro\Model\Direct\InstallmentsMethod;
+use UOL\PagSeguro\Helper\Library;
 
 /**
- * Class Checkout
- * @package UOL\PagSeguro\Controller\Payment
+ * Installments controller class
+ * @package UOL\PagSeguro\Controller\Direct
  */
-class Boleto extends \Magento\Framework\App\Action\Action
+class Installments extends \Magento\Framework\App\Action\Action
 {
-
     /** @var  \Magento\Framework\View\Result\Page */
     protected $resultJsonFactory;
 
@@ -40,9 +40,8 @@ class Boleto extends \Magento\Framework\App\Action\Action
      */
     protected $payment;
 
-
     /**
-     * Checkout constructor.
+     * installments constructor
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
@@ -56,21 +55,14 @@ class Boleto extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Show payment page
+     * Returns the installments
      * @return \Magento\Framework\View\Result\PageFactory
      */
     public function execute()
     {
-
-        /** @var $_POST['order_id'] $orderEntity */
         $orderEntity = $this->getRequest()->getParam('order_id');
-        /** @var $_POST['sender_hash'] $senderHash */
-        $senderHash = $this->getRequest()->getParam('sender_hash');
-        /** @var $_POST['sender_document'] $senderDocument */
-        $senderDocument = $this->getRequest()->getParam('sender_document');
-
-        /** @var \UOL\PagSeguro\Helper\Data $helperData */
-        $helperData = $this->_objectManager->create('UOL\PagSeguro\Helper\Data');
+        $creditCardBrand = $this->getRequest()->getParam('credit_card_brand');
+        $creditCardInternational = $this->getRequest()->getParam('credit_card_international');
 
         /** @var \Magento\Framework\Controller\Result\Json $result */
         $result = $this->resultJsonFactory->create();
@@ -78,42 +70,31 @@ class Boleto extends \Magento\Framework\App\Action\Action
         /** @var \Magento\Store\Model\StoreManagerInterface $storeManager */
         $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
 
-        /** @var UOL\PagSeguro\Helper\Crypt $crypt */
-        $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
-
         try {
-            /** @var \UOL\PagSeguro\Model\Direct\BoletoMethod $boleto */
-            $boleto = new BoletoMethod(
+            $installments = new InstallmentsMethod(
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
                 $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderEntity),
-                $this->_objectManager->create('Magento\Directory\Api\CountryInformationAcquirerInterface'),
                 $this->_objectManager->create('Magento\Framework\Module\ModuleList')
             );
 
-            $boleto->setSenderDocument($helperData->formatDocument($senderDocument));
-            $boleto->setSenderHash($senderHash);
-
-            /** @var \PagSeguro\Parsers\Transaction\Boleto\Response $response */
-            $response = $boleto->createPaymentRequest();
-
-            $this->changeOrderHistory($orderEntity, 'pagseguro_aguardando_pagamento');
+            $response =  $installments->create($creditCardBrand, $creditCardInternational);
 
             return $result->setData([
                 'success' => true,
                 'payload' => [
-                    'data' => $response,
-                    'redirect' => sprintf(
-                        '%s%s?payment=%s',
-                        $storeManager->getStore()->getBaseUrl(),
-                        'pagseguro/direct/success',
-                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([$response->getPaymentLink(), $orderEntity])))
-                    )
+                    'data' => $response
                 ]
             ]);
 
         } catch (\Exception $exception) {
-
-            $this->changeOrderHistory($orderEntity, 'pagseguro_cancelada');
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
+                $orderEntity
+            );
+            /** change payment status in magento */
+            $order->addStatusToHistory('pagseguro_cancelada', null, true);
+            /** save order */
+            $order->save();
 
             return $result->setData([
                 'success' => false,
@@ -123,23 +104,5 @@ class Boleto extends \Magento\Framework\App\Action\Action
                 ]
             ]);
         }
-    }
-
-    /**
-     * Change the magento order status
-     *
-     * @param $orderId
-     * @param $status
-     */
-    private function changeOrderHistory($orderId, $status)
-    {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-            $orderId
-        );
-        /** change payment status in magento */
-        $order->addStatusToHistory($status, null, true);
-        /** save order */
-        $order->save();
     }
 }
