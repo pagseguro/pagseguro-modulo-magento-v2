@@ -198,9 +198,7 @@
 
             //Update the total value according with installments
             $('#card_installments').on('change', function(){
-                console.log($(this).val());
                 var currency = parseFloat($(this).val()).toFixed(2);
-                console.log(currency)
                 $('#card_total').text('R$ ' + currency);
             });
 
