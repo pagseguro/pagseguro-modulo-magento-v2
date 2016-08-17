@@ -30,13 +30,13 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control input-md" id="document-credit-card" name="document" type="text">
+                        <input class="form-control cpf-cnpj-mask" id="document-credit-card" name="document" type="text">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_num">Número do cartão</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="card_num" name="card_num" type="text" required>
+                        <input class="form-control credit-card-mask" id="card_num" name="card_num" type="text" required>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
@@ -48,7 +48,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_holder_birthdate">Data de nascimento</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="card_holder_birthdate" name="card_holder_birthdate" type="text" required="">
+                        <input class="form-control date-mask" id="card_holder_birthdate" name="card_holder_birthdate" type="text" required="">
                     </div>
                 </div>
                 <div class="form-group">
@@ -89,7 +89,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">Código de segurança</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="card_cod" name="card_cod" type="text">
+                        <input class="form-control code-card-mask" id="card_cod" name="card_cod" type="text">
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group display-none">
@@ -115,7 +115,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="document-debit" name="document" type="text">
+                        <input class="form-control cpf-cnpj-mask" id="document-debit" name="document" type="text">
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
@@ -148,7 +148,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="document-boleto" name="document" type="text">
+                        <input class="form-control cpf-cnpj-mask" id="document-boleto" name="document" type="text">
                     </div>
                 </div>
                 <button class="btn-pagseguro --align-right" id="payment-boleto">Concluir</button>
@@ -172,9 +172,35 @@
 <script type="text/javascript">
     require([
             'jquery',
+            'masks',
             "public"
         ],
         function($) {
+
+            ;(function masksInputs() {
+                $('.cpf-mask').mask('000.000.000-00');
+                $('.cnpj-mask').mask('00.000.000/0000-00');
+                $('.credit-card-mask').mask('0000 0000 0000 0000');
+                $('.code-card-mask').mask('000');
+                $('.date-mask').mask('00/00/0000', { placeholder: "__/__/____" });
+
+                $('.cpf-cnpj-mask').on('keydown', function() {
+
+                    try {
+                       $(this).unmask();
+                   } catch (e) {}
+
+                    var isLength = $(this).val().length;
+
+                    if (isLength < 11) {
+                        $(this).mask('000.000.000-00');
+                    } else {
+                        $(this).mask('00.000.000/0000-00');
+                    }
+                });
+            }());
+
+
             ;(function tabsPagseguro($, undefined){
                 var $action = $('.js-tab-action');
                 $action.on('click', function(e){
