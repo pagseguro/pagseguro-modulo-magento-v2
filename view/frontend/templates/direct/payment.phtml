@@ -34,7 +34,13 @@
 
                         <div class="col-md-8 col-md-offset-3">
                             <form>
-
+                                <!-- Text input-->
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label" for="card_cod">CPF/CNPJ</label>
+                                    <div class="col-md-4">
+                                        <input id="document-credit-card" name="document" type="text" placeholder="" class="form-control input-md">
+                                    </div>
+                                </div>
 
                                 <!-- Text input-->
                                 <div class="form-group row">
@@ -50,7 +56,14 @@
                                     <label class="col-md-4 control-label" for="card_holder_name">Nome impresso no cartão</label>
                                     <div class="col-md-4">
                                         <input id="card_holder_name" name="card_holder_name" type="text" placeholder="" class="form-control input-md" required="">
-
+                                    </div>
+                                </div>
+                                
+                                <!-- Holder birthdate -->
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label" for="card_holder_birthdate">Data de nascimento</label>
+                                    <div class="col-md-4">
+                                        <input id="card_holder_birthdate" name="card_holder_birthdate" type="text" placeholder="" class="form-control input-md" required="">
                                     </div>
                                 </div>
 
@@ -58,7 +71,7 @@
                                 <div class="form-group row">
                                     <label class="col-md-4 control-label" for="card_validate">Validade</label>
                                     <div class="col-md-2">
-                                        <select id="card_validate" name="card_validate" class="form-control">
+                                        <select id="card_expiration_month" name="card_validate" class="form-control">
                                             <option value="" disabled selected>Mês</option>
                                             <option value="01">01</option>
                                             <option value="02">02</option>
@@ -75,9 +88,12 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <select id="card_validate" name="card_validate" class="form-control">
+                                        <select id="card_expiration_year" name="card_validate" class="form-control">
                                             <option value="" disabled selected>Ano</option>
-                                            <?php for ($i = 2016; $i < 2035; $i++): ?>
+                                            <?php 
+                                                $year = idate("Y");
+                                                $maxYear = $year + 20;
+                                                for ($i = $year; $i < $maxYear; $i++): ?>
                                             <option value="<?=$i;?>"><?=$i;?></option>
                                             <?php endfor; ?>
                                         </select>
@@ -89,11 +105,27 @@
                                     <label class="col-md-4 control-label" for="card_cod">Código de segurança</label>
                                     <div class="col-md-4">
                                         <input id="card_cod" name="card_cod" type="text" placeholder="" class="form-control input-md">
-
                                     </div>
                                 </div>
 
-
+                                <!-- Installments -->
+                                <div class="form-group row display-none">
+                                    <label class="col-md-4 control-label" for="card_installments">Parcelas</label>
+                                    <div class="col-md-4">
+                                        <select id="card_installments" name="card_installments" class="form-control">
+                                            <option value="" disabled selected>Escolha o N° de parcelas</option>
+                                        </select>
+                                    </div>
+                                    
+                                </div>
+                                
+                                <!-- Total -->
+                                <div class="form-group row display-none">    
+                                    <div class="col-md-2 col-md-offset-3 ">
+                                        Total: R$<span id="card_total"></span>  
+                                    </div>
+                                </div>
+                                
                             </form>
                         </div>
                         <!-- Text input-->
@@ -138,7 +170,7 @@
                                     <div class="radio">
                                         <label>
                                             <input type="radio" name="bank" id="optionsRadios2" value="4">
-                                            Banco do Brasil
+                                            Banco do Brasil'#card_expiration_month').val();
                                         </label>
                                     </div>
                                 </fieldset>
@@ -179,6 +211,8 @@
 <input type="hidden" id="adminurl" data-target="<?=$this->getBaseUrl(); ?>"/>
 <input type="hidden" id="order" data-target="<?=$this->getOrder(); ?>"/>
 <input type="hidden" id="session-code" data-target="<?=$this->getData('sessionCode'); ?>"/>
+<input type="hidden" id="card-international" data-target=""/>
+<input type="hidden" id="card-brand" data-target=""/>
 
 <script type="text/javascript" src="<?=$this->getData('paymentUrl'); ?>"></script>
 <script type="text/javascript">
@@ -190,8 +224,13 @@
         function($, tabs) {
 
             $("#tabs").tabs();
+            
+            //Update the total value according with installments
+            $('#card_installments').on('change', function(){
+                $('#card_total').text(this.value)
+            });
 
-            function loadElements(service, bank = false)
+            function loadElements(service, bank = false, creditCard = false)
             {
 
                 $("#payment-"+service).trigger('processStart');
@@ -208,6 +247,15 @@
                         data['bank'] = bankId.val();
                     }
                 }
+                
+                if (creditCard) {
+                    data['cardInternational'] = $('#card-international').attr('data-target');
+                    data['installmentQuantity'] = $("#card_installments option:selected" ).attr('data-quantity');
+                    data['installmentAmount'] = $("#card_installments option:selected" ).attr('data-amount');
+                    data['holderName'] = $('#card_holder_name').val();
+                    data['holderBirthdate'] = $('#card_holder_birthdate').val();
+                }
+                
                 return data;
             }
 
@@ -228,6 +276,62 @@
                 setTimeout(function () {
                     WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
                 }, 5000);
+            });
+            
+            $('#payment-credit-card').on('click', function(){
+                //PagSeguroDirectPayment.setSessionId(el.sessionCode);
+
+                PagSeguroDirectPayment.createCardToken({ 
+                    cardNumber: $('#card_num').val(),
+                    brand: $('#card-brand').attr('data-target'), 
+                    internationalMode: $('#card-international').attr('data-target'),
+                    cvv: $('#card_cod').val(), 
+                    expirationMonth: $('#card_expiration_month').val(), 
+                    expirationYear: $('#card_expiration_year').val(),
+                    success: function(response) { 
+                        var el = loadElements('credit-card', false, true);
+                        var token = response.card.token;
+                        var hash = PagSeguroDirectPayment.getSenderHash();
+
+                        setTimeout(function () {
+                            WS.Ajax.Direct.CreditCard.Payment(
+                                el.url,
+                                el.orderId,
+                                hash,
+                                el.document,
+                                token,
+                                el.cardInternational,
+                                el.installmentQuantity,
+                                el.installmentAmount,
+                                el.holderName,
+                                el.holderBirthdate
+                            );
+                        }, 5000);
+                    },
+                    error: function(response) {
+                        //console.log(response);
+                    }
+                });
+            });
+            
+            //Get the installments and the credit card brand
+            $('#card_num').on("blur", function() {
+                PagSeguroDirectPayment.setSessionId($('#session-code').attr('data-target'));
+
+                PagSeguroDirectPayment.getBrand({
+                    cardBin: $('#card_num').val().substring(0,6),
+                    internationalMode: true,
+                    success: function(response) {
+                        setTimeout(function () {
+                            WS.Ajax.Direct.CreditCard.Installments(
+                                $('#adminurl').attr('data-target'),
+                                $('#order').attr('data-target'),
+                                response.brand.name,
+                                response.brand.international
+                            );
+                        }, 1500);
+                    }
+                });
             });
         }
     );

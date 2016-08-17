@@ -1640,3 +1640,7 @@ a.badge:focus {
     display: block;
     margin-bottom: 7px!important;
 }
+
+.display-none {
+    display: none;
+}
