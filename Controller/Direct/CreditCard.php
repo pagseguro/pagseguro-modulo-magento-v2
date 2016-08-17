@@ -110,7 +110,7 @@ class CreditCard extends \Magento\Framework\App\Action\Action
                         '%s%s?payment=%s',
                         $storeManager->getStore()->getBaseUrl(),
                         'pagseguro/direct/success',
-                        base64_encode($crypt->encrypt('A3c$#g5R', serialize(['Link cartao', $orderEntity])))
+                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([null, $orderEntity, null])))
                     )
                 ]
             ]);

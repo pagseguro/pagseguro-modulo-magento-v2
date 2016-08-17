@@ -120,9 +120,9 @@
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-6 control-label">Escolha seu banco abaixo onde deverá fazer o pagamento online.</label>
-                    <div class="col-xs-12 col-sm-5 col-sm-offset-1">
+                    <div id="bankList" class="col-xs-12 col-sm-5 col-sm-offset-1">
                         <label class="radio">
-                            <input type="radio" name="bank" id="optionsRadios1" value="1" checked>
+                            <input type="radio" name="bank" id="optionsRadios1" value="1">
                             Itaú
                         </label>
                         <label class="radio">
@@ -131,11 +131,15 @@
                         </label>
                         <label class="radio">
                             <input type="radio" name="bank" id="optionsRadios2" value="3">
-                            Santander
+                            Banrisul
                         </label>
                         <label class="radio">
                             <input type="radio" name="bank" id="optionsRadios2" value="4">
                             Banco do Brasil
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="bank" id="optionsRadios2" value="5">
+                            HSBC
                         </label>
                     </div>
                 </div><!-- /.form-group -->
@@ -198,9 +202,7 @@
 
             //Update the total value according with installments
             $('#card_installments').on('change', function(){
-                console.log($(this).val());
                 var currency = parseFloat($(this).val()).toFixed(2);
-                console.log(currency)
                 $('#card_total').text('R$ ' + currency);
             });
 
@@ -233,18 +235,22 @@
                 return data;
             }
 
-            $('#payment-boleto').on('click', function(){
+            $('#payment-boleto').on('click', function(event){
+                event.preventDefault();
                 var el = loadElements('boleto');
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
                 setTimeout(function () {
+                    console.log('test');
                     WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
                 }, 5000);
 
             });
 
             $('#payment-debit').on('click', function(){
+                event.preventDefault();
                 var el = loadElements('debit', true);
+
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
                 setTimeout(function () {
@@ -253,7 +259,7 @@
             });
 
             $('#payment-credit-card').on('click', function(){
-                //PagSeguroDirectPayment.setSessionId(el.sessionCode);
+                event.preventDefault();
 
                 PagSeguroDirectPayment.createCardToken({
                     cardNumber: $('#card_num').val(),
@@ -281,9 +287,6 @@
                                 el.holderBirthdate
                             );
                         }, 5000);
-                    },
-                    error: function(response) {
-                        //console.log(response);
                     }
                 });
             });

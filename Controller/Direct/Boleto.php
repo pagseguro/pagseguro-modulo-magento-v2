@@ -106,7 +106,7 @@ class Boleto extends \Magento\Framework\App\Action\Action
                         '%s%s?payment=%s',
                         $storeManager->getStore()->getBaseUrl(),
                         'pagseguro/direct/success',
-                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([$response->getPaymentLink(), $orderEntity])))
+                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([$response->getPaymentLink(), $orderEntity, 'boleto'])))
                     )
                 ]
             ]);
