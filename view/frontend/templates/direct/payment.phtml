@@ -125,10 +125,10 @@
                             <input type="radio" name="bank" id="optionsRadios1" value="1">
                             Itaú
                         </label>
-                        <label class="radio">
+                        <!-- <label class="radio">
                             <input type="radio" name="bank" id="optionsRadios2" value="2">
                             Bradesco
-                        </label>
+                        </label> -->
                         <label class="radio">
                             <input type="radio" name="bank" id="optionsRadios2" value="3">
                             Banrisul
@@ -180,32 +180,27 @@
             "public"
         ],
         function($) {
-
-            ;(function masksInputs() {
+            ;(function masksInputs($, undefined) {
                 $('.cpf-mask').mask('000.000.000-00');
                 $('.cnpj-mask').mask('00.000.000/0000-00');
                 $('.credit-card-mask').mask('0000 0000 0000 0000');
                 $('.code-card-mask').mask('000');
                 $('.date-mask').mask('00/00/0000', { placeholder: "__/__/____" });
-
-                $('.cpf-cnpj-mask').on('keydown', function() {
+                $('.cpf-cnpj-mask').on('keyup', function() {
 
                     try {
-                       $(this).unmask();
-                   } catch (e) {}
+                        $(this).unmask();
+                    } catch(e) {
+                        alert('Ops, algo deu errado!');
+                    };
 
                     var isLength = $(this).val().length;
-
-                    if (isLength < 11) {
-                        $(this).mask('000.000.000-00');
-                    } else {
-                        $(this).mask('00.000.000/0000-00');
-                    }
+                    //9 is number optional, is fake the transtion two types mask
+                    isLength <= 11 ? $(this).mask('000.000.000-009') : $(this).mask('00.000.000/0000-00');
+                    
                 });
-            }());
-
-
-            ;(function tabsPagseguro($, undefined){
+            }($));
+            ;(function tabsPagseguro($, undefined) {
                 var $action = $('.js-tab-action');
                 $action.on('click', function(e){
                     e.preventDefault();
@@ -226,31 +221,40 @@
                 });
             }($));
 
-            //Update the total value according with installments
-            $('#card_installments').on('change', function(){
-                var currency = parseFloat($(this).val()).toFixed(2);
-                $('#card_total').text('R$ ' + currency);
-            });
+            ;(function calcTotal($, undefined) {
+                //Update the total value according with installments
+                $('#card_installments').on('change', function(){
+                    var currency = parseFloat($(this).val()).toFixed(2);
+                    $('#card_total').text('R$ ' + currency);
+                });
+            }($));
 
-            function loadElements(service, bank = false, creditCard = false)
-            {
 
+
+            function loadElements(service, bank, creditCart) {
+                var bank = bank || false;
+                var creditCard = creditCard || false;
+                var data = [];
+
+                //start request process started
                 $("#payment-"+service).trigger('processStart');
 
-                var data = new Array();
+                //default values to send
                 data['url'] = $('#adminurl').attr('data-target');
                 data['orderId'] = $('#order').attr('data-target');
                 data['sessionCode'] = $('#session-code').attr('data-target');
                 data['document'] = $('#document-'+service).val();
 
-                if (bank) {
+                //values only debit method to use
+                if(bank) {
                     var bankId = $("#bankList input[type='radio']:checked");
                     if (bankId.length > 0) {
                         data['bank'] = bankId.val();
                     }
                 }
 
-                if (creditCard) {
+                //values only credit card method to use
+                if(creditCard) {
                     data['cardInternational'] = $('#card-international').attr('data-target');
                     data['installmentQuantity'] = $("#card_installments option:selected" ).attr('data-quantity');
                     data['installmentAmount'] = $("#card_installments option:selected" ).attr('data-amount');
@@ -258,23 +262,24 @@
                     data['holderBirthdate'] = $('#card_holder_birthdate').val();
                 }
 
-                return data;
-            }
+                console.log(data);
 
-            $('#payment-boleto').on('click', function(event){
-                event.preventDefault();
+                // return data;
+            };
+
+            $('#payment-boleto').on('click', function(e){
+                e.preventDefault();
                 var el = loadElements('boleto');
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
                 setTimeout(function () {
-                    console.log('test');
                     WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
                 }, 5000);
 
             });
 
-            $('#payment-debit').on('click', function(){
-                event.preventDefault();
+            $('#payment-debit').on('click', function(e){
+                e.preventDefault();
                 var el = loadElements('debit', true);
 
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
@@ -284,8 +289,8 @@
                 }, 5000);
             });
 
-            $('#payment-credit-card').on('click', function(){
-                event.preventDefault();
+            $('#payment-credit-card').on('click', function(e){
+                e.preventDefault();
 
                 PagSeguroDirectPayment.createCardToken({
                     cardNumber: $('#card_num').val(),
