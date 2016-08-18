@@ -35,8 +35,9 @@ class Debit extends \Magento\Framework\App\Action\Action
     private $bankList = array(
         1 => 'itau',
         2 => 'bradesco',
-        3 => 'santander',
-        4 => 'bancodobrasil'
+        3 => 'banrinsul',
+        4 => 'bancodobrasil',
+        5 => 'hsbc'
     );
 
     /** @var  \Magento\Framework\View\Result\Page */
@@ -111,7 +112,7 @@ class Debit extends \Magento\Framework\App\Action\Action
                         '%s%s?payment=%s',
                         $storeManager->getStore()->getBaseUrl(),
                         'pagseguro/direct/success',
-                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([$response->getPaymentLink(), $orderEntity])))
+                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([$response->getPaymentLink(), $orderEntity, 'debit'])))
                     )
                 ]
             ]);

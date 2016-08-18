@@ -73,6 +73,7 @@ class Success extends \Magento\Framework\App\Action\Action
             $payment[0]
         );
         $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setOrderId($order->getIncrementId());
+        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setPaymentType($payment[2]);
         $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setCanViewOrder(true);
 
         return $resultPage;
