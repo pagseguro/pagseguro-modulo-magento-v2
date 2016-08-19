@@ -197,7 +197,6 @@
                     var isLength = $(this).val().length;
                     //9 is number optional, is fake the transtion two types mask
                     isLength <= 11 ? $(this).mask('000.000.000-009') : $(this).mask('00.000.000/0000-00');
-                    
                 });
             }($));
             ;(function tabsPagseguro($, undefined) {
@@ -223,18 +222,28 @@
 
             ;(function calcTotal($, undefined) {
                 //Update the total value according with installments
-                $('#card_installments').on('change', function(){
+                $('#card_installments').on('change', function() {
                     var currency = parseFloat($(this).val()).toFixed(2);
                     $('#card_total').text('R$ ' + currency);
                 });
             }($));
 
+            function unmaskField($el) {
+                try {
+                    var oldvalue = $el.val();
+                    var newvalue = oldvalue.replace(/[/ -. ]+/g, '').trim();
 
+                    return newvalue;
+                } catch(e) {
+                    alert('Ops, algo deu errado! Recarregue a página');
+                };
+            };
 
-            function loadElements(service, bank, creditCart) {
+            function loadElements(service, bank, creditCard) {
                 var bank = bank || false;
                 var creditCard = creditCard || false;
                 var data = [];
+
 
                 //start request process started
                 $("#payment-"+service).trigger('processStart');
@@ -243,7 +252,7 @@
                 data['url'] = $('#adminurl').attr('data-target');
                 data['orderId'] = $('#order').attr('data-target');
                 data['sessionCode'] = $('#session-code').attr('data-target');
-                data['document'] = $('#document-'+service).val();
+                data['document'] = unmaskField($('#document-'+service));
 
                 //values only debit method to use
                 if(bank) {
@@ -262,38 +271,33 @@
                     data['holderBirthdate'] = $('#card_holder_birthdate').val();
                 }
 
-                console.log(data);
-
-                // return data;
+                return data;
             };
 
+            //Event buttons methods buy types
             $('#payment-boleto').on('click', function(e){
                 e.preventDefault();
                 var el = loadElements('boleto');
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
-                setTimeout(function () {
-                    WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
-                }, 5000);
+                WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
 
             });
 
             $('#payment-debit').on('click', function(e){
                 e.preventDefault();
                 var el = loadElements('debit', true);
-
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
-                setTimeout(function () {
-                    WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
-                }, 5000);
+                WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
+
             });
 
             $('#payment-credit-card').on('click', function(e){
                 e.preventDefault();
 
                 PagSeguroDirectPayment.createCardToken({
-                    cardNumber: $('#card_num').val(),
+                    cardNumber: unmaskField($('#card_num')),
                     brand: $('#card-brand').attr('data-target'),
                     internationalMode: $('#card-international').attr('data-target'),
                     cvv: $('#card_cod').val(),
@@ -322,25 +326,46 @@
                 });
             });
 
-            //Get the installments and the credit card brand
-            $('#card_num').on("blur", function() {
+            //get and showing brand credit card
+            function getBrandCard(cardBinVal) {
                 PagSeguroDirectPayment.setSessionId($('#session-code').attr('data-target'));
 
                 PagSeguroDirectPayment.getBrand({
-                    cardBin: $('#card_num').val().substring(0,6),
+                    cardBin: cardBinVal,
                     internationalMode: true,
                     success: function(response) {
-                        setTimeout(function () {
-                            WS.Ajax.Direct.CreditCard.Installments(
-                                $('#adminurl').attr('data-target'),
-                                $('#order').attr('data-target'),
-                                response.brand.name,
-                                response.brand.international
-                            );
-                        }, 1500);
+                        WS.Ajax.Direct.CreditCard.Installments(
+                            $('#adminurl').attr('data-target'),
+                            $('#order').attr('data-target'),
+                            response.brand.name,
+                            response.brand.international
+                        );
                     }
                 });
-            });
+            };
+
+            ;(function putBrandCard($, undefined) {
+                var cardBinVal;
+                var isLength;
+                var firstcheck = false;
+                //Get the installments and the credit card brand
+                $('#card_num').on("keyup", function() {
+                    isLength = $(this).val().length;
+
+                    //6 number + space of mask
+                    if (isLength >= 7) {
+                        clearValue = unmaskField($(this));
+                        cardBinVal = clearValue.substring(0,6);
+
+                        if(cardBinVal != clearValue.substring(0, 6) || firstcheck == false){
+                            getBrandCard(cardBinVal);
+                            firstcheck = true;
+                        }
+                    }
+                });
+            }($));
+
+
         }
     );
 </script>
