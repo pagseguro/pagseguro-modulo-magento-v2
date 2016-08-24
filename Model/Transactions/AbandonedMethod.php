@@ -362,7 +362,7 @@ class AbandonedMethod
      */
     private function getDates()
     {
-        $date = new \DateTime ( "15 minutes ago" );
+        $date = new \DateTime ( "20 minutes ago" );
         $date->setTimezone ( new \DateTimeZone ( "America/Sao_Paulo" ) );
         $final = $date->format ( "Y-m-d\TH:i:s" );
 

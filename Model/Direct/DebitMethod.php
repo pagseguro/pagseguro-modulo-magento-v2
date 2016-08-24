@@ -176,11 +176,22 @@ class DebitMethod
         }
         $this->_paymentRequest->setSender()->setName($senderName);
 
-        $email = $this->_order->getCustomerEmail();
-        $email = "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
-        $this->_paymentRequest->setSender()->setEmail($email);
+        $this->_paymentRequest->setSender()->setEmail($this->getEmail());
         $this->setSenderPhone();
 
+    }
+
+    /**
+     * Return a mock for sandbox if this is the active environment
+     *
+     * @return string
+     */
+    private function getEmail()
+    {
+        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
+            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
+        }
+        return $this->_order->getCustomerEmail();
     }
 
     /**
