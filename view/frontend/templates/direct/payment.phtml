@@ -346,20 +346,22 @@
 
             ;(function putBrandCard($, undefined) {
                 var cardBinVal;
-                var isLength;
+                var isLength = 0;
                 var firstcheck = false;
+                var cardNumLastValLength = 0;
                 //Get the installments and the credit card brand
                 $('#card_num').on("keyup", function() {
+                    cardNumLastValLength = isLength;
                     isLength = $(this).val().length;
 
                     //6 number + space of mask
-                    if (isLength >= 7) {
+                    if (isLength == 7 && cardNumLastValLength <= 7) {
                         clearValue = unmaskField($(this));
                         cardBinVal = clearValue.substring(0,6);
 
                         if(cardBinVal != clearValue.substring(0, 6) || firstcheck == false){
                             getBrandCard(cardBinVal);
-                            firstcheck = true;
+                            //firstcheck = true;
                         }
                     }
                 });

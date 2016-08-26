@@ -23,6 +23,7 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Create an order in the pagseguro_orders table -->
     <event name="checkout_submit_all_after">
         <observer name="save_pagseguro_info_after_order_save" instance="UOL\PagSeguro\Observer\CreatePagSeguroOrder"/>
     </event>

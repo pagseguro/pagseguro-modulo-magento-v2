@@ -40,7 +40,6 @@ class Boleto extends \Magento\Framework\App\Action\Action
      */
     protected $payment;
 
-
     /**
      * Checkout constructor.
      * @param \Magento\Framework\App\Action\Context $context
@@ -61,7 +60,6 @@ class Boleto extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-
         /** @var $_POST['order_id'] $orderEntity */
         $orderEntity = $this->getRequest()->getParam('order_id');
         /** @var $_POST['sender_hash'] $senderHash */
@@ -82,6 +80,7 @@ class Boleto extends \Magento\Framework\App\Action\Action
         $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
 
         try {
+
             /** @var \UOL\PagSeguro\Model\Direct\BoletoMethod $boleto */
             $boleto = new BoletoMethod(
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),

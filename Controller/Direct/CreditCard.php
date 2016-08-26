@@ -102,6 +102,8 @@ class CreditCard extends \Magento\Framework\App\Action\Action
 
             $response = $creditCard->createPaymentRequest();
 
+            $this->changeOrderHistory($orderEntity, 'pagseguro_aguardando_pagamento');
+
             return $result->setData([
                 'success' => true,
                 'payload' => [
@@ -116,14 +118,8 @@ class CreditCard extends \Magento\Framework\App\Action\Action
             ]);
 
         } catch (\Exception $exception) {
-            /** @var \Magento\Sales\Model\Order $order */
-            $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-                $orderEntity
-            );
-            /** change payment status in magento */
-            $order->addStatusToHistory('pagseguro_cancelada', null, true);
-            /** save order */
-            $order->save();
+            
+            $this->changeOrderHistory($orderEntity, 'pagseguro_cancelada');
 
             return $result->setData([
                 'success' => false,
@@ -133,5 +129,23 @@ class CreditCard extends \Magento\Framework\App\Action\Action
                 ]
             ]);
         }
+    }
+
+    /**
+     * Change the magento order status
+     *
+     * @param $orderId
+     * @param $status
+     */
+    private function changeOrderHistory($orderId, $status)
+    {
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
+            $orderId
+        );
+        /** change payment status in magento */
+        $order->addStatusToHistory($status, null, true);
+        /** save order */
+        $order->save();
     }
 }

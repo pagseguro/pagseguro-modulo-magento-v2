@@ -67,6 +67,7 @@ class Request extends \Magento\Backend\App\Action
               $this->_objectManager->create('Magento\Sales\Model\Order'),
               $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
               $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
+              $this->_objectManager->create('\Magento\Framework\Stdlib\DateTime\TimezoneInterface'),
               $this->getRequest()->getParam('days')
         );
 
