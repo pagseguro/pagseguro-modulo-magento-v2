@@ -69,7 +69,6 @@ class Debit extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-
         $orderEntity = $this->getRequest()->getParam('order_id');
         $senderHash = $this->getRequest()->getParam('sender_hash');
         $bankName = $this->getRequest()->getParam('bank_name');
@@ -91,6 +90,7 @@ class Debit extends \Magento\Framework\App\Action\Action
         $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
 
         try {
+
             $debit = new DebitMethod(
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
                 $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderEntity),
@@ -103,6 +103,8 @@ class Debit extends \Magento\Framework\App\Action\Action
             $debit->setSenderHash($senderHash);
 
             $response = $debit->createPaymentRequest();
+
+            $this->changeOrderHistory($orderEntity, 'pagseguro_aguardando_pagamento');
 
             return $result->setData([
                 'success' => true,
@@ -118,14 +120,8 @@ class Debit extends \Magento\Framework\App\Action\Action
             ]);
 
         } catch (\Exception $exception) {
-            /** @var \Magento\Sales\Model\Order $order */
-            $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-                $orderEntity
-            );
-            /** change payment status in magento */
-            $order->addStatusToHistory('pagseguro_cancelada', null, true);
-            /** save order */
-            $order->save();
+            
+            $this->changeOrderHistory($orderEntity, 'pagseguro_cancelada');
 
             return $result->setData([
                 'success' => false,
@@ -135,5 +131,23 @@ class Debit extends \Magento\Framework\App\Action\Action
                 ]
             ]);
         }
+    }
+
+    /**
+     * Change the magento order status
+     *
+     * @param $orderId
+     * @param $status
+     */
+    private function changeOrderHistory($orderId, $status)
+    {
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
+            $orderId
+        );
+        /** change payment status in magento */
+        $order->addStatusToHistory($status, null, true);
+        /** save order */
+        $order->save();
     }
 }

@@ -30,13 +30,13 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control input-md" id="document-credit-card" name="document" type="text">
+                        <input class="form-control cpf-cnpj-mask" id="document-credit-card" name="document" type="text">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_num">Número do cartão</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="card_num" name="card_num" type="text" required>
+                        <input class="form-control credit-card-mask" id="card_num" name="card_num" type="text" required>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
@@ -48,7 +48,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_holder_birthdate">Data de nascimento</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="card_holder_birthdate" name="card_holder_birthdate" type="text" required="">
+                        <input class="form-control date-mask" id="card_holder_birthdate" name="card_holder_birthdate" type="text" required="">
                     </div>
                 </div>
                 <div class="form-group">
@@ -89,7 +89,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">Código de segurança</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="card_cod" name="card_cod" type="text">
+                        <input class="form-control code-card-mask" id="card_cod" name="card_cod" type="text">
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group display-none">
@@ -115,7 +115,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="document-debit" name="document" type="text">
+                        <input class="form-control cpf-cnpj-mask" id="document-debit" name="document" type="text">
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
@@ -125,10 +125,10 @@
                             <input type="radio" name="bank" id="optionsRadios1" value="1">
                             Itaú
                         </label>
-                        <label class="radio">
+                        <!-- <label class="radio">
                             <input type="radio" name="bank" id="optionsRadios2" value="2">
                             Bradesco
-                        </label>
+                        </label> -->
                         <label class="radio">
                             <input type="radio" name="bank" id="optionsRadios2" value="3">
                             Banrisul
@@ -152,7 +152,7 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
-                        <input class="form-control" id="document-boleto" name="document" type="text">
+                        <input class="form-control cpf-cnpj-mask" id="document-boleto" name="document" type="text">
                     </div>
                 </div>
                 <button class="btn-pagseguro --align-right" id="payment-boleto">Concluir</button>
@@ -176,10 +176,30 @@
 <script type="text/javascript">
     require([
             'jquery',
+            'masks',
             "public"
         ],
         function($) {
-            ;(function tabsPagseguro($, undefined){
+            ;(function masksInputs($, undefined) {
+                $('.cpf-mask').mask('000.000.000-00');
+                $('.cnpj-mask').mask('00.000.000/0000-00');
+                $('.credit-card-mask').mask('0000 0000 0000 0000');
+                $('.code-card-mask').mask('000');
+                $('.date-mask').mask('00/00/0000', { placeholder: "__/__/____" });
+                $('.cpf-cnpj-mask').on('keyup', function() {
+
+                    try {
+                        $(this).unmask();
+                    } catch(e) {
+                        alert('Ops, algo deu errado!');
+                    };
+
+                    var isLength = $(this).val().length;
+                    //9 is number optional, is fake the transtion two types mask
+                    isLength <= 11 ? $(this).mask('000.000.000-009') : $(this).mask('00.000.000/0000-00');
+                });
+            }($));
+            ;(function tabsPagseguro($, undefined) {
                 var $action = $('.js-tab-action');
                 $action.on('click', function(e){
                     e.preventDefault();
@@ -200,31 +220,50 @@
                 });
             }($));
 
-            //Update the total value according with installments
-            $('#card_installments').on('change', function(){
-                var currency = parseFloat($(this).val()).toFixed(2);
-                $('#card_total').text('R$ ' + currency);
-            });
+            ;(function calcTotal($, undefined) {
+                //Update the total value according with installments
+                $('#card_installments').on('change', function() {
+                    var currency = parseFloat($(this).val()).toFixed(2);
+                    $('#card_total').text('R$ ' + currency);
+                });
+            }($));
 
-            function loadElements(service, bank = false, creditCard = false)
-            {
+            function unmaskField($el) {
+                try {
+                    var oldvalue = $el.val();
+                    var newvalue = oldvalue.replace(/[/ -. ]+/g, '').trim();
 
+                    return newvalue;
+                } catch(e) {
+                    alert('Ops, algo deu errado! Recarregue a página');
+                };
+            };
+
+            function loadElements(service, bank, creditCard) {
+                var bank = bank || false;
+                var creditCard = creditCard || false;
+                var data = [];
+
+
+                //start request process started
                 $("#payment-"+service).trigger('processStart');
 
-                var data = new Array();
+                //default values to send
                 data['url'] = $('#adminurl').attr('data-target');
                 data['orderId'] = $('#order').attr('data-target');
                 data['sessionCode'] = $('#session-code').attr('data-target');
-                data['document'] = $('#document-'+service).val();
+                data['document'] = unmaskField($('#document-'+service));
 
-                if (bank) {
+                //values only debit method to use
+                if(bank) {
                     var bankId = $("#bankList input[type='radio']:checked");
                     if (bankId.length > 0) {
                         data['bank'] = bankId.val();
                     }
                 }
 
-                if (creditCard) {
+                //values only credit card method to use
+                if(creditCard) {
                     data['cardInternational'] = $('#card-international').attr('data-target');
                     data['installmentQuantity'] = $("#card_installments option:selected" ).attr('data-quantity');
                     data['installmentAmount'] = $("#card_installments option:selected" ).attr('data-amount');
@@ -233,36 +272,32 @@
                 }
 
                 return data;
-            }
+            };
 
-            $('#payment-boleto').on('click', function(event){
-                event.preventDefault();
+            //Event buttons methods buy types
+            $('#payment-boleto').on('click', function(e){
+                e.preventDefault();
                 var el = loadElements('boleto');
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
-                setTimeout(function () {
-                    console.log('test');
-                    WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
-                }, 5000);
+                WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
 
             });
 
-            $('#payment-debit').on('click', function(){
-                event.preventDefault();
+            $('#payment-debit').on('click', function(e){
+                e.preventDefault();
                 var el = loadElements('debit', true);
-
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
-                setTimeout(function () {
-                    WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
-                }, 5000);
+                WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
+
             });
 
-            $('#payment-credit-card').on('click', function(){
-                event.preventDefault();
+            $('#payment-credit-card').on('click', function(e){
+                e.preventDefault();
 
                 PagSeguroDirectPayment.createCardToken({
-                    cardNumber: $('#card_num').val(),
+                    cardNumber: unmaskField($('#card_num')),
                     brand: $('#card-brand').attr('data-target'),
                     internationalMode: $('#card-international').attr('data-target'),
                     cvv: $('#card_cod').val(),
@@ -291,25 +326,48 @@
                 });
             });
 
-            //Get the installments and the credit card brand
-            $('#card_num').on("blur", function() {
+            //get and showing brand credit card
+            function getBrandCard(cardBinVal) {
                 PagSeguroDirectPayment.setSessionId($('#session-code').attr('data-target'));
 
                 PagSeguroDirectPayment.getBrand({
-                    cardBin: $('#card_num').val().substring(0,6),
+                    cardBin: cardBinVal,
                     internationalMode: true,
                     success: function(response) {
-                        setTimeout(function () {
-                            WS.Ajax.Direct.CreditCard.Installments(
-                                $('#adminurl').attr('data-target'),
-                                $('#order').attr('data-target'),
-                                response.brand.name,
-                                response.brand.international
-                            );
-                        }, 1500);
+                        WS.Ajax.Direct.CreditCard.Installments(
+                            $('#adminurl').attr('data-target'),
+                            $('#order').attr('data-target'),
+                            response.brand.name,
+                            response.brand.international
+                        );
                     }
                 });
-            });
+            };
+
+            ;(function putBrandCard($, undefined) {
+                var cardBinVal;
+                var isLength = 0;
+                var firstcheck = false;
+                var cardNumLastValLength = 0;
+                //Get the installments and the credit card brand
+                $('#card_num').on("keyup", function() {
+                    cardNumLastValLength = isLength;
+                    isLength = $(this).val().length;
+
+                    //6 number + space of mask
+                    if (isLength == 7 && cardNumLastValLength <= 7) {
+                        clearValue = unmaskField($(this));
+                        cardBinVal = clearValue.substring(0,6);
+
+                        if(cardBinVal != clearValue.substring(0, 6) || firstcheck == false){
+                            getBrandCard(cardBinVal);
+                            //firstcheck = true;
+                        }
+                    }
+                });
+            }($));
+
+
         }
     );
 </script>

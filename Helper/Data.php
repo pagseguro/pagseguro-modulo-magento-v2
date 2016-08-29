@@ -265,7 +265,7 @@ class Data
      */
     public static function formatPhone($phone)
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
+        $phone = self::keepOnlyNumbers($phone);
         $ddd = '';
         if (strlen($phone) > 9) {
             if (substr($phone, 0, 1) == 0) {
@@ -278,27 +278,39 @@ class Data
     }
 
     /**
-    * Remove especial characters and keep only numbers of the $document and
-    * returns it and his type. If it is not a CPF or CNPJ size, 
-    * throws an exception
-    *
-    * @param string $document
-    * @return array
-    * @throws Exception Invalid document
+     * Remove especial characters and keep only numbers of the $document and
+     * returns it and his type. If it is not a CPF or CNPJ size, 
+     * throws an exception
+     *
+     * @param string $document
+     * @return array
+     * @throws Exception Invalid document
     */
-   public function formatDocument($document)
-   {
-       $document = preg_replace('/[^0-9]/', '', $document);
+    public static function formatDocument($document)
+    {
+       $document = self::keepOnlyNumbers($document);
        switch (strlen($document)) {
-           case 14:
-               return ['number' => $document, 'type' => 'cnpj'];
-               break;
-           case 11:
-               return ['number' => $document, 'type' => 'cpf'];
-               break;
-           default:
-               throw new \Exception('Invalid document');
-               break;
-       }
-   }
+            case 14:
+                return ['number' => $document, 'type' => 'cnpj'];
+                break;
+            case 11:
+                return ['number' => $document, 'type' => 'cpf'];
+                break;
+            default:
+                throw new \Exception('Invalid document');
+                break;
+        }
+    }
+
+    /**
+     * Remove empty spaces and special characters, returning 
+     * only the numbers of the $data
+     *
+     * @param   string $data
+     * @return  string
+    */
+    public static function keepOnlyNumbers($data)
+    {
+        return preg_replace('/[^0-9]/', '', $data);
+    }
 }

@@ -56,7 +56,7 @@ class Checkout implements ArrayInterface
         return [
             self::STANDARD => __('Padrão'),
             self::LIGHTBOX => __('Lightbox'),
-            self::DIRECT   => __('Checkout Transparent')
+            self::DIRECT   => __('Checkout Transparente')
         ];
     }
 }

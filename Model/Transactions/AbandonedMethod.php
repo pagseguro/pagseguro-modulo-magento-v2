@@ -84,6 +84,11 @@ class AbandonedMethod
     private $_crypt;
 
     /**
+     * @var \UOL\PagSeguro\Helper\Crypt
+     */
+    protected $_timezone;
+
+    /**
      * Conciliation constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
@@ -100,6 +105,7 @@ class AbandonedMethod
         \Magento\Sales\Model\Order $order,
         \UOL\PagSeguro\Helper\Library $library,
         \UOL\PagSeguro\Helper\Crypt $crypt,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         $days = null
     ) {
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
@@ -123,6 +129,7 @@ class AbandonedMethod
             'sales_order_grid',
             'order_id'
         );
+        $this->_timezone = $timezone;
     }
 
     /**
@@ -166,9 +173,10 @@ class AbandonedMethod
     {
         //load payments by date
         $this->getPagSeguroAbandoned();
+
         if ($this->_PagSeguroPaymentList->getTransactions()) {
             foreach ($this->_PagSeguroPaymentList->getTransactions() as $payment) {
-
+                date_default_timezone_set('UTC');
                 $order = \UOL\PagSeguro\Helper\Data::getReferenceDecryptOrderID($payment->getReference());
                 $order = $this->_order->load($order);
                 if ($this->getStoreReference() == \UOL\PagSeguro\Helper\Data::getReferenceDecrypt(
@@ -183,6 +191,8 @@ class AbandonedMethod
                 }
             }
         }
+        date_default_timezone_set($this->_timezone->getConfigTimezone());
+
         return $this->_arrayPayments;
     }
 
@@ -195,10 +205,12 @@ class AbandonedMethod
      */
     private function build($payment, $order)
     {
-        return  [
-            'date'             => date("d/m/Y H:i:s", strtotime($order->getCreatedAt())),
+        $orderDate = new \DateTime($order->getCreatedAtFormatted(\IntlDateFormatter::MEDIUM));
+
+        return [
+            'date'             => $orderDate->format('d/m/Y H:i:s'),
             'magento_id'       => sprintf('#%s', $order->getIncrementId()),
-            'validate'         => $this->abandonedIntervalToDate($order),
+            'validate'         => $this->abandonedIntervalToDate($orderDate),
             'sent'             => current($this->getSent($order->getId())),
             'order_id'         => $order->getId(),
             'details'          => $this->_crypt->encrypt('!QAWRRR$HU%W34tyh59yh544%', json_encode([
@@ -328,16 +340,15 @@ class AbandonedMethod
     /**
      * Converts a day interval to date.
      *
-     * @param \DateTime $order
+     * @param \DateTime $date
      * @return string
      */
-    private function abandonedIntervalToDate($order)
+    private function abandonedIntervalToDate($date)
     {
-        $date = new \DateTime($order->getCreatedAt());
-        $date->setTimezone(new \DateTimeZone("America/Sao_Paulo"));
         $dateInterval = "P".(String)self::VALID_RANGE_DAYS."D";
         $date->add(new \DateInterval($dateInterval));
-        return date("d/m/Y H:i:s", $date->getTimestamp());
+
+        return $date->format('d/m/Y H:i:s');
     }
 
     /**

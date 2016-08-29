@@ -1617,6 +1617,9 @@ a.badge:focus {
         bottom: -15px; /* subtract the height unit this element */
         opacity: 1;
         border-top-color: #4F7743;
+        -webkit-transition-duration: .25s;
+        -moz-transition-duration: .25s;
+        transition-duration: .25s;
     }
     /* end item active */
 
@@ -1642,7 +1645,12 @@ a.badge:focus {
         /* style of animation */
         opacity: 0;
         bottom: -5px;
-        transition: all .25s linear;
+        -webkit-transition: all linear;
+        -moz-transition: all linear;
+        transition: all linear;
+        -webkit-transition-duration: 0s;
+        -moz-transition-duration: 0s;
+        transition-duration: 0s;
     }
 
 

@@ -94,13 +94,14 @@ class Library
      */
     private function loader()
     {
-
         /** @var \Magento\Framework\App\ObjectManager $objectManager */
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+        $timezone = $objectManager->create('\Magento\Framework\Stdlib\DateTime\TimezoneInterface');
         /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
 
-
+        //set the store timezone to the script
+        date_default_timezone_set($timezone->getConfigTimezone());
         \PagSeguro\Library::initialize();
 		\PagSeguro\Library::cmsVersion()->setName("Magento")->setRelease($productMetadata->getVersion());
         \PagSeguro\Library::moduleVersion()->setName($this->_moduleList->getOne('UOL_PagSeguro')['name'])
