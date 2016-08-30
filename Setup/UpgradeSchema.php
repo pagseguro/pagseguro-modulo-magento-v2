@@ -172,6 +172,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function cleanUiBookmark($setup)
     {
         $setup->getConnection()
-            ->delete('ui_bookmark', "namespace='sales_order_grid'");
+            ->delete($setup->getTable('ui_bookmark'), "namespace='sales_order_grid'");
     }
 }

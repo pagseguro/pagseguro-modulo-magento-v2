@@ -26,8 +26,6 @@ namespace UOL\PagSeguro\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\ResourceModel\Grid;
 use UOL\PagSeguro\Model\Orders;
-use UOL\PagSeguro\Model\OrdersFactory;
-use UOL\PagSeguro\Model\System\Config\Environment;
 
 /**
  * Observer for saving the order and his environment when a PagSeguro order is done
@@ -40,44 +38,58 @@ class CreatePagSeguroOrder implements ObserverInterface
      * @var ObjectManagerInterface
      */
     protected $_objectManager;
+
     /**
      * @var ScopeConfigInterface
      */
     protected $_scopeConfig;
+
     /**
      * @var UOL\PagSeguro\Model\System\Config\Environment 
      */
     protected $_environment;
+
     /**
      * Automatic generated factory class
      * @var UOL\PagSeguro\Model\OrdersFactory;
      */
     protected $_ordersFactory;
+
     /**
      * @var \Magento\Framework\Model\ResourceModel\Db\Context
      */
     protected $_context;
+
     /**
      * @var Magento\Sales\Model\ResourceModel\Grid;
      */
     protected $_grid;
 
     /**
+     * @var Magento\Sales\Model\ResourceModel\Grid;
+     */
+    protected $_resource;
+
+    /**
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
      * @param OrdersFactory $ordersFactory
-     * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
+     * @param \Magento\Framework\App\ResourceConnection $resourceConnection
      */
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-        OrdersFactory $ordersFactory,
-        \Magento\Framework\Model\ResourceModel\Db\Context $context
+        \Magento\Framework\Model\ResourceModel\Db\Context $context,
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
+        \UOL\PagSeguro\Model\OrdersFactory $ordersFactory,
+        \UOL\PagSeguro\Model\System\Config\Environment $environmentConfig
     ) {
         $this->_objectManager = $objectManager;
         $this->_scopeConfig = $scopeConfigInterface;
-        $this->_environment = new Environment();
+        $this->_environment = $environmentConfig;
         $this->_ordersFactory = $ordersFactory;
+        $this->_resource = $resourceConnection;
+        // Unavaliable for DI
         $this->_grid = new Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
     }
     
@@ -117,13 +129,10 @@ class CreatePagSeguroOrder implements ObserverInterface
     private function saveOrderAndEnvironment($orderId, $environment)
     {
         $this->_ordersFactory->create()
-            ->setData(
-                [
+            ->setData([
                     'order_id' => $orderId,
                     'environment' => $environment
-                ]
-            )
-            ->save();
+            ])->save();
     }
     
     /**
@@ -133,23 +142,24 @@ class CreatePagSeguroOrder implements ObserverInterface
     private function getEnvironmentName($environment)
     {
         $environmentName = $this->_environment->toOptionArray();
-
         return $environmentName[$environment]->getText();
     }
     
     /**
      * Update environment in sales_order_grid table
+     *
      * @param int $orderId
      * @param string $environment
      */
     private function updateSalesOrderGridEnvironment($orderId, $environment)
     {
         $environmentName = $this->getEnvironmentName($environment);
-        
-        $this->_grid->getConnection()->query(
-            "UPDATE sales_order_grid
-            SET environment='$environmentName'
-            WHERE entity_id=$orderId"
-        );
+        //Getting connection
+        $connection  = $this->_resource->getConnection();
+        //Getting full table name
+        $tableName = $this->_resource->getTableName('sales_order_grid');
+        //Update sales_order_grid query
+        $mapsDeleteQuery = "UPDATE $tableName SET environment='$environmentName' WHERE entity_id=$orderId";
+        $connection->query($mapsDeleteQuery);
     }
 }
