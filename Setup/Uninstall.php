@@ -85,7 +85,7 @@ class Uninstall implements UninstallInterface
     {
         foreach ($statuses as $status) {
             $setup->getConnection()
-                ->delete('sales_order_status', "status='$status'");
+                ->delete($setup->getTable('sales_order_status'), "status='$status'");
         }
     }
     //sales_order_status_state
@@ -93,7 +93,7 @@ class Uninstall implements UninstallInterface
     {
         foreach ($statuses as $status) {
             $setup->getConnection()
-                ->delete('sales_order_status_state', "status='$status'");
+                ->delete($setup->getTable('sales_order_status_state'), "status='$status'");
         }
     }
     //core_config_data
@@ -101,13 +101,13 @@ class Uninstall implements UninstallInterface
     {
         foreach ($paths as $path) {
             $setup->getConnection()
-                ->delete('core_config_data', "path='$path'");
+                ->delete($setup->getTable('core_config_data'), "path='$path'");
         }
     }
     
     private function removeModuleSetup($setup)
     {
         $setup->getConnection()
-            ->delete('setup_module', "module='UOL_PagSeguro'");
+            ->delete($setup->getTable('setup_module'), "module='UOL_PagSeguro'");
     }
 }
