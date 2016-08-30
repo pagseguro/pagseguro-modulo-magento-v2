@@ -53,6 +53,11 @@ class ConciliationMethod
     private $_scopeConfig;
 
     /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    private $_resource;
+
+    /**
      * @var \Magento\Sales\Model\ResourceModel\Grid
      */
     private $_salesGrid;
@@ -88,6 +93,7 @@ class ConciliationMethod
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Backend\Model\Session $session,
         \Magento\Sales\Model\Order $order,
@@ -97,6 +103,8 @@ class ConciliationMethod
     ) {
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var \Magento\Framework\App\ResourceConnection _resource */
+        $this->_resource = $resourceConnection;
         /** @var  \Magento\Backend\Model\Session  _session */
         $this->_session = $session;
         /** @var \Magento\Sales\Model\Order _order */
@@ -329,11 +337,13 @@ class ConciliationMethod
      */
     private function updateSalesOrderGridTransactionCode($orderId, $transactionCode)
     {
-        $this->_salesGrid->getConnection()->query(
-            "UPDATE sales_order_grid
-            SET transaction_code='$transactionCode'
-            WHERE entity_id=$orderId"
-        );
+        //Getting connection
+        $connection  = $this->_resource->getConnection();
+        //Getting full table name
+        $tableName = $this->_resource->getTableName('sales_order_grid');
+        //Update sales_order_grid query
+        $mapsDeleteQuery = "UPDATE $tableName SET transaction_code='$transactionCode' WHERE entity_id=$orderId";
+        $connection->query($mapsDeleteQuery);
     }
 
     /**
@@ -344,10 +354,12 @@ class ConciliationMethod
      */
     private function updatePagSeguroOrdersTransactionCode($orderId, $transactionCode)
     {
-        $this->_salesGrid->getConnection()->query(
-            "UPDATE pagseguro_orders
-            SET transaction_code='$transactionCode'
-            WHERE order_id=$orderId"
-        );
+        //Getting connection
+        $connection  = $this->_resource->getConnection();
+        //Getting full table name
+        $tableName = $this->_resource->getTableName('pagseguro_orders');
+        //Update sales_order_grid query
+        $mapsDeleteQuery = "UPDATE $tableName SET transaction_code='$transactionCode' WHERE entity_id=$orderId";
+        $connection->query($mapsDeleteQuery);
     }
 }

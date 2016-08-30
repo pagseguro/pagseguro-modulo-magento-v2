@@ -61,6 +61,7 @@ class Request extends \Magento\Backend\App\Action
 
         $abandoned = new AbandonedMethod(
               $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+              $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
               $this->_objectManager->create('Magento\Framework\Mail\Template\TransportBuilder'),
               $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
               $this->_objectManager->create('Magento\Backend\Model\Session'),

@@ -61,6 +61,7 @@ class Request extends \Magento\Backend\App\Action
 
         $conciliation = new ConciliationMethod(
               $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+              $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
               $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
               $this->_objectManager->create('Magento\Backend\Model\Session'),
               $this->_objectManager->create('Magento\Sales\Model\Order'),

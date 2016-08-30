@@ -10,15 +10,10 @@
         "php": "~5.5.0|~5.6.0|~7.0.0",
         "pagseguro/php": "dev-3.0.0-dev"
     },
-    "extra": {
-        "map": [
-            [
-                "*",
-                "UOL/PagSeguro"
-            ]
-        ]
-    },
     "autoload": {
+        "files": [
+                "registration.php"
+        ],      
         "psr-4": {
             "UOL\\PagSeguro\\": ""
         }

@@ -99,6 +99,7 @@ class AbandonedMethod
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Backend\Model\Session $session,
@@ -110,6 +111,8 @@ class AbandonedMethod
     ) {
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var \Magento\Framework\App\ResourceConnection _resource */
+        $this->_resource = $resourceConnection;
         /** @var  \Magento\Backend\Model\Session  _session */
         $this->_session = $session;
         /** @var \Magento\Sales\Model\Order _order */
@@ -405,10 +408,13 @@ class AbandonedMethod
      */
     private function getSent($orderId)
     {
-        return $this->_salesGrid->getConnection()->query(
-            "SELECT sent FROM pagseguro_orders
-            WHERE order_id=$orderId"
-        )->fetch();
+        //Getting connection
+        $connection  = $this->_resource->getConnection();
+        //Getting full table name
+        $tableName = $this->_resource->getTableName('pagseguro_orders');
+        //Update sales_order_grid query
+        $mapsDeleteQuery = "SELECT sent FROM {$tableName} WHERE order_id={$orderId}";
+        return $connection->query($mapsDeleteQuery)->fetch();
     }
 
 
@@ -420,10 +426,12 @@ class AbandonedMethod
      */
     private function setSent($orderId, $sent)
     {
-        $this->_salesGrid->getConnection()->query(
-            "UPDATE pagseguro_orders
-              SET sent={$sent}
-              WHERE order_id={$orderId}"
-        );
+        //Getting connection
+        $connection  = $this->_resource->getConnection();
+        //Getting full table name
+        $tableName = $this->_resource->getTableName('pagseguro_orders');
+        //Update sales_order_grid query
+        $mapsDeleteQuery = "UPDATE {$tableName} SET sent={$sent} WHERE order_id={$orderId}";
+        $connection->query($mapsDeleteQuery);
     }
 }
