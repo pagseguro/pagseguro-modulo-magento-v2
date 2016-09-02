@@ -24,7 +24,7 @@
     <?php echo $block->getAdditionalInfoHtml() ?>
 
 	<?php switch($this->getPaymentType()):
-			case 'debit':?>
+			case 'uol\pagseguro\controller\direct\debit':?>
 				<?php if(!is_null($this->getPaymentLink())): ?>
 					<div class="actions-toolbar">
 					<div class="primary">
@@ -34,7 +34,7 @@
 				<?php endif; ?>
 		<?php break; ?>
 
-		<?php case 'boleto':?>
+		<?php case 'uol\pagseguro\controller\direct\boleto':?>
 				<?php if(!is_null($this->getPaymentLink())): ?>
 					<div class="actions-toolbar">
 					<div class="primary">

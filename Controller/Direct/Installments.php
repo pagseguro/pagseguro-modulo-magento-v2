@@ -40,6 +40,9 @@ class Installments extends \Magento\Framework\App\Action\Action
      */
     protected $payment;
 
+    /** @var \Magento\Framework\Controller\Result\Json  */
+    protected $result;
+
     /**
      * installments constructor
      * @param \Magento\Framework\App\Action\Context $context
@@ -52,6 +55,7 @@ class Installments extends \Magento\Framework\App\Action\Action
     {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->result = $this->resultJsonFactory->create();
     }
 
     /**
@@ -60,49 +64,139 @@ class Installments extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $orderEntity = $this->getRequest()->getParam('order_id');
-        $creditCardBrand = $this->getRequest()->getParam('credit_card_brand');
-        $creditCardInternational = $this->getRequest()->getParam('credit_card_international');
-
-        /** @var \Magento\Framework\Controller\Result\Json $result */
-        $result = $this->resultJsonFactory->create();
-
-        /** @var \Magento\Store\Model\StoreManagerInterface $storeManager */
-        $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
-
         try {
             $installments = new InstallmentsMethod(
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
-                $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderEntity),
-                $this->_objectManager->create('Magento\Framework\Module\ModuleList')
-            );
-
-            $response =  $installments->create($creditCardBrand, $creditCardInternational);
-
-            return $result->setData([
-                'success' => true,
-                'payload' => [
-                    'data' => $response
+                $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
+                $this->loadOrder(),
+                $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+                $data = [
+                    'brand' => $this->getRequest()->getParam('credit_card_brand'),
+                    'international' => $this->getRequest()->getParam('credit_card_international')
                 ]
-            ]);
+            );
+            return $this->place($installments);
 
         } catch (\Exception $exception) {
-            /** @var \Magento\Sales\Model\Order $order */
-            $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-                $orderEntity
-            );
-            /** change payment status in magento */
-            $order->addStatusToHistory('pagseguro_cancelada', null, true);
-            /** save order */
-            $order->save();
-
-            return $result->setData([
-                'success' => false,
-                'payload' => [
-                    'error'    => $exception->getMessage(),
-                    'redirect' => sprintf('%s%s', $storeManager->getStore()->getBaseUrl(), 'pagseguro/payment/failure')
-                ]
-            ]);
+            $this->changeOrderHistory('pagseguro_cancelada');
+            $this->clearSession();
+            return $this->whenError($exception->getMessage());
         }
+    }
+
+    /**
+     * Place
+     *
+     * @param $installments
+     * @return Installments
+     */
+    private function place($installments)
+    {
+        return $this->whenSuccess($installments->create());
+    }
+
+    /**
+     * Return when success
+     *
+     * @param $response
+     * @return $this
+     */
+    private function whenSuccess($response)
+    {
+        return $this->result->setData([
+            'success' => true,
+            'payload' => [
+                'data'     => $response
+            ]
+        ]);
+    }
+
+    /**
+     * Return when fails
+     *
+     * @param $message
+     * @return $this
+     */
+    private function whenError($message)
+    {
+        return $this->result->setData([
+            'success' => false,
+            'payload' => [
+                'error'    => $message,
+                'redirect' => sprintf('%s%s', $this->baseUrl(), 'pagseguro/payment/failure')
+            ]
+        ]);
+    }
+
+    /**
+     * Clear session storage
+     */
+    private function clearSession()
+    {
+        $this->_objectManager->create('Magento\Framework\Session\SessionManager')->clearStorage();
+    }
+
+    /**
+     * Load a order by id
+     *
+     * @return \Magento\Sales\Model\Order
+     */
+    private function loadOrder()
+    {
+        return $this->_objectManager->create('Magento\Sales\Model\Order')->load($this->lastRealOrderId());
+    }
+
+    /**
+     * Load PagSeguro helper data
+     *
+     * @return \UOL\PagSeguro\Helper\Data
+     */
+    private function helperData()
+    {
+        return $this->_objectManager->create('UOL\PagSeguro\Helper\Data');
+    }
+
+    /**
+     * Get base url
+     *
+     * @return string url
+     */
+    private function baseUrl()
+    {
+        return $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface')->getStore()->getBaseUrl();
+    }
+
+    /**
+     * Get last real order id
+     *
+     * @return string id
+     */
+    private function lastRealOrderId()
+    {
+        return $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
+    }
+
+    /**
+     * Create a new session object
+     *
+     * @return \Magento\Framework\Session\SessionManager
+     */
+    private function session()
+    {
+        return $this->_objectManager->create('Magento\Framework\Session\SessionManager');
+    }
+
+    /**
+     * Change the magento order status
+     *
+     * @param $status
+     */
+    private function changeOrderHistory($status)
+    {
+        $order = $this->loadOrder();
+        /** change payment status in magento */
+        $order->addStatusToHistory($status, null, true);
+        /** save order */
+        $order->save();
     }
 }

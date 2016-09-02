@@ -39,10 +39,13 @@ class CreditCard extends \Magento\Framework\App\Action\Action
      */
     protected $payment;
 
+    /** @var \Magento\Framework\Controller\Result\Json  */
+    protected $result;
+
     /**
      * Checkout constructor.
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -51,6 +54,7 @@ class CreditCard extends \Magento\Framework\App\Action\Action
     {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->result = $this->resultJsonFactory->create();
     }
 
     /**
@@ -59,90 +63,168 @@ class CreditCard extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $orderEntity = $this->getRequest()->getParam('order_id');
-        $senderHash = $this->getRequest()->getParam('sender_hash');
-        //card data
-        $cardToken = $this->getRequest()->getParam('card_token');
-        $cardInternational = $this->getRequest()->getParam('card_international');
-        //installment data
-        $installmentQuantity = $this->getRequest()->getParam('installment_quantity');
-        $installmentAmount = $this->getRequest()->getParam('installment_amount');
-        //holder data
-        $holderName = $this->getRequest()->getParam('holder_name');
-        $holderBirthdate = $this->getRequest()->getParam('holder_birthdate');
-        //document
-        $senderDocument = $this->getRequest()->getParam('sender_document');
 
-        /** @var \UOL\PagSeguro\Helper\Data $helperData */
-        $helperData = $this->_objectManager->create('UOL\PagSeguro\Helper\Data');
-
-        /** @var \Magento\Framework\Controller\Result\Json $result */
-        $result = $this->resultJsonFactory->create();
-
-        /** @var \Magento\Store\Model\StoreManagerInterface $storeManager */
-        $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
-
-        /** @var UOL\PagSeguro\Helper\Crypt $crypt */
-        $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
+        //$cardInternational = $this->getRequest()->getParam('card_international');
 
         try {
             $creditCard = new CreditCardMethod(
-                $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
-                $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderEntity),
                 $this->_objectManager->create('Magento\Directory\Api\CountryInformationAcquirerInterface'),
-                $this->_objectManager->create('Magento\Framework\Module\ModuleList')
-            );
+                $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+                $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
+                $this->loadOrder(),
+                $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+                $data = [
+                    'sender_document' => $this->helperData()->formatDocument($this->getRequest()->getParam('sender_document')),
+                    'sender_hash' => $this->getRequest()->getParam('sender_hash'),
+                    'order_id' => $this->lastRealOrderId(),
+                    'installment' => [
+                        'quantity' => $this->getRequest()->getParam('installment_quantity'),
+                        'amount'   => $this->getRequest()->getParam('installment_amount')
+                    ],
+                    'token' => $this->getRequest()->getParam('card_token'),
+                    'holder' => [
+                        'name'       => $this->getRequest()->getParam('holder_name'),
+                        'birth_date' => $this->getRequest()->getParam('holder_birthdate'),
 
-            $creditCard->setSenderDocument($helperData->formatDocument($senderDocument));
-            $creditCard->setSenderHash($senderHash);
-            
-            $creditCard->setInstallment($installmentQuantity, $installmentAmount);
-            $creditCard->setToken($cardToken);
-            $creditCard->setHolder($holderName, $holderBirthdate, $helperData->formatDocument($senderDocument));
-
-            $response = $creditCard->createPaymentRequest();
-
-            $this->changeOrderHistory($orderEntity, 'pagseguro_aguardando_pagamento');
-
-            return $result->setData([
-                'success' => true,
-                'payload' => [
-                    'data' => $response,
-                    'redirect' => sprintf(
-                        '%s%s?payment=%s',
-                        $storeManager->getStore()->getBaseUrl(),
-                        'pagseguro/direct/success',
-                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([null, $orderEntity, null])))
-                    )
+                    ]
                 ]
-            ]);
+            );
+            return $this->placeOrder($creditCard);
 
         } catch (\Exception $exception) {
-            
-            $this->changeOrderHistory($orderEntity, 'pagseguro_cancelada');
-
-            return $result->setData([
-                'success' => false,
-                'payload' => [
-                    'error'    => $exception->getMessage(),
-                    'redirect' => sprintf('%s%s', $storeManager->getStore()->getBaseUrl(), 'pagseguro/payment/failure')
-                ]
-            ]);
+            $this->changeOrderHistory('pagseguro_cancelada');
+            $this->clearSession();
+            return $this->whenError($exception->getMessage());
         }
+    }
+
+    /**
+     * Place order
+     *
+     * @param $creditCard
+     * @return CreditCard
+     */
+    private function placeOrder($creditCard)
+    {
+        $this->changeOrderHistory('pagseguro_aguardando_pagamento');
+        return $this->whenSuccess($creditCard->createPaymentRequest());
+    }
+
+    /**
+     * Return when success
+     *
+     * @param $response
+     * @return $this
+     */
+    private function whenSuccess($response)
+    {
+        $this->makeSession();
+        return $this->result->setData([
+            'success' => true,
+            'payload' => [
+                'redirect' => sprintf('%s%s', $this->baseUrl(), 'pagseguro/direct/success')
+            ]
+        ]);
+    }
+
+    /**
+     * Return when fails
+     *
+     * @param $message
+     * @return $this
+     */
+    private function whenError($message)
+    {
+        return $this->result->setData([
+            'success' => false,
+            'payload' => [
+                'error'    => $message,
+                'redirect' => sprintf('%s%s', $this->baseUrl(), 'pagseguro/payment/failure')
+            ]
+        ]);
+    }
+
+    /**
+     * Create new pogseguro payment session data
+     *
+     * @param $response
+     */
+    private function makeSession()
+    {
+        $this->session()->setData([
+            'pagseguro_payment' => [
+                'payment_type'  => strtolower(CreditCardMethod::class),
+                'order_id'      => $this->lastRealOrderId(),
+            ]
+        ]);
+    }
+
+    /**
+     * Clear session storage
+     */
+    private function clearSession()
+    {
+        $this->_objectManager->create('Magento\Framework\Session\SessionManager')->clearStorage();
+    }
+
+    /**
+     * Load a order by id
+     *
+     * @return \Magento\Sales\Model\Order
+     */
+    private function loadOrder()
+    {
+        return $this->_objectManager->create('Magento\Sales\Model\Order')->load($this->lastRealOrderId());
+    }
+
+    /**
+     * Load PagSeguro helper data
+     *
+     * @return \UOL\PagSeguro\Helper\Data
+     */
+    private function helperData()
+    {
+        return $this->_objectManager->create('UOL\PagSeguro\Helper\Data');
+    }
+
+    /**
+     * Get base url
+     *
+     * @return string url
+     */
+    private function baseUrl()
+    {
+        return $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface')->getStore()->getBaseUrl();
+    }
+
+    /**
+     * Get last real order id
+     *
+     * @return string id
+     */
+    private function lastRealOrderId()
+    {
+        return $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
+    }
+
+    /**
+     * Create a new session object
+     *
+     * @return \Magento\Framework\Session\SessionManager
+     */
+    private function session()
+    {
+        return $this->_objectManager->create('Magento\Framework\Session\SessionManager');
     }
 
     /**
      * Change the magento order status
      *
-     * @param $orderId
      * @param $status
      */
-    private function changeOrderHistory($orderId, $status)
+    private function changeOrderHistory($status)
     {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-            $orderId
-        );
+        $order = $this->loadOrder();
         /** change payment status in magento */
         $order->addStatusToHistory($status, null, true);
         /** save order */

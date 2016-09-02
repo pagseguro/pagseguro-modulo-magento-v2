@@ -32,27 +32,19 @@ use UOL\PagSeguro\Model\Direct\DebitMethod;
 class Debit extends \Magento\Framework\App\Action\Action
 {
 
-    private $bankList = array(
-        1 => 'itau',
-        2 => 'bradesco',
-        3 => 'banrinsul',
-        4 => 'bancodobrasil',
-        5 => 'hsbc'
-    );
-
     /** @var  \Magento\Framework\View\Result\Page */
     protected $resultJsonFactory;
 
-    /**
-     * @var \UOL\PagSeguro\Model\PaymentMethod
-     */
+    /** @var \UOL\PagSeguro\Model\PaymentMethod */
     protected $payment;
 
+    /** @var \Magento\Framework\Controller\Result\Json  */
+    protected $result;
 
     /**
      * Checkout constructor.
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -61,6 +53,7 @@ class Debit extends \Magento\Framework\App\Action\Action
     {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->result = $this->resultJsonFactory->create();
     }
 
     /**
@@ -69,82 +62,184 @@ class Debit extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $orderEntity = $this->getRequest()->getParam('order_id');
-        $senderHash = $this->getRequest()->getParam('sender_hash');
-        $bankName = $this->getRequest()->getParam('bank_name');
-        if (filter_var($bankName, FILTER_VALIDATE_INT)) {
-            $bankName = $this->bankList[$bankName];
-        }
-        $senderDocument = $this->getRequest()->getParam('sender_document');
-
-        /** @var \UOL\PagSeguro\Helper\Data $helperData */
-        $helperData = $this->_objectManager->create('UOL\PagSeguro\Helper\Data');
-
-        /** @var \Magento\Framework\Controller\Result\Json $result */
-        $result = $this->resultJsonFactory->create();
-
-        /** @var \Magento\Store\Model\StoreManagerInterface $storeManager */
-        $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
-
-        /** @var UOL\PagSeguro\Helper\Crypt $crypt */
-        $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
-
         try {
-
             $debit = new DebitMethod(
-                $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
-                $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderEntity),
                 $this->_objectManager->create('Magento\Directory\Api\CountryInformationAcquirerInterface'),
-                $this->_objectManager->create('Magento\Framework\Module\ModuleList')
+                $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+                $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
+                $this->loadOrder(),
+                $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+                $data = [
+                    'sender_document' => $this->helperData()->formatDocument($this->getRequest()->getParam('sender_document')),
+                    'sender_hash' => $this->getRequest()->getParam('sender_hash'),
+                    'bank_name' => $this->bank(),
+                    'order_id' => $this->lastRealOrderId()
+                ]
             );
-
-            $debit->setSenderDocument($helperData->formatDocument($senderDocument));
-            $debit->setBankName($bankName);
-            $debit->setSenderHash($senderHash);
-
-            $response = $debit->createPaymentRequest();
-
-            $this->changeOrderHistory($orderEntity, 'pagseguro_aguardando_pagamento');
-
-            return $result->setData([
-                'success' => true,
-                'payload' => [
-                    'data' => $response,
-                    'redirect' => sprintf(
-                        '%s%s?payment=%s',
-                        $storeManager->getStore()->getBaseUrl(),
-                        'pagseguro/direct/success',
-                        base64_encode($crypt->encrypt('A3c$#g5R', serialize([$response->getPaymentLink(), $orderEntity, 'debit'])))
-                    )
-                ]
-            ]);
-
+            return $this->placeOrder($debit);
         } catch (\Exception $exception) {
-            
-            $this->changeOrderHistory($orderEntity, 'pagseguro_cancelada');
-
-            return $result->setData([
-                'success' => false,
-                'payload' => [
-                    'error'    => $exception->getMessage(),
-                    'redirect' => sprintf('%s%s', $storeManager->getStore()->getBaseUrl(), 'pagseguro/payment/failure')
-                ]
-            ]);
+            $this->changeOrderHistory('pagseguro_cancelada');
+            $this->clearSession();
+            return $this->whenError($exception->getMessage());
         }
+    }
+
+    /**
+     * Place order
+     *
+     * @param $debit
+     * @return Debit
+     */
+    private function placeOrder($debit)
+    {
+        $this->changeOrderHistory('pagseguro_aguardando_pagamento');
+        return $this->whenSuccess($debit->createPaymentRequest());
+    }
+
+    /**
+     * Return when success
+     *
+     * @param $response
+     * @return $this
+     */
+    private function whenSuccess($response)
+    {
+        $this->makeSession($response);
+        return $this->result->setData([
+            'success' => true,
+            'payload' => [
+                'redirect' => sprintf('%s%s', $this->baseUrl(), 'pagseguro/direct/success')
+            ]
+        ]);
+    }
+
+    /**
+     * Return when fails
+     *
+     * @param $message
+     * @return $this
+     */
+    private function whenError($message)
+    {
+        return $this->result->setData([
+            'success' => false,
+            'payload' => [
+                'error'    => $message,
+                'redirect' => sprintf('%s%s', $this->baseUrl(), 'pagseguro/payment/failure')
+            ]
+        ]);
+    }
+
+    /**
+     * Create new pogseguro payment session data
+     *
+     * @param $response
+     */
+    private function makeSession($response)
+    {
+        $this->session()->setData([
+            'pagseguro_payment' => ['payment_link' => $response->getPaymentLink(),
+                'payment_type'  => strtolower(Debit::class),
+                'order_id'      => $this->lastRealOrderId(),
+            ]
+        ]);
+    }
+
+
+    /**
+     * Get bank
+     */
+    private function bank()
+    {
+        try {
+            return $this->bankList()[$this->bankId()];
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Get bank name
+     */
+    private function bankId()
+    {
+        return $this->getRequest()->getParam('bank_name');
+    }
+
+    /**
+     * Get bank list
+     *
+     * @return array
+     */
+    private function bankList()
+    {
+        return [
+            1 => 'itau',
+            2 => 'bradesco',
+            3 => 'banrinsul',
+            4 => 'bancodobrasil',
+            5 => 'hsbc'
+        ];
+    }
+
+    /**
+     * Load a order by id
+     *
+     * @return \Magento\Sales\Model\Order
+     */
+    private function loadOrder()
+    {
+        return $this->_objectManager->create('Magento\Sales\Model\Order')->load($this->lastRealOrderId());
+    }
+
+    /**
+     * Load PagSeguro helper data
+     *
+     * @return \UOL\PagSeguro\Helper\Data
+     */
+    private function helperData()
+    {
+        return $this->_objectManager->create('UOL\PagSeguro\Helper\Data');
+    }
+
+    /**
+     * Get base url
+     *
+     * @return string url
+     */
+    private function baseUrl()
+    {
+        return $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface')->getStore()->getBaseUrl();
+    }
+
+    /**
+     * Get last real order id
+     *
+     * @return string id
+     */
+    private function lastRealOrderId()
+    {
+        return $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
+    }
+
+    /**
+     * Create a new session object
+     *
+     * @return \Magento\Framework\Session\SessionManager
+     */
+    private function session()
+    {
+        return $this->_objectManager->create('Magento\Framework\Session\SessionManager');
     }
 
     /**
      * Change the magento order status
      *
-     * @param $orderId
      * @param $status
      */
-    private function changeOrderHistory($orderId, $status)
+    private function changeOrderHistory($status)
     {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->_objectManager->create('\Magento\Sales\Model\Order')->load(
-            $orderId
-        );
+        $order = $this->loadOrder();
         /** change payment status in magento */
         $order->addStatusToHistory($status, null, true);
         /** save order */

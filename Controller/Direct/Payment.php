@@ -50,6 +50,7 @@ class Payment extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
+
         parent::__construct($context);
         /** @var  _resultPageFactory */
         $this->_resultPageFactory = $resultPageFactory;

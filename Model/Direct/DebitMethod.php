@@ -55,6 +55,11 @@ class DebitMethod
     protected $_countryInformation;
 
     /**
+     * @var array
+     */
+    protected $_data;
+
+    /**
      * DebitMethod constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
@@ -63,11 +68,14 @@ class DebitMethod
      * @param \Magento\Framework\Module\ModuleList $moduleList
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-        \Magento\Sales\Model\Order $order,
         \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
-		\Magento\Framework\Module\ModuleList $moduleList
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
+        \Magento\Framework\Module\ModuleList $moduleList,
+        \Magento\Sales\Model\Order $order,
+        \UOL\PagSeguro\Helper\Library $library,
+        $data = array()
     ) {
+        $this->_data = $data;
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
         /** @var \Magento\Sales\Model\Order _order */
@@ -75,7 +83,7 @@ class DebitMethod
         /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _countryInformation */
         $this->_countryInformation = $countryInformation;
         /** @var \UOL\PagSeguro\Helper\Library _library */
-        $this->_library = new Library($scopeConfigInterface, $moduleList);
+        $this->_library = $library;
         /** @var \PagSeguro\Domains\Requests\DirectPayment\OnlineDebit _paymentRequest */
         $this->_paymentRequest = new OnlineDebit();
     }
@@ -85,82 +93,146 @@ class DebitMethod
      */
     public function createPaymentRequest()
     {
-        // Currency
-        $this->_paymentRequest->setCurrency("BRL");
-        // Order ID
-        $this->_paymentRequest->setReference($this->getOrderStoreReference());
-        // Shipping
-        $this->setShippingInformation();
-        $this->_paymentRequest->setShipping()->setType()
-            ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
-        $this->_paymentRequest->setShipping()->setCost()
-            ->withParameters(number_format($this->getShippingAmount(), 2, '.', '')); //Shipping Coast
-        // Sender
-        $this->setSenderInformation();
-        // Itens
-        $this->setItemsInformation();
-        // Redirect Url
-        $this->_paymentRequest->setRedirectUrl($this->getRedirectUrl());
-        // Notification Url
-        $this->_paymentRequest->setNotificationUrl($this->getNotificationUrl());
         try {
-            $this->_library->setEnvironment();
-            $this->_library->setCharset();
-            $this->_library->setLog();
-
-            return $this->_paymentRequest->register(
-                $this->_library->getPagSeguroCredentials()
-            );
+            $this->currency();
+            $this->reference();
+            $this->shipping();
+            $this->sender();
+            $this->urls();
+            $this->items();
+            $this->config();
+            $this->bank();
+            return $this->register();
         } catch (\Exception $exception) {
-            $this->logger->debug($exception->getMessage());
-            $this->getCheckoutRedirectUrl();
+            throw $exception;
         }
     }
 
     /**
-     * Set bank name
+     * Register a new payment
      *
-     * @param $name
+     * @return string
      */
-    public function setBankName($name)
+    private function register()
     {
-        $this->_paymentRequest->setBankName(htmlentities($name));
+        return $this->_paymentRequest->register($this->_library->getPagSeguroCredentials());
+    }
+
+    /**
+     * Set configuration for payment
+     */
+    private function config()
+    {
+        $this->_library->setEnvironment();
+        $this->_library->setCharset();
+        $this->_library->setLog();
+    }
+
+    /**
+     * Set redirect and notification url's
+     */
+    private function urls()
+    {
+        //Redirect Url
+        $this->_paymentRequest->setRedirectUrl($this->getRedirectUrl());
+        // Notification Url
+        $this->_paymentRequest->setNotificationUrl($this->getNotificationUrl());
+    }
+
+    /**
+     * Set currency for payment
+     */
+    private function currency()
+    {
+        $this->_paymentRequest->setCurrency("BRL");
+    }
+
+    /**
+     * Set reference for payment
+     */
+    private function reference()
+    {
+        $this->_paymentRequest->setReference($this->getOrderStoreReference());
+    }
+
+    /**
+     * Set shipping for payment
+     */
+    private function shipping()
+    {
+        $this->setShippingInformation();
+        //Shipping Type
+        $this->_paymentRequest->setShipping()->setType()->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED);
+        //Shipping Coast
+        $this->_paymentRequest->setShipping()->setCost()->withParameters(number_format(
+                $this->getShippingAmount(),
+                2,
+                '.',
+                null //''
+            )
+        );
+    }
+
+    /**
+     * Set sender for payment
+     */
+    private function sender()
+    {
+        $this->setSenderHash();
+        $this->setSenderDocument();
+        $this->setSenderPhone();
+        $this->setSenderInformation();
+    }
+
+    /**
+     * Set items for payment
+     */
+    private function items()
+    {
+        foreach ($this->_order->getAllVisibleItems() as $product) {
+            $this->setItemsInformation($product);
+        }
+    }
+
+    /**
+     * Set bank
+     */
+    public function bank()
+    {
+        $this->_paymentRequest->setBankName(htmlentities($this->_data['bank_name']));
     }
 
     /**
      * Set sender hash
-     *
-     * @param $hash
      */
-    public function setSenderHash($hash)
+    private function setSenderHash()
     {
-        $this->_paymentRequest->setSender()->setHash(htmlentities($hash));
+        $this->_paymentRequest->setSender()->setHash(htmlentities($this->_data['sender_hash']));
     }
 
     /**
      * Set sender document
-     *
-     * @param $document
      */
-    public function setSenderDocument($document)
+    private function setSenderDocument()
     {
-        $this->_paymentRequest->setSender()->setDocument()->withParameters($document['type'], $document['number']);
+        $this->_paymentRequest->setSender()->setDocument()->withParameters(
+            $this->_data['sender_document']['type'],
+            $this->_data['sender_document']['number']
+        );
     }
 
     /**
      * Get information of purchased items and set in the attribute $_paymentRequest
      */
-    private function setItemsInformation()
+    private function setItemsInformation($product)
     {
-        foreach ($this->_order->getAllVisibleItems() as $product) {
-            $this->_paymentRequest->addItems()->withParameters(
-                $product->getId(), //id
-                \UOL\PagSeguro\Helper\Data::fixStringLength($product->getName(), 255), //description
-                $product->getSimpleQtyToShip(), //quantity
-                \UOL\PagSeguro\Helper\Data::toFloat($product->getPrice()), //amount
-                round($product->getWeight()) //weight
-            );
-        }
+        $this->_paymentRequest->addItems()->withParameters(
+            $product->getId(), //id
+            \UOL\PagSeguro\Helper\Data::fixStringLength($product->getName(), 255), //description
+            $product->getSimpleQtyToShip(), //quantity
+            \UOL\PagSeguro\Helper\Data::toFloat($product->getPrice()), //amount
+            round($product->getWeight()) //weight
+        );
     }
 
     /**
@@ -168,17 +240,28 @@ class DebitMethod
      */
     private function setSenderInformation()
     {
-        $senderName = $this->_order->getCustomerName();
-
-        if ($senderName == __('Guest')) {
-            $address = $this->getBillingAddress();
-            $senderName = $address->getFirstname() . ' ' . $address->getLastname();
-        }
-        $this->_paymentRequest->setSender()->setName($senderName);
+        if ($this->_order->getCustomerName() == __('Guest'))
+            $this->guest();
+        $this->loggedIn();
 
         $this->_paymentRequest->setSender()->setEmail($this->getEmail());
-        $this->setSenderPhone();
+    }
 
+    /**
+     * Set guest info
+     */
+    private function guest()
+    {
+        $address = $this->getBillingAddress();
+        $this->_paymentRequest->setSender()->setName($address->getFirstname() . ' ' . $address->getLastname());
+    }
+
+    /**
+     * Set logged in user info
+     */
+    private function loggedIn()
+    {
+        $this->_paymentRequest->setSender()->setName($this->_order->getCustomerName());
     }
 
     /**
@@ -215,7 +298,6 @@ class DebitMethod
     private function setShippingInformation()
     {
         $shipping = $this->getShippingData();
-		$country = $this->getCountryName($shipping['country_id']);
         $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
 
         $this->_paymentRequest->setShipping()->setAddress()->withParameters(
@@ -225,7 +307,7 @@ class DebitMethod
             \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']),
             $shipping['city'],
             $this->getRegionAbbreviation($shipping['region']),
-            $country,
+            $this->getCountryName($shipping['country_id']),
             $this->getShippingAddress($address[2])
         );
     }
@@ -239,12 +321,10 @@ class DebitMethod
      */
     private function getShippingAddress($address, $shipping = null)
     {
-        if (!is_null($address) or !empty($adress)) {
+        if (!is_null($address) or !empty($adress))
             return $address;
-        }
-        if ($shipping) {
+        if ($shipping)
             return \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
-        }
         return null;
     }
 
@@ -255,9 +335,8 @@ class DebitMethod
      */
     private function getShippingData()
     {
-        if ($this->_order->getIsVirtual()) {
+        if ($this->_order->getIsVirtual())
             return $this->getBillingAddress();
-        }
         return $this->_order->getShippingAddress();
     }
 
@@ -272,7 +351,7 @@ class DebitMethod
     }
 
     /**
-     * Get store reference in magento core_config_data
+     * Get store reference from magento core_config_data
      *
      * @return string
      */
@@ -318,7 +397,6 @@ class DebitMethod
         return $this->_scopeConfig->getValue('payment/pagseguro/redirect');
     }
 
-
     /**
      * Get the billing address data of the Order
      *
@@ -329,7 +407,7 @@ class DebitMethod
         return $this->_order->getBillingAddress();
     }
 
-	/**
+    /**
      * Get the country name based on the $countryId
      *
      * @param string $countryId

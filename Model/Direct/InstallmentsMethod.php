@@ -52,44 +52,56 @@ class InstallmentsMethod
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
+        \Magento\Framework\Module\ModuleList $moduleList,
         \Magento\Sales\Model\Order $order,
-        \Magento\Framework\Module\ModuleList $moduleList
+        \UOL\PagSeguro\Helper\Library $library,
+        $data = array()
     ) {
+        $this->_data = $data;
+        /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
+        /** @var \Magento\Sales\Model\Order _order */
         $this->_order = $order;
-        $this->_library = new Library($scopeConfigInterface, $moduleList);
+        /** @var \UOL\PagSeguro\Helper\Library _library */
+        $this->_library = $library;
     }
+
     /**
      * Create the request to return the installments
-     * @return \PagSeguroPaymentRequest
+     *
+     * @return array
+     * @throws \Exception
      */
-    public function create($creditCardBrand, $creditCardInternational = false)
-    {   
-        $options = [
-            'amount' => $this->getTotalAmount(),
-            'card_brand' => $creditCardBrand
-        ];
-
+    public function create()
+    {
         try {
-            $this->_library->setEnvironment();
-            $this->_library->setCharset();
-            $this->_library->setLog();
-            
+            $this->config();
             $installments = \PagSeguro\Services\Installment::create(
                 $this->_library->getPagSeguroCredentials(),
-                $options
+                $this->options()
             );
-            
-            return $this->formatInstallmentsOutput(
-                $installments->getInstallments(),
-                $creditCardBrand,
-                $creditCardInternational
-            );
-
-        } catch (PagSeguroServiceException $ex) {
-            $this->logger->debug($ex->getMessage());
-            $this->getCheckoutRedirectUrl();
+            return $this->output($installments);
+        } catch (PagSeguroServiceException $exception) {
+            throw $exception;
         }
+    }
+
+    private function options()
+    {
+        return [
+            'amount' => $this->getTotalAmount(),
+            'card_brand' => $this->_data['brand']
+        ];
+    }
+
+    /**
+     * Set configuration for payment
+     */
+    private function config()
+    {
+        $this->_library->setEnvironment();
+        $this->_library->setCharset();
+        $this->_library->setLog();
     }
     
     /**
@@ -101,29 +113,46 @@ class InstallmentsMethod
         return round($this->_order->getGrandTotal(),2);
         
     }
+
+    /**
+     * Return a formated output
+     *
+     * @param $installments
+     * @return array
+     */
+    private function output($installments)
+    {
+        return $this->formatOutput($installments->getInstallments());
+    }
     
     /**
      * Format the installment to the be show in the view
      * @param  array $installments
      * @return array
      */
-    private function formatInstallmentsOutput($installments, $creditCardBrand, $creditCardInternational)
-    {        
-        $formatedInstallments = [
-            'cardBrand' => $creditCardBrand,
-            'cardInternational' => $creditCardInternational
-        ];
-
+    private function formatOutput($installments)
+    {
+        $response = $this->options();
         foreach($installments as $installment) {
-           $formatedInstallments['installments'][] = [
-               'quantity' => $installment->getQuantity(),
-               'amount' => $installment->getAmount(),
-               'totalAmount' => round($installment->getTotalAmount(), 2),
-               'text' => $this->getInstallmentText($installment)
-            ];
+            $response['installments'][] = $this->formatInstallments($installment);
         }
+        return $response;
+    }
 
-        return $formatedInstallments;
+    /**
+     * Format a installment for output
+     *
+     * @param $installment
+     * @return array
+     */
+    private function formatInstallments($installment)
+    {
+        return [
+            'quantity' => $installment->getQuantity(),
+            'amount' => $installment->getAmount(),
+            'totalAmount' => round($installment->getTotalAmount(), 2),
+            'text' => $this->getInstallmentText($installment)
+        ];
     }
     
     /**

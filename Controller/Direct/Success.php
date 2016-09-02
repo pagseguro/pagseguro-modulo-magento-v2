@@ -23,8 +23,6 @@
 
 namespace UOL\PagSeguro\Controller\Direct;
 
-use UOL\PagSeguro\Model\PaymentMethod;
-
 /**
  * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
@@ -43,7 +41,7 @@ class Success extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
-    ) {
+        ) {
         parent::__construct($context);
 
         /** @var  _resultPageFactory */
@@ -56,26 +54,63 @@ class Success extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-
-        /** @var \UOL\PagSeguro\Helper\Crypt $crypt */
-        $crypt = $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt');
-        /** @var $_POST['payment'] $data */
-        $data = base64_decode($this->getRequest()->getParam('payment'));
-
-        $payment = unserialize($crypt->decrypt('A3c$#g5R', $data));
-        
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->_objectManager->create('Magento\Sales\Model\Order')->load($payment[1]);
-        
         /** @var \Magento\Framework\View\Result\PageFactory $resultPage */
         $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setPaymentLink(
-            $payment[0]
-        );
-        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setOrderId($order->getIncrementId());
-        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setPaymentType($payment[2]);
+        if($this->link())
+            $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setPaymentLink($this->link());
+        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setPaymentType($this->type());
+        $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setOrderId($this->order()->getIncrementId());
         $resultPage->getLayout()->getBlock('pagseguro.payment.success')->setCanViewOrder(true);
-
+        $this->clearSession();
         return $resultPage;
+    }
+
+    private function clearSession()
+    {
+        $this->_objectManager->create('Magento\Framework\Session\SessionManager')->clearStorage();
+    }
+
+    /**
+     * Get order
+     *
+     * @return \Magento\Sales\Model\Order
+     */
+    private function order()
+    {
+        return $this->_objectManager->create('Magento\Sales\Model\Order')->load($this->session()->order_id);
+    }
+
+    /**
+     * Get paymment link
+     *
+     * @return string
+     */
+    private function link()
+    {
+        if (isset($this->session()->payment_link))
+            return $this->session()->payment_link;
+        return false;
+    }
+
+    /**
+     * Get payment type
+     *
+     * @return string
+     */
+    private function type()
+    {
+        return $this->session()->payment_type;
+    }
+
+    /**
+     * Get session
+     *
+     * @return object
+     */
+    private function session()
+    {
+        return (object)$this->_objectManager->create('Magento\Framework\Session\SessionManager')->getData(
+            'pagseguro_payment'
+        );
     }
 }
