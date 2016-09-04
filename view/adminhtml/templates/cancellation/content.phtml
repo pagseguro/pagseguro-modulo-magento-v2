@@ -1,0 +1,84 @@
+<!-- DataTable -->
+<div class="col-m-12">
+    <div class="admin__data-grid-wrap" data-role="grid-wrapper">
+        <table id="pagseguro-datatable" class="data-grid data-grid-draggable" data-role="grid">
+            <thead>
+            <tr>
+<!--                <th class="data-grid-multicheck-cell">-->
+<!--                    <input type="checkbox" id="cancellation-mass-select-checkbox" />-->
+<!--                </th>-->
+                <th class="data-grid-th _sortable _draggable">Data</th>
+                <th class="data-grid-th _sortable _draggable">ID Magento</th>
+                <th class="data-grid-th _sortable _draggable">ID PagSeguro</th>
+                <th class="data-grid-th _sortable _draggable">Status Magento</th>
+                <th class="data-grid-th _sortable _draggable">Ação</th>
+            </tr>
+            </thead>
+            <tbody class="admin__table-secondary">
+            </tbody>
+        </table>
+    </div>
+</div>
+<input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
+<script type="text/javascript">
+    require(["jquery", 'Magento_Ui/js/modal/confirm', "datatables", "public"],function($, confirmation) {
+
+        // DataTable config
+        $('#pagseguro-datatable').DataTable({
+            "autoWidth": true,
+            "info": false,
+            "lengthChange": false,
+            "searching": false,
+            "bStateSave": true,
+            "pageLength": 10,
+            "aaSorting": [[ 1, "desc" ]],
+            "aoColumnDefs": [
+                { 'bSortable': false, 'aTargets': [ 0, 4] },
+                { "sClass": "tabela", 'aTargets': [ 1, 2, 3, 4] }
+            ],
+            // Creates paging and notifies when there is no record
+            "oLanguage": {
+                "sEmptyTable":"<?php echo __('Não há registros.'); ?>",
+                "oPaginate": {
+                    "sNext": '<?php echo __('Próximo');?>',
+                    "sLast": '<?php echo __('Último');?>',
+                    "sFirst": '<?php echo __('Primeiro');?>',
+                    "sPrevious": '<?php echo __('Anterior');?>'
+                }
+            },
+            "fnDrawCallback" : function(){
+                if ( $('#pagseguro-datatable_paginate span span.paginate_button').size()) {
+                    $('#pagseguro-datatable_paginate')[0].style.display = "block";
+                } else {
+                    $('#pagseguro-datatable_paginate')[0].style.display = "none";
+                }
+
+                jQuery('#pagseguro-datatable tbody tr').unbind('click');
+                jQuery('#pagseguro-datatable tbody tr').bind('click', function () {
+
+                    var id = jQuery(this).find('td')[1];
+                    var block = jQuery(this).find('.cancellation-cancel').attr('data-block');
+                    var url = $('#adminurl').attr('data-target');
+                    var row = $(this);
+                    confirmation({
+                        title: 'Tem certeza que deseja cancelar?',
+                        content: 'Order: ' + $(id).html() + '<br> Clique em OK para cancelar.',
+                        actions: {
+                            confirm: function(){
+                                WS.Ajax.Cancellation.Cancel(url, block, row);
+                            },
+                            cancel: function(){}
+                        }
+                    });
+
+                });
+            }
+        });
+
+        // Search button observer
+        $('#cancellation-search').on('click', function(){
+            var url = $('#adminurl').attr('data-target');
+            WS.Ajax.Cancellation.Search(url);
+        });
+    });
+</script>

@@ -28,5 +28,6 @@
         <add id="UOL_PagSeguro::Config" title="Configurações" module="UOL_PagSeguro" sortOrder="10" action="adminhtml/system_config/edit/section/payment/" resource="UOL_PagSeguro::Config" parent="UOL_PagSeguro::PagSeguro"/>
         <add id="UOL_PagSeguro::Conciliation" title="Conciliação" module="UOL_PagSeguro" sortOrder="20" action="pagseguro/conciliation/index" resource="UOL_PagSeguro::Conciliation" parent="UOL_PagSeguro::PagSeguro"/>
         <add id="UOL_PagSeguro::Abandoned" title="Abandonadas" module="UOL_PagSeguro" sortOrder="20" action="pagseguro/abandoned/index" resource="UOL_PagSeguro::Abandoned" parent="UOL_PagSeguro::PagSeguro"/>
+        <add id="UOL_PagSeguro::Cancellation" title="Cancelamento" module="UOL_PagSeguro" sortOrder="30" action="pagseguro/cancellation/index" resource="UOL_PagSeguro::Cancellation" parent="UOL_PagSeguro::PagSeguro"/>
     </menu>
 </config>

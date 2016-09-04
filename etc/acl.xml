@@ -3,7 +3,8 @@
     <resources>
         <resource id="UOL_PagSeguro::Conciliation" title="Conciliation" sortOrder="10" />
         <resource id="UOL_PagSeguro::Abandoned" title="Abandoned" sortOrder="20" />
-        <resource id="UOL_PagSeguro::Credentials" title="Credentials" sortOrder="30" />
+        <resource id="UOL_PagSeguro::Cancellation" title="Cancellation" sortOrder="30" />
+        <resource id="UOL_PagSeguro::Credentials" title="Credentials" sortOrder="40" />
     </resources>
 </acl>
 </config>

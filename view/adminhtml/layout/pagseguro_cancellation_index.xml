@@ -9,19 +9,19 @@
     <body>
         <referenceContainer name="content">
             <block class="Magento\Backend\Block\Template"
-                   name="adminhtml.block.pagseguro.abandoned.header"
-                   template="UOL_PagSeguro::abandoned/header.phtml"/>
+                   name="adminhtml.block.pagseguro.cancellation.header"
+                   template="UOL_PagSeguro::cancellation/header.phtml"/>
         </referenceContainer>
         <referenceContainer name="content">
             <block class="Magento\Backend\Block\Template"
-                   name="adminhtml.block.pagseguro.abandoned.buttons"
-                   template="UOL_PagSeguro::abandoned/toolbar/buttons.phtml"
+                   name="adminhtml.block.pagseguro.cancellation.buttons"
+                   template="UOL_PagSeguro::cancellation/toolbar/buttons.phtml"
                    cacheable="false" />
         </referenceContainer>
         <referenceContainer name="content">
             <block class="Magento\Backend\Block\Template"
-                   name="adminhtml.block.pagseguro.abandoned.content"
-                   template="UOL_PagSeguro::abandoned/content.phtml" />
+                   name="adminhtml.block.pagseguro.cancellation.content"
+                   template="UOL_PagSeguro::cancellation/content.phtml" />
         </referenceContainer>
     </body>
 </page>
