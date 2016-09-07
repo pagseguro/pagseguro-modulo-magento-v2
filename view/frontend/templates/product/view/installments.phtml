@@ -1,0 +1,39 @@
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    table, tbody,td, th {
+        border: 1px solid #EEE;
+        text-align: left;
+        padding: 5px 5px !important;
+        font-size: 1.4rem;
+    }
+
+    tr:nth-child(even) {
+        background-color: #EEE;
+    }
+</style>
+<?php /* @var $block \UOL\PagSeguro\Block\Product\View\ShowInstallments */
+    if ($block->isEnabled()) {
+        $_product = $block->getProduct();
+        $installments = $block->getInstallment($_product->getFinalPrice());
+        $countInstallment = count($installments);
+        $halfInstallment = ceil($countInstallment/2);
+        $totalAmount = str_replace('.', ',', $installments[$countInstallment-1]['totalAmount']);
+
+        echo "<p>Ou pague em até {$installments[$countInstallment-1]['text']} (Total a prazo R\${$totalAmount})</p>";
+        echo "<table border=\"1\" class=\"pagseguro-installments-table\"><tbody>";
+
+        for($i = 0; $i < $halfInstallment; $i++) {
+            echo "<tr><td>{$installments[$i]['text']}</td>";
+            if (isset($installments[$i + $halfInstallment]['text'])) {
+                echo "<td>{$installments[$i + $halfInstallment]['text']}</td>";
+            }
+            echo "</tr>";
+        }
+        echo "</tbody></table>";
+    }
+?>

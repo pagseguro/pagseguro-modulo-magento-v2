@@ -43,6 +43,14 @@ class InstallmentsMethod
      * @var \Magento\Directory\Api\CountryInformationAcquirerInterface
      */
     protected $_countryInformation;
+    
+    /**
+     * Installment options:
+     *      amount
+     *      card_brand
+     * @var array
+     */
+    private $options;
 
     /**
      * InstallmentsMethod constructor.
@@ -68,30 +76,57 @@ class InstallmentsMethod
 
     /**
      * Create the request to return the installments
-     *
+     * If $amount is passed it will be use as the default value
+     * If $maxInstallment is true it will return the bigger installment list available
+     * 
+     * @param mixed $amount (optional)
+     * @param midex $maxInstallment (optional)
      * @return array
      * @throws \Exception
      */
-    public function create()
+    public function create($amount = false, $maxInstallment = false)
     {
         try {
             $this->config();
+            $this->setOptions($this->getTotalAmount($amount), $this->getBrand());
+            
             $installments = \PagSeguro\Services\Installment::create(
                 $this->_library->getPagSeguroCredentials(),
-                $this->options()
+                $this->getOptions()
             );
-            return $this->output($installments);
+            return $this->output($installments->getInstallments(), $maxInstallment);
         } catch (PagSeguroServiceException $exception) {
             throw $exception;
         }
     }
 
-    private function options()
-    {
-        return [
-            'amount' => $this->getTotalAmount(),
-            'card_brand' => $this->_data['brand']
+    /**
+     * Getter of the options attribute
+     * @return array
+     */
+    private function getOptions() {
+        return $this->options;
+    }
+
+    /**
+     * Setter the options attribute
+     * @param mixed $amount
+     * @param string $brand
+     */
+    private function setOptions($amount, $brand) {
+        $this->options = [
+            'amount' => $amount,
+            'card_brand' => $brand
         ];
+    }
+    
+    /**
+     * Get the brand from the attribute _data or return an empty string
+     * @return string
+     */
+    private function getBrand()
+    {
+        return (isset($this->_data['brand'])) ? $this->_data['brand'] : '';
     }
 
     /**
@@ -106,23 +141,27 @@ class InstallmentsMethod
     
     /**
      * Get the total amount of the current order until the second decimal place
+     * if the amount is not passed to the function
      * @return type
      */
-    private function getTotalAmount()
+    private function getTotalAmount($amount)
     {   
-        return round($this->_order->getGrandTotal(),2);
+        return (!$amount) ? round($this->_order->getGrandTotal(),2) : $amount;
         
     }
 
     /**
-     * Return a formated output
+     * Return a formated output of installments
      *
      * @param $installments
+     * @param $maxInstallments
      * @return array
      */
-    private function output($installments)
+    private function output($installments, $maxInstallment)
     {
-        return $this->formatOutput($installments->getInstallments());
+        return ($maxInstallment) ?
+            $this->formatOutput($this->getMaxInstallment($installments)) :
+            $this->formatOutput($installments);
     }
     
     /**
@@ -132,7 +171,7 @@ class InstallmentsMethod
      */
     private function formatOutput($installments)
     {
-        $response = $this->options();
+        $response = $this->getOptions();
         foreach($installments as $installment) {
             $response['installments'][] = $this->formatInstallments($installment);
         }
@@ -151,7 +190,7 @@ class InstallmentsMethod
             'quantity' => $installment->getQuantity(),
             'amount' => $installment->getAmount(),
             'totalAmount' => round($installment->getTotalAmount(), 2),
-            'text' => $this->getInstallmentText($installment)
+            'text' => str_replace('.', ',', $this->getInstallmentText($installment))
         ];
     }
     
@@ -163,7 +202,7 @@ class InstallmentsMethod
     private function getInstallmentText($installment)
     {
         return sprintf(
-            "%sx de R$ %.2f %s juros",
+            "%s x de R$ %.2f %s juros",
             $installment->getQuantity(),
             $installment->getAmount(),
             $this->getInterestFreeText($installment->getInterestFree()));
@@ -179,4 +218,33 @@ class InstallmentsMethod
         return ($insterestFree == 'true') ? 'sem' : 'com';
     }
     
+    /**
+     * Get the bigger installments list in the installments
+     * @param array $installments
+     * @return array
+     */
+    private function getMaxInstallment($installments)
+    {
+        $final = $current = ['brand' => '', 'start' => 0, 'final' => 0, 'quantity' => 0];
+
+        foreach ($installments as $key => $installment) {
+            if ($current['brand'] !== $installment->getCardBrand()) {
+                $current['brand'] = $installment->getCardBrand();
+                $current['start'] = $key;
+            }
+
+            $current['quantity'] = $installment->getQuantity();
+            $current['end'] = $key;
+
+            if ($current['quantity'] > $final['quantity']) {
+                $final = $current;
+            }
+        }
+        
+        return array_slice(
+            $installments,
+            $final['start'],
+            $final['end'] - $final['start'] + 1
+        );
+    }
 }

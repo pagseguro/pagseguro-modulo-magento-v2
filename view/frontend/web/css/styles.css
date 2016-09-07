@@ -1773,3 +1773,22 @@ button:not(.primary),
 .display-none {
     display: none;
 }
+
+.pagseguro-installments-table {
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    table, tbody,td, th {
+        border: 1px solid #EEE;
+        text-align: left;
+        padding: 5px 5px !important;
+        font-size: 1.4rem;
+    }
+
+    tr:nth-child(even) {
+        background-color: #EEE;
+    }
+}

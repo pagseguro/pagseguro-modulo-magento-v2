@@ -81,6 +81,11 @@
                     <!--<tooltip>Deseja habilitar o módulo?</tooltip>-->
                     <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
                 </field>
+                <field id="installments" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>LISTAR PARCELAMENTO</label>
+                    <tooltip>Ativar a exibição da listagem de parcelas na tela de visualização do produto. (Irá exibir o maior parcelamento disponível para o produto no pagamento com cartão de crédito)</tooltip>
+                    <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+                </field>
             </group>
         </section>
     </system>
