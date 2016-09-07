@@ -187,13 +187,11 @@
                 $('.code-card-mask').mask('000');
                 $('.date-mask').mask('00/00/0000', { placeholder: "__/__/____" });
                 $('.cpf-cnpj-mask').on('keyup', function() {
-
                     try {
                         $(this).unmask();
                     } catch(e) {
                         alert('Ops, algo deu errado!');
                     };
-
                     var isLength = $(this).val().length;
                     //9 is number optional, is fake the transtion two types mask
                     isLength <= 11 ? $(this).mask('000.000.000-009') : $(this).mask('00.000.000/0000-00');
@@ -205,12 +203,10 @@
                     e.preventDefault();
                     var $itemtTab = $(this).parent('.item');
                     var isActive = $itemtTab.hasClass('--active');
-
                     if(!isActive) {
                         var $newTabId = $($(this).attr('href'));
                         $('#tabs-payment .item.--active').removeClass('--active'); //remove class the old tab selected
                         $('.item-tab.--current').removeClass('--current');
-
                         //add new tab selected
                         $itemtTab.addClass('--active');
                         $newTabId.addClass('--current');
@@ -219,7 +215,6 @@
                     }
                 });
             }($));
-
             ;(function calcTotal($, undefined) {
                 //Update the total value according with installments
                 $('#card_installments').on('change', function() {
@@ -227,33 +222,17 @@
                     $('#card_total').text('R$ ' + currency);
                 });
             }($));
-
-            function unmaskField($el) {
-                try {
-                    var oldvalue = $el.val();
-                    var newvalue = oldvalue.replace(/[/ -. ]+/g, '').trim();
-
-                    return newvalue;
-                } catch(e) {
-                    alert('Ops, algo deu errado! Recarregue a página');
-                };
-            };
-
             function loadElements(service, bank, creditCard) {
                 var bank = bank || false;
                 var creditCard = creditCard || false;
                 var data = [];
-
-
                 //start request process started
                 $("#payment-"+service).trigger('processStart');
-
                 //default values to send
                 data['url'] = $('#adminurl').attr('data-target');
                 data['orderId'] = $('#order').attr('data-target');
                 data['sessionCode'] = $('#session-code').attr('data-target');
                 data['document'] = unmaskField($('#document-'+service));
-
                 //values only debit method to use
                 if(bank) {
                     var bankId = $("#bankList input[type='radio']:checked");
@@ -261,7 +240,6 @@
                         data['bank'] = bankId.val();
                     }
                 }
-
                 //values only credit card method to use
                 if(creditCard) {
                     data['cardInternational'] = $('#card-international').attr('data-target');
@@ -270,10 +248,8 @@
                     data['holderName'] = $('#card_holder_name').val();
                     data['holderBirthdate'] = $('#card_holder_birthdate').val();
                 }
-
                 return data;
             };
-
             //Event buttons methods buy types
             $('#payment-boleto').on('click', function(e){
                 e.preventDefault();
@@ -281,21 +257,16 @@
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
                 WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
-
             });
-
             $('#payment-debit').on('click', function(e){
                 e.preventDefault();
                 var el = loadElements('debit', true);
                 PagSeguroDirectPayment.setSessionId(el.sessionCode);
                 var hash = PagSeguroDirectPayment.getSenderHash();
                 WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
-
             });
-
             $('#payment-credit-card').on('click', function(e){
                 e.preventDefault();
-
                 PagSeguroDirectPayment.createCardToken({
                     cardNumber: unmaskField($('#card_num')),
                     brand: $('#card-brand').attr('data-target'),
@@ -307,7 +278,6 @@
                         var el = loadElements('credit-card', false, true);
                         var token = response.card.token;
                         var hash = PagSeguroDirectPayment.getSenderHash();
-
                         setTimeout(function () {
                             WS.Ajax.Direct.CreditCard.Payment(
                                 el.url,
@@ -325,11 +295,9 @@
                     }
                 });
             });
-
             //get and showing brand credit card
             function getBrandCard(cardBinVal) {
                 PagSeguroDirectPayment.setSessionId($('#session-code').attr('data-target'));
-
                 PagSeguroDirectPayment.getBrand({
                     cardBin: cardBinVal,
                     internationalMode: true,
@@ -343,31 +311,50 @@
                     }
                 });
             };
+            function unmaskField($el, val = true) {
+                try {
+                    if (val === true) {
+                        var $el = $el.val();
+                    }
+                    return $el.replace(/[/ -. ]+/g, '').trim();
+                } catch(e) {
+                    alert('Ops, algo deu errado! Recarregue a página');
+                };
+            };
 
-            ;(function putBrandCard($, undefined) {
-                var cardBinVal;
-                var isLength = 0;
-                var firstcheck = false;
-                var cardNumLastValLength = 0;
-                //Get the installments and the credit card brand
-                $('#card_num').on("keyup", function() {
-                    cardNumLastValLength = isLength;
-                    isLength = $(this).val().length;
-
+            ;(function()
+            {
+                var kbinValue,
+                    klength = 0,
+                    klastLength = 0,
+                    kunMasked;
+                $('#card_num').on('keyup', function () {
+                    klastLength = klength;
+                    klength = $(this).val().length;
                     //6 number + space of mask
-                    if (isLength == 7 && cardNumLastValLength <= 7) {
-                        clearValue = unmaskField($(this));
-                        cardBinVal = clearValue.substring(0,6);
-
-                        if(cardBinVal != clearValue.substring(0, 6) || firstcheck == false){
-                            getBrandCard(cardBinVal);
-                            //firstcheck = true;
-                        }
+                    if (klength == 7 && klastLength <= 7) {
+                        kunMasked = unmaskField($(this).val(), false);
+                        kbinValue = kunMasked.substring(0,6);
+                        getBrandCard(kbinValue);
                     }
                 });
             }($));
 
-
+            ;(function()
+            {
+                var pbinValue,
+                    plength = 0;
+                $('#card_num').on('paste', function (e) {
+                    var value = unmaskField(e.originalEvent.clipboardData.getData('text'), false);
+                    plength = function() {
+                        return value.length;
+                    };
+                    if (plength() == 16) {
+                        pbinValue = value.substring(0,6);
+                        getBrandCard(pbinValue);
+                    }
+                });
+            }($));
         }
     );
 </script>
