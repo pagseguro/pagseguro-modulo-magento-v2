@@ -176,10 +176,18 @@ class Debit extends \Magento\Framework\App\Action\Action
         return [
             1 => 'itau',
             2 => 'bradesco',
-            3 => 'banrinsul',
+            3 => 'banrisul',
             4 => 'bancodobrasil',
             5 => 'hsbc'
         ];
+    }
+
+    /**
+     * Clear session storage
+     */
+    private function clearSession()
+    {
+        $this->_objectManager->create('Magento\Framework\Session\SessionManager')->clearStorage();
     }
 
     /**

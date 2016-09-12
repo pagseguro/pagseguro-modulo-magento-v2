@@ -20,12 +20,17 @@ limitations under the License.
 @copyright 2016 PagSeguro Internet Ltda.
 @license   http://www.apache.org/licenses/LICENSE-2.0
 -->
-<body>
-    <referenceContainer name="product.info.social">
-        <block class="UOL\PagSeguro\Block\Product\View\Installments"
-            name="product.view.installments"
-            template="UOL_PagSeguro::product/view/installments.phtml"
-            before="-">
-        </block>
-    </referenceContainer>
-</body>
+<page>
+    <head>
+        <css src="UOL_PagSeguro::css/styles.css"/>
+    </head>
+    <body>
+        <referenceContainer name="product.info.social">
+            <block class="UOL\PagSeguro\Block\Product\View\Installments"
+                name="product.view.installments"
+                template="UOL_PagSeguro::product/view/installments.phtml"
+                before="-">
+            </block>
+        </referenceContainer>
+    </body>
+</page>

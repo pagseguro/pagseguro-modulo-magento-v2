@@ -153,8 +153,8 @@ class InstallmentsMethod
     /**
      * Return a formated output of installments
      *
-     * @param $installments
-     * @param $maxInstallments
+     * @param array $installments
+     * @param bool $maxInstallments
      * @return array
      */
     private function output($installments, $maxInstallment)

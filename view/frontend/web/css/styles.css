@@ -1775,20 +1775,18 @@ button:not(.primary),
 }
 
 .pagseguro-installments-table {
-    table {
-        font-family: arial, sans-serif;
-        border-collapse: collapse;
-        width: 100%;
-    }
+    max-width: 100%;
+    margin-bottom: 1rem;
+}
 
-    table, tbody,td, th {
-        border: 1px solid #EEE;
-        text-align: left;
-        padding: 5px 5px !important;
-        font-size: 1.4rem;
-    }
+.pagseguro-installments-table table, th, td {
+    border: 1px solid #DDD;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 2px 2px !important;
+}
 
-    tr:nth-child(even) {
-        background-color: #EEE;
-    }
+.pagseguro-installments-table tr:nth-child(even) {
+    background-color: #EEE;
 }
