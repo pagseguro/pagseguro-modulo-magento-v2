@@ -342,19 +342,12 @@
 
             ;(function()
             {
-                var pbinValue,
-                    plength = 0;
                 $('#card_num').on('paste', function (e) {
-                    var value = unmaskField(e.originalEvent.clipboardData.getData('text'), false);
-                    plength = function() {
-                        return value.length;
-                    };
-                    if (plength() == 16) {
-                        pbinValue = value.substring(0,6);
-                        getBrandCard(pbinValue);
-                    }
+                    e.preventDefault();
+                    return false;
                 });
             }($));
         }
     );
 </script>
+
