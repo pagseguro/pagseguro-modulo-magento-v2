@@ -1,0 +1,107 @@
+<!-- DataTable -->
+<div class="col-m-12">
+    <div class="admin__data-grid-wrap" data-role="grid-wrapper">
+        <table id="pagseguro-datatable" class="data-grid data-grid-draggable" data-role="grid">
+            <thead>
+            <tr>
+                <th class="data-grid-multicheck-cell">
+                        <input type="checkbox" id="abandoned-mass-select-checkbox" />
+                </th>
+                <th class="data-grid-th _sortable _draggable">Data</th>
+                <th class="data-grid-th _sortable _draggable">ID Magento</th>
+                <th class="data-grid-th _sortable _draggable">Validade do Link</th>
+                <th class="data-grid-th _sortable _draggable">E-mails enviados</th>
+                <th class="data-grid-th _sortable _draggable">Ação</th>
+            </tr>
+            </thead>
+            <tbody class="admin__table-secondary">
+            </tbody>
+        </table>
+    </div>
+</div>
+<input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
+<script type="text/javascript">
+    require(["jquery", "datatables", "public"],function($) {
+
+        // DataTable config
+        $('#pagseguro-datatable').DataTable({
+            "autoWidth": true,
+            "info": false,
+            "lengthChange": false,
+            "searching": false,
+            "bStateSave": true,
+            "pageLength": 10,
+            "aaSorting": [[ 1, "desc" ]],
+            "aoColumnDefs": [
+                { 'bSortable': false, 'aTargets': [ 0, 5] },
+                { "sClass": "tabela", 'aTargets': [ 1, 2, 3, 4, 5 ] }
+            ],
+            // Creates paging and notifies when there is no record
+            "oLanguage": {
+                "sEmptyTable":"<?php echo __('Não há registros.'); ?>",
+                "oPaginate": {
+                    "sNext": '<?php echo __('Próximo');?>',
+                    "sLast": '<?php echo __('Último');?>',
+                    "sFirst": '<?php echo __('Primeiro');?>',
+                    "sPrevious": '<?php echo __('Anterior');?>'
+                }
+            },
+            "fnDrawCallback" : function(){
+                if ( $('#pagseguro-datatable_paginate span span.paginate_button').size()) {
+                    $('#pagseguro-datatable_paginate')[0].style.display = "block";
+                } else {
+                    $('#pagseguro-datatable_paginate')[0].style.display = "none";
+                }
+
+                //Disable/Enable conciliation button
+                $('[data-target="abandoned"]').on('click', function () {
+                    enableOrDisable(this);
+                });
+
+                //Disable/Enable all conciliation button
+                $('#abandoned-mass-select-checkbox').on('click', function () {
+                    enableOrDisable(this);
+                });
+            }
+        });
+
+        // Search button observer
+        $('#abandoned-search').on('click', function(){
+            var url = $('#adminurl').attr('data-target');
+            WS.Ajax.Abandoned.Search(url);
+        });
+
+        // Send e-mail's button observer
+        $('#abandoned-send-email').on('click', function(){
+            var url = $('#adminurl').attr('data-target');
+            WS.Ajax.Abandoned.Transport(url);
+        });
+
+        // Check/Uncheck all checkboxes.
+        $('#abandoned-mass-select-checkbox').on('click', function () {
+            if (this.checked == true) {
+                $('[data-target="abandoned"]').prop('checked', true);
+            }
+            if (this.checked == false) {
+                $('[data-target="abandoned"]').prop('checked', false);
+            }
+        })
+
+        // Enable/Disable abandoned send email button
+        function enableOrDisable(value) {
+            if ( $(value).is(':checked') ) {
+                $('#abandoned-send-email').removeAttr('disabled');
+            } else {
+                var hasOne = false;
+                jQuery.each($('[data-target="abandoned"]'), function(index, value) {
+                    if ( $(value).is(':checked') ) {
+                        if (hasOne != true) hasOne = true;
+                    }
+                });
+                if (hasOne === false) {
+                    $('#abandoned-send-email').attr('disabled', 'disabled');
+                }
+            }
+        }
+    });
+</script>

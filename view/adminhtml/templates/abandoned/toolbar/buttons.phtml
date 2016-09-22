@@ -1,0 +1,17 @@
+<div class="admin__data-grid-header-row">
+    <div class="admin__filter-actions">
+        <select id="abandoned-days" class="admin__control-select">
+            <?php for ($i =1; $i <= 10; $i++): ?>
+                <option value="<?=$i;?>" <?php if ($i == 1) echo 'selected="selected"';?>><?=$i;?></option>
+            <?php endfor; ?>
+        </select>
+        <button id="abandoned-search" title="Search" type="button" class="action-default scalable action-secondary">
+            <span>Pesquisar</span>
+        </button>
+        <div class="admin__data-grid-pager-wrap">
+            <button id="abandoned-send-email" title="Search" type="button" class="action-default scalable action-secondary" disabled>
+                <span>Enviar e-mail(s)</span>
+            </button>
+        </div>
+    </div>
+</div>

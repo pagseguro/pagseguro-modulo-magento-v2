@@ -1,0 +1,30 @@
+<h2>Finalizando sua compra com PagSeguro</h2>
+
+<script type="text/javascript" src="<?php echo $this->getPaymentJs(); ?>"></script>
+
+<script type="text/javascript">
+    function checkout(payment)
+    {
+        PagSeguroLightbox(
+            '<?php echo $this->getCode(); ?>',{
+                success: function(token){
+                    window.location.href = "<?php echo $this->getUrl('checkout/onepage/success', array('_secure' => true));?>";
+                },
+                abort: function(){
+                    window.location.href = '<?php echo $this->getBaseUrl(); ?>';
+                }
+            });
+    }
+</script>
+
+<table style="width:100%;">
+    <tr>
+        <td style="width:100%">
+            Sua compra est&aacute; em processo de finaliza&ccedil;&atilde;o, aguarde um instante.<br />
+            Caso a p&aacute;gina de finaliza&ccedil;&atilde;o de pagamento n&atilde;o se inicie automaticamente, <a href="<?php echo $this->getPaymentUrl(); ?>" id="redirect">Clique Aqui</a>
+            <script type="text/javascript">
+                checkout();
+            </script>
+        </td>
+    </tr>
+</table>

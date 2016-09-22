@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>PagSeguro</title>
+        <meta name="viewport" content="width=1024, initial-scale=1"/>
+        <css src="UOL_PagSeguro::css/dataTables.min.css"/>
+        <css src="UOL_PagSeguro::css/styles.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template"
+                   name="adminhtml.block.pagseguro.cancellation.header"
+                   template="UOL_PagSeguro::cancellation/header.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template"
+                   name="adminhtml.block.pagseguro.cancellation.buttons"
+                   template="UOL_PagSeguro::cancellation/toolbar/buttons.phtml"
+                   cacheable="false" />
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template"
+                   name="adminhtml.block.pagseguro.cancellation.content"
+                   template="UOL_PagSeguro::cancellation/content.phtml" />
+        </referenceContainer>
+    </body>
+</page>

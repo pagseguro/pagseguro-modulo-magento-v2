@@ -1,0 +1,23 @@
+.data-grid td {
+    text-align: center!important;
+}
+
+.page-wrapper {
+    background: url(../images/background.png) no-repeat;
+    -moz-background-size: 100% 40%;
+    -webkit-background-size: 100% 40%;
+    background-size: 100% 40%;
+}
+
+#conciliation-search, #abandoned-search, #cancellation-search, #refund-search {
+    background: #77B800!important;
+    border: 1px #639900 solid;
+}
+
+.abandoned-error {
+    height: 100px;
+    text-align: center;
+    padding: 40px;
+    margin-bottom: 20px;
+}
+

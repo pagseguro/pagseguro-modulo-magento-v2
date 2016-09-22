@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * 2007-2016 [PagSeguro Internet Ltda.]
+ *
+ * NOTICE OF LICENSE
+ *
+ *Licensed under the Apache License, Version 2.0 (the "License");
+ *you may not use this file except in compliance with the License.
+ *You may obtain a copy of the License at
+ *
+ *http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *
+ *  @author    PagSeguro Internet Ltda.
+ *  @copyright 2016 PagSeguro Internet Ltda.
+ *  @license   http://www.apache.org/licenses/LICENSE-2.0
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="pagseguro" translate="label" type="text" sortOrder="50" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>UOL PagSeguro</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>ATIVAR MÓDULO</label>
+                    <!--<tooltip>Deseja habilitar o módulo?</tooltip>-->
+                    <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>NOME DE EXIBIÇÃO</label>
+                    <tooltip>Informe o nome que deve ser apresentado para este meio de pagamento no checkout de sua loja.</tooltip>
+                </field>
+                <field id="environment" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>AMBIENTE</label>
+                    <tooltip>Define o ambiente de uso</tooltip>
+                    <source_model>UOL\PagSeguro\Model\System\Config\Environment</source_model>
+                </field>
+                <field id="email" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>E-MAIL</label>
+                    <comment>Clique &lt;a href=&quot;https://pagseguro.uol.com.br/registration/registration.jhtml?ep=7&amp;tipo=cadastro#!vendedor&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt; e cadastre-se gr&#225;tis.</comment>
+                </field>
+                <field id="token" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>TOKEN</label>
+                    <tooltip>Acesse sua conta PagSeguro ou Sandbox para obter um token.</tooltip>
+                </field>
+                <field id="redirect" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>URL DE REDIRECIONAMENTO</label>
+                    <tooltip>Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve acessar sua conta PagSeguro ou Sandbox e habilitar requisições de pagamentos gerados somente via API.</tooltip>
+                </field>
+                <field id="notification" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>URL DE NOTIFICAÇÃO</label>
+                    <tooltip>Sempre que uma transa&#231;&#227;o mudar de status, o PagSeguro envia uma notifica&#231;&#227;o para sua loja ou para a URL que voc&#234; informar neste campo.</tooltip>
+                </field>
+                <field id="charset" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>CHARSET</label>
+                    <comment>Defina o charset de acordo com a codificação do seu sistema.</comment>
+                    <source_model>UOL\PagSeguro\Model\System\Config\Charset</source_model>
+                </field>
+                <field id="log" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>ATIVAR LOG</label>
+                    <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+                </field>
+                <field id="log_file" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>DIRETÓRIO</label>
+                    <tooltip>Caminho para o arquivo de log.</tooltip>
+                </field>
+                <field id="checkout" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>CHECKOUT</label>
+                    <comment>Selecione o tipo de checkout desejado.</comment>
+                    <source_model>UOL\PagSeguro\Model\System\Config\Checkout</source_model>
+                </field>
+                <field id="abandoned_active" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>LISTAR TRANSAÇÕES ABANDONADAS?</label>
+                    <!--<tooltip>Deseja habilitar o módulo?</tooltip>-->
+                    <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+                </field>
+                <field id="installments" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>LISTAR PARCELAMENTO</label>
+                    <tooltip>Ativar a exibição da listagem de parcelas na tela de visualização do produto. (Irá exibir o maior parcelamento disponível para o produto no pagamento com cartão de crédito)</tooltip>
+                    <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
