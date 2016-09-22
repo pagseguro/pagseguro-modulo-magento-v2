@@ -21,16 +21,16 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Adminhtml\Credentials;
+namespace UOL\PagSeguro\Controller;
 
-use UOL\PagSeguro\Controller\Pageable;
-
-/**
- * Class Error
- * @package UOL\PagSeguro\Controller\Adminhtml\Credentials
- */
-class Error extends Pageable
+abstract class Pageable extends \Magento\Backend\App\Action
 {
+    /**
+     * Result page factory
+     *
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
+    protected $_resultPageFactory;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
@@ -40,27 +40,40 @@ class Error extends Pageable
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
-        parent::__construct($context, $resultPageFactory);
+        parent::__construct($context);
+        $this->_resultPageFactory = $resultPageFactory;
     }
 
     /**
-     * @return \Magento\Framework\View\Result\Page
-     */
-    public function execute()
-    {
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
-        $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__('PagSeguro'));
-        return $resultPage;
-    }
-
-    /**
-     * Credentials access rights checking
+     * Generate Admin Url
      *
-     * @return bool
+     * @return string
      */
-    protected function _isAllowed()
+    protected function getAdminUrl()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Credentials');
+        return sprintf("%s%s",$this->getBaseUrl(), $this->getAdminSuffix());
+    }
+
+    /**
+     * Get admin suffix from config
+     *
+     * @return string
+     */
+    private function getAdminSuffix()
+    {
+        $configReader = $this->_objectManager->create('Magento\Framework\App\DeploymentConfig\Reader');
+        $config = $configReader->load();
+        return $config['backend']['frontName'];
+    }
+
+    /**
+     * Get store base url
+     *
+     * @return string
+     */
+    private function getBaseUrl()
+    {
+        $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
+        return $storeManager->getStore()->getBaseUrl();
     }
 }

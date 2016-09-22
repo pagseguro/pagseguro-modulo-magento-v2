@@ -23,77 +23,55 @@
 
 namespace UOL\PagSeguro\Controller\Adminhtml\Abandoned;
 
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
-use UOL\PagSeguro\Model\Transactions\AbandonedMethod;
+use UOL\PagSeguro\Controller\Ajaxable;
+use UOL\PagSeguro\Model\Transactions\Methods\Abandoned;
 
 /**
- * Class Conciliation
+ * Class Request
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Request extends \Magento\Backend\App\Action
+class Request extends Ajaxable
 {
 
     /**
-     * Result json factory
-     *
-     * @var \Magento\Framework\Controller\Result\JsonFactory
-     */
-    protected $_resultJsonFactory;
-
-    /**
-     * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
-        Context $context,
+        \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
-        parent::__construct($context);
-        $this->_resultJsonFactory = $resultJsonFactory;
+        parent::__construct($context, $resultJsonFactory);
     }
-    /**
 
-     * @return void
+    /**
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
 
-        $abandoned = new AbandonedMethod(
-              $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
-              $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
-              $this->_objectManager->create('Magento\Framework\Mail\Template\TransportBuilder'),
-              $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
-              $this->_objectManager->create('Magento\Backend\Model\Session'),
-              $this->_objectManager->create('Magento\Sales\Model\Order'),
-              $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
-              $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
-              $this->_objectManager->create('\Magento\Framework\Stdlib\DateTime\TimezoneInterface'),
-              $this->getRequest()->getParam('days')
+        $abandoned = new Abandoned(
+            $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+            $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
+            $this->_objectManager->create('Magento\Framework\Mail\Template\TransportBuilder'),
+            $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
+            $this->_objectManager->create('Magento\Backend\Model\Session'),
+            $this->_objectManager->create('Magento\Sales\Model\Order'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
+            $this->_objectManager->create('\Magento\Framework\Stdlib\DateTime\TimezoneInterface'),
+            $this->getRequest()->getParam('days')
         );
 
-        /** @var \Magento\Framework\Controller\Result\Json $result */
-        $result = $this->_resultJsonFactory->create();
-
         try {
-            return $result->setData([
-                'success' => true,
-                'payload' => [
-                    'data' => $abandoned->requestAbandonedTransactions()
-                ]
-            ]);
+            return $this->whenSuccess($abandoned->request());
         } catch (\Exception $exception) {
-            return $result->setData([
-                'success' => false,
-                'payload' => [
-                    'error' => $exception->getMessage()
-                ]
-            ]);
+            return $this->whenError($exception->getMessage());
         }
     }
 
     /**
-     * News access rights checking
+     * Abandoned access rights checking
      *
      * @return bool
      */

@@ -23,43 +23,38 @@
 
 namespace UOL\PagSeguro\Controller\Adminhtml\Conciliation;
 
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
-use UOL\PagSeguro\Model\Transactions\ConciliationMethod;
+use UOL\PagSeguro\Controller\Ajaxable;
+use UOL\PagSeguro\Model\Transactions\Methods\Conciliation;
 
 /**
  * Class Conciliation
+ *
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Request extends \Magento\Backend\App\Action
+class Request extends Ajaxable
 {
 
     /**
-     * Result json factory
+     * Request constructor.
      *
-     * @var \Magento\Framework\Controller\Result\JsonFactory
-     */
-    protected $_resultJsonFactory;
-
-    /**
-     * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
-        Context $context,
+        \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
-        parent::__construct($context);
-        $this->_resultJsonFactory = $resultJsonFactory;
+        parent::__construct($context, $resultJsonFactory);
     }
-    /**
 
-     * @return void
+    /**
+     * Execute
+     *
+     * @return $this
      */
     public function execute()
     {
-
-        $conciliation = new ConciliationMethod(
+        $conciliation = new Conciliation(
               $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
               $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
               $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
@@ -69,29 +64,15 @@ class Request extends \Magento\Backend\App\Action
               $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
               $this->getRequest()->getParam('days')
         );
-
-        /** @var \Magento\Framework\Controller\Result\Json $result */
-        $result = $this->_resultJsonFactory->create();
-
         try {
-            return $result->setData([
-                'success' => true,
-                'payload' => [
-                    'data' => $conciliation->requestTransactionsToConciliation()
-                ]
-            ]);
+            return $this->whenSuccess($conciliation->request());
         } catch (\Exception $exception) {
-            return $result->setData([
-                'success' => false,
-                'payload' => [
-                    'error' => $exception->getMessage()
-                ]
-            ]);
+            return $this->whenError($exception->getMessage());
         }
     }
 
     /**
-     * News access rights checking
+     * Conciliation access rights checking
      *
      * @return bool
      */

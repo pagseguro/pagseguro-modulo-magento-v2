@@ -21,61 +21,62 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Adminhtml\Cancellation;
+namespace UOL\PagSeguro\Controller\Adminhtml\Refund;
 
+use Magento\Backend\App\Action\Context;
 use UOL\PagSeguro\Controller\Ajaxable;
-use UOL\PagSeguro\Model\Transactions\Methods\Cancellation;
+use UOL\PagSeguro\Model\Transactions\Methods\Refund as RefundMethod;
 
 /**
- * Class Request
+ * Class Conciliation
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Request extends Ajaxable
+class Refund extends Ajaxable
 {
 
     /**
-     * Request constructor.
+     * Refund constructor.
      *
-     * @param \Magento\Backend\App\Action\Context $context
+     * @param Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
+        Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
         parent::__construct($context, $resultJsonFactory);
     }
 
     /**
-     * @return Request
+     * @return void
      */
     public function execute()
     {
-        $cancellation = new Cancellation(
-              $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
-              $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
-              $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
-              $this->_objectManager->create('Magento\Backend\Model\Session'),
-              $this->_objectManager->create('Magento\Sales\Model\Order'),
-              $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
-              $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
-              $this->getRequest()->getParam('days')
+
+        $refund = new RefundMethod(
+            $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+            $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
+            $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
+            $this->_objectManager->create('Magento\Backend\Model\Session'),
+            $this->_objectManager->create('Magento\Sales\Model\Order'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt')
         );
 
         try {
-            return $this->whenSuccess($cancellation->request());
+            return $this->whenSuccess($refund->execute($this->getRequest()->getParam('data')));
         } catch (\Exception $exception) {
             return $this->whenError($exception->getMessage());
         }
     }
 
     /**
-     * Cancellation access rights checking
+     * Refund access rights checking
      *
      * @return bool
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Cancellation');
+        return $this->_authorization->isAllowed('UOL_PagSeguro::Refund');
     }
 }

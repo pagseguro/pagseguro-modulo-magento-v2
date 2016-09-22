@@ -9,7 +9,7 @@
     background-size: 100% 40%;
 }
 
-#conciliation-search, #abandoned-search, #cancellation-search {
+#conciliation-search, #abandoned-search, #cancellation-search, #refund-search {
     background: #77B800!important;
     border: 1px #639900 solid;
 }

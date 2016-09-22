@@ -21,15 +21,15 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Adminhtml\Credentials;
+namespace UOL\PagSeguro\Controller\Adminhtml\Refund;
 
 use UOL\PagSeguro\Controller\Pageable;
 
 /**
- * Class Error
- * @package UOL\PagSeguro\Controller\Adminhtml\Credentials
+ * Class Index
+ * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Error extends Pageable
+class Index extends Pageable
 {
 
     /**
@@ -48,19 +48,27 @@ class Error extends Pageable
      */
     public function execute()
     {
+        /** @var \UOL\PagSeguro\Helper\Auth $authHelper */
+        $authHelper = $this->_objectManager->create('UOL\PagSeguro\Helper\Auth');
+
+        /** Check for credentials **/
+        if (!$authHelper->hasCredentials())
+            return $this->_redirect('pagseguro/credentials/error');
+
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__('PagSeguro'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Estorno'));
+        $resultPage->getLayout()->getBlock('adminhtml.block.pagseguro.refund.content')->setData('adminurl', $this->getAdminUrl());
         return $resultPage;
     }
 
     /**
-     * Credentials access rights checking
+     * Refund access rights checking
      *
      * @return bool
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Credentials');
+        return $this->_authorization->isAllowed('UOL_PagSeguro::Refund');
     }
 }

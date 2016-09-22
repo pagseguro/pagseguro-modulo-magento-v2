@@ -23,51 +23,35 @@
 
 namespace UOL\PagSeguro\Controller\Adminhtml\Cancellation;
 
-use Magento\Backend\App\Action\Context;
-use UOL\PagSeguro\Model\Transactions\CancellationMethod;
+use UOL\PagSeguro\Controller\Ajaxable;
+use UOL\PagSeguro\Model\Transactions\Methods\Cancellation;
 
 /**
  * Class Conciliation
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Cancel extends \Magento\Backend\App\Action
+class Cancel extends Ajaxable
 {
 
     /**
-     * Result json factory
+     * Cancel constructor.
      *
-     * @var \Magento\Framework\Controller\Result\JsonFactory
-     */
-    protected $_resultJsonFactory;
-
-    /** @var \Magento\Framework\Controller\Result\Json  */
-    protected $_result;
-
-    /**
-     * Conciliate constructor.
-     *
-     * @param Context $context
+     * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
-        Context $context,
+        \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
-        parent::__construct($context);
-        $this->_resultJsonFactory = $resultJsonFactory;
-        /** @var \Magento\Framework\Controller\Result\Json $_result */
-        $this->_result = $this->_resultJsonFactory->create();
+        parent::__construct($context, $resultJsonFactory);
     }
-    /**
 
+    /**
      * @return void
      */
     public function execute()
     {
-
-        $requests = $this->getRequest()->getParams();
-
-        $cancellation = new CancellationMethod(
+        $cancellation = new Cancellation(
             $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
             $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
             $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
@@ -78,42 +62,10 @@ class Cancel extends \Magento\Backend\App\Action
         );
 
         try {
-            return $this->whenSuccess($cancellation->cancel($requests['data']));
+            return $this->whenSuccess($cancellation->execute($this->getRequest()->getParam('data')));
         } catch (\Exception $exception) {
             return $this->whenError($exception->getMessage());
         }
-    }
-
-    /**
-     * Return when success
-     *
-     * @param $response
-     * @return $this
-     */
-    private function whenSuccess($response)
-    {
-        return $this->_result->setData([
-            'success' => true,
-            'payload' => [
-                'data' => $response
-            ]
-        ]);
-    }
-
-    /**
-     * Return when fails
-     *
-     * @param $message
-     * @return $this
-     */
-    private function whenError($message)
-    {
-        return $this->_result->setData([
-            'success' => false,
-            'payload' => [
-                'error'    => $message,
-            ]
-        ]);
     }
 
     /**

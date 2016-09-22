@@ -21,16 +21,18 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Model\Transactions;
+namespace UOL\PagSeguro\Model\Transactions\Methods;
+
 use Magento\Store\Model\ScopeInterface;
 use Magento\Sales\Model\ResourceModel\Grid;
+use UOL\PagSeguro\Model\Transactions\Method;
 
 /**
- * Class Conciliation
+ * Class Abandoned
  *
  * @package UOL\PagSeguro\Model\Transactions
  */
-class AbandonedMethod
+class Abandoned extends Method
 {
 
     /**
@@ -41,47 +43,47 @@ class AbandonedMethod
     /**
      * @var integer
      */
-    private $_days;
+    protected $_days;
 
     /**
      * @var array
      */
-    private $_arrayPayments = array();
+    protected $_arrayPayments = array();
 
     /**
      * @var \PagSeguro\Parsers\Transaction\Search\Date\Response
      */
-    private $_PagSeguroPaymentList;
+    protected $_PagSeguroPaymentList;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    private $_scopeConfig;
+    protected $_scopeConfig;
 
     /**
      * @var \Magento\Sales\Model\ResourceModel\Grid
      */
-    private $_salesGrid;
+    protected $_salesGrid;
 
     /**
      * @var \Magento\Backend\Model\Session
      */
-    private $_session;
+    protected $_session;
 
     /**
      * @var \Magento\Sales\Model\Order
      */
-    private $_order;
+    protected $_order;
 
     /**
      * @var \UOL\PagSeguro\Helper\Library
      */
-    private $_library;
+    protected $_library;
 
     /**
      * @var \UOL\PagSeguro\Helper\Crypt
      */
-    private $_crypt;
+    protected $_crypt;
 
     /**
      * @var \UOL\PagSeguro\Helper\Crypt
@@ -142,7 +144,7 @@ class AbandonedMethod
      * @return bool
      * @throws \Exception
      */
-    public function recoverTransaction($data) {
+    public function execute($data) {
 
         try {
             foreach ($data as $transaction) {
@@ -172,7 +174,7 @@ class AbandonedMethod
      *
      * @return array
      */
-    public function requestAbandonedTransactions()
+    public function request()
     {
         //load payments by date
         $this->getPagSeguroAbandoned();
@@ -200,27 +202,59 @@ class AbandonedMethod
     }
 
     /**
-     * Build data for datatable
+     * Build data for dataTable
      *
      * @param $payment
      * @param $order
      * @return array
      */
-    private function build($payment, $order)
+    protected function build($payment, $order)
     {
-        $orderDate = new \DateTime($order->getCreatedAtFormatted(\IntlDateFormatter::MEDIUM));
+        return $this->toArray($payment, $order);
+    }
 
-        return [
-            'date'             => $orderDate->format('d/m/Y H:i:s'),
-            'magento_id'       => sprintf('#%s', $order->getIncrementId()),
-            'validate'         => $this->abandonedIntervalToDate($orderDate),
+    /**
+     * Create array
+     *
+     * @param $payment
+     * @param $order
+     * @param bool $conciliate
+     * @return array
+     */
+    private function toArray($payment, $order, $conciliate = false)
+    {
+        return  [
+            'date'             => $this->formatDate($order),
+            'magento_id'       => $this->formatMagentoId($order),
+            'magento_status'   => $this->formatMagentoStatus($order),
+            'validate'         => $this->abandonedIntervalToDate(
+                new \DateTime(
+                    $order->getCreatedAtFormatted(\IntlDateFormatter::MEDIUM)
+                )
+            ),
             'sent'             => current($this->getSent($order->getId())),
             'order_id'         => $order->getId(),
-            'details'          => $this->_crypt->encrypt('!QAWRRR$HU%W34tyh59yh544%', json_encode([
-                'order_id' => $order->getId(),
-                'recovery_code' => $payment->getRecoveryCode(),
-            ]))
+            'details'          => $this->details($order, $payment, ['conciliate' => $conciliate])
         ];
+    }
+
+    /**
+     * Get data for details
+     *
+     * @param $order
+     * @param $payment
+     * @param $options
+     * @return string
+     */
+    protected function details($order, $payment, $options)
+    {
+        unset($options);
+        return $this->_crypt->encrypt('!QAWRRR$HU%W34tyh59yh544%',
+            json_encode([
+                'order_id'      => $order->getId(),
+                'recovery_code' => $payment->getRecoveryCode()
+            ])
+        );
     }
 
     /**
@@ -238,10 +272,10 @@ class AbandonedMethod
         try {
             //check if is the first step, if is just add the response object to local var
             if (is_null($this->_PagSeguroPaymentList)) {
-                $this->_PagSeguroPaymentList = $this->requestPagSeguroPayments($page);
+                $this->_PagSeguroPaymentList = $this->requestPagSeguroAbandoned($page);
             } else {
 
-                $response = $this->requestPagSeguroPayments($page);
+                $response = $this->requestPagSeguroAbandoned($page);
                 //update some important data
                 $this->_PagSeguroPaymentList->setDate($response->getDate());
                 $this->_PagSeguroPaymentList->setCurrentPage($response->getCurrentPage());
@@ -312,7 +346,7 @@ class AbandonedMethod
      * @return string
      * @throws \Exception
      */
-    private function requestPagSeguroPayments($page)
+    protected function requestPagSeguroAbandoned($page)
     {
 
         $date = $this->getDates();
@@ -374,7 +408,7 @@ class AbandonedMethod
      *
      * @return array
      */
-    private function getDates()
+    protected function getDates()
     {
         $date = new \DateTime ( "20 minutes ago" );
         $date->setTimezone ( new \DateTimeZone ( "America/Sao_Paulo" ) );
@@ -388,16 +422,6 @@ class AbandonedMethod
             'initial' => $initial,
             'final'   => $final
         ];
-    }
-
-    /**
-     * Get store reference
-     *
-     * @return mixed
-     */
-    private function getStoreReference()
-    {
-        return $this->_scopeConfig->getValue('pagseguro/store/reference');
     }
 
     /**

@@ -23,43 +23,32 @@
 
 namespace UOL\PagSeguro\Controller\Adminhtml\Abandoned;
 
-use Magento\Backend\App\Action\Context;
-use UOL\PagSeguro\Model\Transactions\AbandonedMethod;
+use UOL\PagSeguro\Controller\Ajaxable;
+use UOL\PagSeguro\Model\Transactions\Methods\Abandoned;
 
 /**
  * Class Conciliation
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Transport extends \Magento\Backend\App\Action
+class Transport extends Ajaxable
 {
-
     /**
-     * Result json factory
-     *
-     * @var \Magento\Framework\Controller\Result\JsonFactory
-     */
-    protected $_resultJsonFactory;
-
-    /**
-     * @param Context $context
+     * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
-        Context $context,
+        \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
-        parent::__construct($context);
-        $this->_resultJsonFactory = $resultJsonFactory;
+        parent::__construct($context, $resultJsonFactory);
     }
 
     /**
-     * @return void
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
-        $requests = $this->getRequest()->getParams();
-
-        $abandoned = new AbandonedMethod(
+        $abandoned = new Abandoned(
             $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
             $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
             $this->_objectManager->create('Magento\Framework\Mail\Template\TransportBuilder'),
@@ -72,28 +61,15 @@ class Transport extends \Magento\Backend\App\Action
             $this->getRequest()->getParam('days')
         );
 
-        /** @var \Magento\Framework\Controller\Result\Json $result */
-        $result = $this->_resultJsonFactory->create();
-
         try {
-            return $result->setData([
-                'success' => true,
-                'payload' => [
-                    'data' => $abandoned->recoverTransaction($requests['data'])
-                ]
-            ]);
+            return $this->whenSuccess($abandoned->execute($this->getRequest()->getParam('data')));
         } catch (\Exception $exception) {
-            return $result->setData([
-                'success' => false,
-                'payload' => [
-                    'error' => $exception->getMessage()
-                ]
-            ]);
+            return $this->whenError($exception->getMessage());
         }
     }
 
     /**
-     * News access rights checking
+     * Abandoned access rights checking
      *
      * @return bool
      */

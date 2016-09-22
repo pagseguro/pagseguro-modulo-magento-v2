@@ -22,38 +22,28 @@
  */
 
 namespace UOL\PagSeguro\Controller\Adminhtml\Cancellation;
-
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
+use UOL\PagSeguro\Controller\Pageable;
 
 /**
- * Class Conciliation
+ * Class Index
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Index extends \Magento\Backend\App\Action
+class Index extends Pageable
 {
 
     /**
-     * Result page factory
-     *
-     * @var \Magento\Framework\View\Result\PageFactory
-     */
-    protected $_resultPageFactory;
-
-    /**
-     * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory
+        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
-        parent::__construct($context);
-        $this->_resultPageFactory = $resultPageFactory;
+        parent::__construct($context, $resultPageFactory);
     }
 
     /**
-     * @return void
+     * @return \Magento\Framework\View\Result\Page
      */
     public function execute()
     {
@@ -72,36 +62,12 @@ class Index extends \Magento\Backend\App\Action
     }
 
     /**
-     * News access rights checking
+     * Cancellation access rights checking
      *
      * @return bool
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Conciliation');
-    }
-
-    /**
-     * Generate Admin Url
-     *
-     * @return string
-     */
-    private function getAdminUrl()
-    {
-        /** @var \Magento\Framework\App\DeploymentConfig\Reader $configReader */
-        $configReader = $this->_objectManager->create('Magento\Framework\App\DeploymentConfig\Reader');
-        /** @var \Magento\Store\Model\StoreManagerInterface $storeManager */
-        $storeManager = $this->_objectManager->create('Magento\Store\Model\StoreManagerInterface');
-
-        /** Load config */
-        $config = $configReader->load();
-        /** Get front name */
-        $adminSuffix = $config['backend']['frontName'];
-
-        return sprintf(
-            "%s%s",
-            $storeManager->getStore()->getBaseUrl(),
-            $adminSuffix
-        );
+        return $this->_authorization->isAllowed('UOL_PagSeguro::Cancellation');
     }
 }

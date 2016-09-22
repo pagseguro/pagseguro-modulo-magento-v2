@@ -23,39 +23,28 @@
 
 namespace UOL\PagSeguro\Controller\Adminhtml\Abandoned;
 
-use UOL\PagSeguro\Controller\Adminhtml\Conciliation;
-
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
+use UOL\PagSeguro\Controller\Pageable;
 
 /**
- * Class Conciliation
+ * Class Error
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Error extends \Magento\Backend\App\Action
+class Error extends Pageable
 {
 
     /**
-     * Result page factory
-     *
-     * @var \Magento\Framework\View\Result\PageFactory
-     */
-    protected $_resultPageFactory;
-
-    /**
-     * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory
+        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
-        parent::__construct($context);
-        $this->_resultPageFactory = $resultPageFactory;
+        parent::__construct($context, $resultPageFactory);
     }
 
     /**
-     * @return void
+     * @return \Magento\Framework\View\Result\Page
      */
     public function execute()
     {
@@ -66,7 +55,7 @@ class Error extends \Magento\Backend\App\Action
     }
 
     /**
-     * News access rights checking
+     * Abandoned access rights checking
      *
      * @return bool
      */

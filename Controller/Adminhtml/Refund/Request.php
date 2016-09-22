@@ -21,10 +21,10 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Adminhtml\Cancellation;
+namespace UOL\PagSeguro\Controller\Adminhtml\Refund;
 
 use UOL\PagSeguro\Controller\Ajaxable;
-use UOL\PagSeguro\Model\Transactions\Methods\Cancellation;
+use UOL\PagSeguro\Model\Transactions\Methods\Refund;
 
 /**
  * Class Request
@@ -34,8 +34,6 @@ class Request extends Ajaxable
 {
 
     /**
-     * Request constructor.
-     *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
@@ -51,7 +49,7 @@ class Request extends Ajaxable
      */
     public function execute()
     {
-        $cancellation = new Cancellation(
+        $refund = new Refund(
               $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
               $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
               $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
@@ -63,19 +61,19 @@ class Request extends Ajaxable
         );
 
         try {
-            return $this->whenSuccess($cancellation->request());
+            return $this->whenSuccess($refund->request());
         } catch (\Exception $exception) {
             return $this->whenError($exception->getMessage());
         }
     }
 
     /**
-     * Cancellation access rights checking
+     * Refund access rights checking
      *
      * @return bool
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('UOL_PagSeguro::Cancellation');
+        return $this->_authorization->isAllowed('UOL_PagSeguro::Refund');
     }
 }
