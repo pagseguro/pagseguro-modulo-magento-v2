@@ -21,13 +21,13 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace UOL\PagSeguro\Controller\Direct;
+namespace UOL\PagSeguro\Controller\Payment;
 
 /**
- * Class Checkout
+ * Class Direct
  * @package UOL\PagSeguro\Controller\Payment
  */
-class Payment extends \Magento\Framework\App\Action\Action
+class Direct extends \Magento\Framework\App\Action\Action
 {
 
     /** @var \Magento\Framework\View\Result\PageFactory */
