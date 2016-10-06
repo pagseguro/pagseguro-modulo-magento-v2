@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
 	"name": "pagseguro/magento2",
-=======
-	"name": "esilvajr/magento2",
->>>>>>> desenvolvimento
 	"type": "magento2-module",
 	"version": "1.0.0",
 	"license": [
@@ -12,22 +8,6 @@
 	],
 	"require": {
 	    "php": "~5.5.0|~5.6.0|~7.0.0",
-<<<<<<< HEAD
-	    "pagseguro/php": "@stable"
-	},
-	"extra": {
-	  "map": [
-		[
-		    "*",
-		    "UOL/PagSeguro"
-		]
-	    ]
-	},
-	"autoload": {
-	  "psr-4": {
-	    "UOL\\PagSeguro\\": ""
-	  }
-=======
 	    "pagseguro/php": "dev-3.0.0-dev"
 	},
 	"autoload": {
@@ -37,6 +17,5 @@
 		"psr-4": {
 			"UOL\\PagSeguro\\": ""
 		}
->>>>>>> desenvolvimento
 	}
 }
