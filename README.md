@@ -27,15 +27,44 @@ Instalação
 -----------
 
 1. Instale via packagist 
-	- composer require pagseguro/magento2
-2. Execute o comando: 
-	- php bin/magento setup:upgrade
+	 - ```composer require pagseguro/magento2```
+2. Execute os comandos: 
+	 - ```php bin/magento setup:upgrade```
+	 - ```php bin/magento setup:static-content:deploy```
 3. Dê permissões as pastas var/ pub/
-	- chmod 777 -R var/ pub/
+	 - ```chmod 777 -R var/ pub/```
+	
+Inputs
+---------
+---
+| Dados do comprador         |Tipo  | Esperado                                                                       |
+| ---------------------------|:----:|:------------------------------------------------------------------------------:| 
+| Email                      | {Pattern - ^([a-zA-Z0-9_])+([@])+([a-zA-Z0-9_])+([.])+([a-zA-Z0-9_])}| email@email.em |
+| Name / Nome                | {String}                                                             | Nome           | 
+| Last Name  / Sobrenome     | {String}                                                             | Sobrenome      |  
+| Company  / Empresa         | {String}                                                             | Empresa        | 
+| Address / Endereço         | {String, Integer}                                                    |Endereço, Numero| 
+| Address 2 / Bairro /Endereço (Linha 2) | {String}                                                          | Bairro        | 
+| PostCode / CEP              | {Integer or String}                                            | 99999999 / 99999-999 |
+| City / Cidade              | {String}                                                             |    Cidade      |
+| Country / País             | {String}                                                             | País           |
+| State or Province / Estado | {String}                                                             | Estado         |
+| Aditional information / Informações adicionais | {String}                                         |Complemento     |
+| Phone / Telefone residencial | {Integer} - {DDD+NUMBER}                                             | 99999999999  |
+| Cell Phone / Telefone celular | {Integer} - {DDD+NUMBER}                                             | 99999999999  |
 
 Changelog
 ---------
+1.2.0
+- Adicionada opção para utilizar o Checkout Transparente.
+
+1.1.0
+- Possibilidade de consultar e solicitar o cancelamento de transações;
+- Possibilidade de consultar e solicitar o estorno de transações;
+- Possibilidade de definir descontos com base no meio de pagamento escolhido durante o checkout PagSeguro;
+
 1.0.0
+- Adicionando opção para utilização do Checkout Lightbox. 
 - Integração com API de Notificação.
 - Integração com API de Pagamento do PagSeguro.
 - Configuração do Setup do módulo.
