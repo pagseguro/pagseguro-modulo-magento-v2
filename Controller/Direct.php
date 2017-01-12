@@ -26,5 +26,7 @@ namespace UOL\PagSeguro\Controller;
 
 class Direct extends Ajaxable
 {
-
+    public function execute()
+    {
+    }
 }
