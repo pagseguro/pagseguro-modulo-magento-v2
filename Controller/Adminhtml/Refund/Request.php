@@ -24,6 +24,7 @@
 namespace UOL\PagSeguro\Controller\Adminhtml\Refund;
 
 use UOL\PagSeguro\Controller\Ajaxable;
+use UOL\PagSeguro\Model\Transactions\Methods;
 
 /**
  * Class Request
@@ -48,7 +49,7 @@ class Request extends Ajaxable
      */
     public function execute()
     {
-        $refund = new UOL\PagSeguro\Model\Transactions\Methods\Refund(
+        $refund = new Methods\Refund(
               $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
               $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
               $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
