@@ -1,21 +1,20 @@
 {
-	"name": "esilvajr/magento2",
+	"name": "pagseguro/magento2",
 	"type": "magento2-module",
-	"version": "1.0.0",
 	"license": [
 	    "OSL-3.0",
 	    "AFL-3.0"
 	],
 	"require": {
 	    "php": "~5.5.0|~5.6.0|~7.0.0",
-	    "pagseguro/pagseguro-php-sdk":"*"
+	    "pagseguro/pagseguro-php-sdk": "3.0.*"
 	},
 	"autoload": {
-		"files": [
-	        	"registration.php"
+	  "files": [
+	     "registration.php"
 	    	],
-		"psr-4": {
-			"UOL\\PagSeguro\\": ""
-		}
+	  "psr-4": {
+	    "UOL\\PagSeguro\\": ""
+	  }
 	}
 }

@@ -37,10 +37,6 @@ class Installments extends Template
      * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry;
-     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $_scopeConfig;
     /**
      * InstallmentMethod auto-generated factory
      * @var \UOL\PagSeguro\Model\Direct\InstallmentsMethod
@@ -53,11 +49,9 @@ class Installments extends Template
      */
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
         \UOL\PagSeguro\Model\Direct\InstallmentsMethodFactory $installmentFactory
     ) {
         $this->_coreRegistry = $context->getRegistry();
-        $this->_scopeConfig = $scopeConfigInterface;
         $this->_installmentFactory = $installmentFactory;
         parent::__construct($context);
     }
