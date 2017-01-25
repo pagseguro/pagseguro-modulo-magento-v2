@@ -53,6 +53,13 @@ Inputs
 | Phone / Telefone residencial | {Integer} - {DDD+NUMBER}                                             | 99999999999  |
 | Cell Phone / Telefone celular | {Integer} - {DDD+NUMBER}                                             | 99999999999  |
 
+
+Dúvidas?
+----------
+---
+Caso tenha dúvidas ou precise de suporte, acesse nosso [fórum].
+
+
 Changelog
 ---------
 1.2.0
@@ -102,9 +109,9 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
 * Obs.: O Pull Request não deve ser enviado para o branch master e sim para o branch correspondente a versão ou para a branch de desenvolvimento.
 
 
-  [API de Pagamentos]: https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-pagamentos.html
+  [API de Pagamentos]: https://dev.pagseguro.uol.com.br/documentacao/pagamentos
   [API de Notificações]: https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-notificacoes.html
-  [fórum]: http://forum.pagseguro.uol.com.br/
+  [fórum]: https://comunidade.pagseguro.uol.com.br/hc/pt-br/community/topics
   [Pagamentos via API]: https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml
   [Notificação de Transações]: https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml
   [Magento]: https://www.magentocommerce.com/
