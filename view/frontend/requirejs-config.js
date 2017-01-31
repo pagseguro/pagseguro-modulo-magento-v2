@@ -8,7 +8,7 @@ var config = {
         '*': {
             "bootstrap": "UOL_PagSeguro/js/bootstrap.min",
             "public": "UOL_PagSeguro/js/public",
-            "masks": "UOL_PagSeguro/js/jquery.mask.min",
+            "masks": "UOL_PagSeguro/js/vanillamasker.min",
         }
     }
 };
