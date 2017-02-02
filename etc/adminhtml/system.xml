@@ -68,8 +68,11 @@
                     <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
                 </field>
                 <field id="log_file" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>DIRETÓRIO</label>
-                    <tooltip>Caminho para o arquivo de log.</tooltip>
+                    <label>NOME DO ARQUIVO DE LOG</label>
+                    <comment>Nome do arquivo de log a ser utilizado, com caminho relativo ou absoluto e que tenham permissões de leitura e escrita (Ex.: var/log/pagseguro.log).</comment>
+                    <tooltip>
+                        Para que ocorra normalmente a geração de logs é estritamente necessário que o diretório e o arquivo de log configurados tenham permissões de leitura e escrita.
+                    </tooltip>
                 </field>
                 <field id="checkout" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>CHECKOUT</label>

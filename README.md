@@ -25,15 +25,20 @@ Requisitos
 
 Instalação
 -----------
+Navegue até o diretório raíz da sua instalação do Magento 2 e siga os seguintes passos:
 
 1. Instale via packagist 
-	 - ```composer require pagseguro/magento2```
+   - ```composer require pagseguro/magento2```
 2. Execute os comandos: 
-	 - ```php bin/magento setup:upgrade```
-	 - ```php bin/magento setup:static-content:deploy```
+   - ```php bin/magento setup:upgrade```
+   - ```php bin/magento setup:static-content:deploy```
 3. Dê permissões as pastas var/ pub/
-	 - ```chmod 777 -R var/ pub/```
-	
+   - ```chmod 777 -R var/ pub/```
+
+*Observações*
+- No passo 1, podem ser solicitadas suas credenciais de autenticação do Magento. Caso tenha alguma dúvida, há uma descrição de como proceder nesse [link da documentação oficial](http://devdocs.magento.com/guides/v2.0/install-gde/prereq/connect-auth.html).
+- De acordo com as configurações da sua loja pode ser necessário também gerar o conteúdo estático referente à sua tradução,através da execução do comando ```bin/magento setup:static-content:deploy pt_BR``` após a execução das instruções anteriores.
+
 Inputs
 ---------
 ---
@@ -62,6 +67,9 @@ Caso tenha dúvidas ou precise de suporte, acesse nosso [fórum].
 
 Changelog
 ---------
+1.2.1
+- Alterada a biblioteca JavaScript utilizada nas máscaras.
+
 1.2.0
 - Adicionada opção para utilizar o Checkout Transparente.
 
@@ -120,4 +128,3 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
   [cURL]: http://php.net/manual/en/book.curl.php
   [DOM]: http://php.net/manual/en/book.dom.php
   [GitHub]: https://github.com/pagseguro/magento2
-
