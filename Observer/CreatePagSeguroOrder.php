@@ -93,7 +93,7 @@ class CreatePagSeguroOrder implements ObserverInterface
      * @return void
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
-    {          
+    {
         $order = $observer->getEvent()->getOrder();
 
         //verify pagseguro transaction

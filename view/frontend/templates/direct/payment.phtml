@@ -31,24 +31,28 @@
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
                         <input class="form-control cpf-cnpj-mask" id="document-credit-card" name="document" type="text">
+                        <span class="display-none help-block document-credit-card-error-message">Insira um CPF ou CNPJ válido</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_num">Número do cartão</label>
                     <div class="col-xs-12 col-sm-10">
                         <input class="form-control credit-card-mask" id="card_num" name="card_num" type="text" required>
+                        <span class="display-none help-block card_num-error-message">Insira um número de cartão válido</span>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_holder_name">Nome impresso no cartão</label>
                     <div class="col-xs-12 col-sm-10">
                         <input class="form-control" id="card_holder_name" name="card_holder_name" type="text" required>
+                        <span class="display-none help-block card_holder_name-error-message">Insira um nome</span>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 control-label" for="card_holder_birthdate">Data de nascimento</label>
                     <div class="col-xs-12 col-sm-10">
                         <input class="form-control date-mask" id="card_holder_birthdate" name="card_holder_birthdate" type="text" required="">
+                        <span class="display-none help-block card_holder_birthdate-error-message">Insira uma data de nascimento válida</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -71,6 +75,7 @@
                                     <option value="11">11</option>
                                     <option value="12">12</option>
                                 </select>
+                                <span class="display-none help-block card_expiration_month-error-message">Escolha um mês</span>
                             </div>
                             <div class="col-xs-12 col-sm-6">
                                 <select id="card_expiration_year" name="card_validate" class="form-control">
@@ -82,6 +87,7 @@
                                     <option value="<?=$i;?>"><?=$i;?></option>
                                     <?php endfor; ?>
                                 </select>
+                                <span class="display-none help-block card_expiration_year-error-message">Escolha um ano</span>
                             </div>
                         </div>
                     </div>
@@ -90,6 +96,7 @@
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">Código de segurança</label>
                     <div class="col-xs-12 col-sm-10">
                         <input class="form-control code-card-mask" id="card_cod" name="card_cod" type="text">
+                        <span class="display-none help-block card_cod-error-message">Insira um código segurança válido</span>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group display-none">
@@ -98,6 +105,7 @@
                         <select id="card_installments" name="card_installments" class="form-control">
                             <option value="" disabled selected>Escolha o N° de parcelas</option>
                         </select>
+                        <span class="display-none help-block card_installments-error-message">Escolha uma opção de parcelamento</span>
                     </div>
                 </div>
                 <div class="form-group credit-total display-none">
@@ -106,7 +114,7 @@
                         <span id="card_total">R$ 00,00</span>
                     </div>
                 </div>
-		<div align="right">
+	            <div align="right">
                     Esta compra está sendo feita no Brasil <img src="<?php echo $this->getViewFileUrl('UOL_PagSeguro::images/flag-origin-country.png'); ?>">
                 </div>
                 <button class="btn-pagseguro --align-right" id="payment-credit-card">Concluir</button>
@@ -119,10 +127,12 @@
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
                         <input class="form-control cpf-cnpj-mask" id="document-debit" name="document" type="text">
+                        <span class="display-none help-block document-debit-error-message">Insira um CPF ou CNPJ válido</span>
                     </div>
                 </div><!-- /.form-group -->
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-6 control-label">Escolha seu banco abaixo onde deverá fazer o pagamento online.</label>
+                    <span class="display-none help-block bankList-error-message">Escolha um banco</span>
                     <div id="bankList" class="col-xs-12 col-sm-5 col-sm-offset-1">
                         <label class="radio">
                             <input type="radio" name="bank" id="optionsRadios1" value="1">
@@ -159,6 +169,7 @@
                     <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
                     <div class="col-xs-12 col-sm-10">
                         <input class="form-control cpf-cnpj-mask" id="document-boleto" name="document" type="text">
+                        <span class="display-none help-block document-boleto-error-message">Insira um CPF ou CNPJ válido</span>
                     </div>
                 </div>
 		<div align="right">
@@ -169,7 +180,7 @@
             <ul class="list-warning">
                 <li>Imprima o boleto e pague no banco</li>
                 <li>Ou pague pela internet utilizando o código de barras do boleto</li>
-                <li>o prazo de validade do boleto é de 1 dia útil</li>
+                <li>O prazo de validade do boleto é de 1 dia útil</li>
             </ul>
         </div><!-- /.item-tab#bilet -->
     </div><!-- /.tabs-content-->
@@ -191,7 +202,7 @@
         function($, VMasker) {
             ;(function masksInputs($, VMasker, undefined) {
                 VMasker(document.querySelector('.credit-card-mask')).maskPattern('9999 9999 9999 9999');
-                VMasker(document.querySelector('.code-card-mask')).maskPattern('999');
+                VMasker(document.querySelector('.code-card-mask')).maskPattern('9999');
                 VMasker(document.querySelector('.date-mask')).maskPattern('99/99/9999');
                 $('.cpf-cnpj-mask').on('keyup', function() {
                     try {
@@ -222,6 +233,7 @@
                     }
                 });
             }($));
+
             ;(function calcTotal($, undefined) {
                 //Update the total value according with installments
                 $('#card_installments').on('change', function() {
@@ -229,6 +241,7 @@
                     $('#card_total').text('R$ ' + currency);
                 });
             }($));
+
             function loadElements(service, bank, creditCard) {
                 var bank = bank || false;
                 var creditCard = creditCard || false;
@@ -260,47 +273,27 @@
             //Event buttons methods buy types
             $('#payment-boleto').on('click', function(e){
                 e.preventDefault();
-                var el = loadElements('boleto');
-                PagSeguroDirectPayment.setSessionId(el.sessionCode);
-                var hash = PagSeguroDirectPayment.getSenderHash();
-                WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);
+                if (validateBoletoForm()) {
+                    var el = loadElements('boleto');
+                    PagSeguroDirectPayment.setSessionId(el.sessionCode);
+                    var hash = PagSeguroDirectPayment.getSenderHash();
+                    WS.Ajax.Direct.Boleto.Payment(el.url, el.orderId, hash, el.document);    
+                }
             });
             $('#payment-debit').on('click', function(e){
                 e.preventDefault();
-                var el = loadElements('debit', true);
-                PagSeguroDirectPayment.setSessionId(el.sessionCode);
-                var hash = PagSeguroDirectPayment.getSenderHash();
-                WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);
+                if (validateOnlineDebitForm()) {
+                    var el = loadElements('debit', true);
+                    PagSeguroDirectPayment.setSessionId(el.sessionCode);
+                    var hash = PagSeguroDirectPayment.getSenderHash();
+                    WS.Ajax.Direct.OnlineDebit.Payment(el.url, el.orderId, hash, el.document, el.bank);    
+                }
             });
             $('#payment-credit-card').on('click', function(e){
                 e.preventDefault();
-                PagSeguroDirectPayment.createCardToken({
-                    cardNumber: unmaskField($('#card_num')),
-                    brand: $('#card-brand').attr('data-target'),
-                    internationalMode: $('#card-international').attr('data-target'),
-                    cvv: $('#card_cod').val(),
-                    expirationMonth: $('#card_expiration_month').val(),
-                    expirationYear: $('#card_expiration_year').val(),
-                    success: function(response) {
-                        var el = loadElements('credit-card', false, true);
-                        var token = response.card.token;
-                        var hash = PagSeguroDirectPayment.getSenderHash();
-                        setTimeout(function () {
-                            WS.Ajax.Direct.CreditCard.Payment(
-                                el.url,
-                                el.orderId,
-                                hash,
-                                el.document,
-                                token,
-                                el.cardInternational,
-                                el.installmentQuantity,
-                                el.installmentAmount,
-                                el.holderName,
-                                el.holderBirthdate
-                            );
-                        }, 5000);
-                    }
-                });
+                if(validateCreditCardForm()) {
+                    createCardToken();
+                }
             });
             //get and showing brand credit card
             function getBrandCard(cardBinVal) {
@@ -330,6 +323,247 @@
                 };
             };
 
+            /**
+             * Validate online debit form
+             * @return true || false
+             */
+            function validateOnlineDebitForm() 
+            {
+                var formIsValid = true;
+
+                // validate online debit sender document
+                if (! validateSenderDocument($('#document-debit'), '.document-debit-error-message')) {
+                    formIsValid = false;
+                }
+                // validate online debit banklist
+                if (! validateBank($("#bankList input[type='radio']:checked").length, '#bankList')) {
+                    formIsValid = false;
+                }
+
+                return formIsValid;
+            }
+
+            /**
+             * Validate online debit form bank field
+             * return true || false
+             */
+            function validateBank(value, validationMessageReference)
+            {
+                if (value == 0) {
+                    $(validationMessageReference).parents('.form-group').removeClass('has-success').addClass('has-error');
+                    return false;
+                }
+                $(validationMessageReference).parents('.form-group').removeClass('has-error').addClass('has-success');
+                return true;
+            }
+
+            /**
+             * Validates boleto form
+             * @return bool true || false
+             */
+            function validateBoletoForm()
+            {
+                var formIsValid = true;
+
+                // validate boleto sender document
+                if (! validateSenderDocument($('#document-boleto'), '.document-boleto-error-message')) {
+                    formIsValid = false;
+                }
+
+                return formIsValid;
+            }
+
+            /**
+             * Validate the credit card form
+             * @return true || false
+             */
+            function validateCreditCardForm() 
+            {
+                var formIsValid = true;
+                //validate sender document
+                if (! validateSenderDocument($('#document-credit-card'), '.document-credit-card-error-message')) {
+                    formIsValid = false;
+                }
+                //validate card number
+                if (! validateCardNumber($('#card_num').val(), '.card_num-error-message')) {
+                    formIsValid = false;
+                }
+                //validate card name
+                if (! fieldValidationWithParameter($('#card_holder_name').val(), '.card_holder_name-error-message', '')) {
+                    formIsValid = false;
+                }
+                //validate card holder birthdate
+                if (! validateBirthDate($('#card_holder_birthdate').val(), '.card_holder_birthdate-error-message')) {
+                    formIsValid = false;
+                }
+                //validate card expiration month
+                if (! fieldValidationWithParameter($('#card_expiration_month').val(), '.card_expiration_month-error-message', null)) {
+                    formIsValid = false;
+                }
+                //validate card expiration year
+                if (! fieldValidationWithParameter($('#card_expiration_year').val(), '.card_expiration_year-error-message', null)) {
+                    formIsValid = false;
+                }
+                //validate card installments
+                if (! fieldValidationWithParameter($('#card_installments').val(), '.card_installments-error-message', null)) {
+                    formIsValid = false;
+                }
+                //validate card code
+                if (! validateCardCode($('#card_cod').val(), '.card_cod-error-message')) {
+                    formIsValid = false;
+                }
+
+                return formIsValid;
+            };
+
+            /**
+             * Call pagseguro api and create credit card token and do the payment
+             */
+            function createCardToken() {
+                PagSeguroDirectPayment.createCardToken({
+                    cardNumber: unmaskField($('#card_num')),
+                    brand: $('#card-brand').attr('data-target'),
+                    internationalMode: $('#card-international').attr('data-target'),
+                    cvv: $('#card_cod').val(),
+                    expirationMonth: $('#card_expiration_month').val(),
+                    expirationYear: $('#card_expiration_year').val(),
+                    success: function(response) {
+                        var el = loadElements('credit-card', false, true);
+                        var token = response.card.token;
+                        var hash = PagSeguroDirectPayment.getSenderHash();
+                        setTimeout(function () {
+                            WS.Ajax.Direct.CreditCard.Payment(
+                                el.url,
+                                el.orderId,
+                                hash,
+                                el.document,
+                                token,
+                                el.cardInternational,
+                                el.installmentQuantity,
+                                el.installmentAmount,
+                                el.holderName,
+                                el.holderBirthdate
+                            );
+                        }, 5000);
+                    },
+                    error: function(response) {
+                        if (response.error === true) {
+                            console.log('erro');
+                        };
+                    }
+                });
+            }
+
+            /**
+             * Validate CPF
+             * @return true | false
+             */
+            function validateCpf(strCPF) {
+                var sum;
+                var rest;
+                sum = 0;
+                var equal_digits = 1;
+                for (i = 0; i < strCPF.length - 1; i++) {
+                    if (strCPF.charAt(i) != strCPF.charAt(i + 1))
+                    {
+                        equal_digits = 0;
+                        break;
+                    }
+                }
+                if (!equal_digits) {
+                    for (var i = 1; i <= 9; i++) {
+                        sum = sum + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+                    }
+                    rest = sum % 11;
+                    if ((rest == 0) || (rest == 1)) {
+                        rest = 0;
+                    } else {
+                        rest = 11 - rest;
+                    };
+                    if (rest != parseInt(strCPF.substring(9, 10)) ) {
+                        return false;
+                    }
+                    sum = 0;
+                    for (i = 1; i <= 10; i++) {
+                        sum = sum + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+                    }
+                    rest = sum % 11;
+                    if ((rest == 0) || (rest == 1)) {
+                        rest = 0;
+                    } else {
+                        rest = 11 - rest;
+                    };
+                    if (rest != parseInt(strCPF.substring(10, 11) ) ) {
+                        return false;
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            /**
+             * Validate CNPJ
+             * @return true | false
+             */
+            function validateCnpj(cnpj) {
+                var numbersVal;
+                var digits;
+                var sum;
+                var i;
+                var result;
+                var pos;
+                var size;
+                var equal_digits;
+                equal_digits = 1;
+                if (cnpj.length < 14 && cnpj.length < 15) {
+                    return false;
+                }
+                for (i = 0; i < cnpj.length - 1; i++) {
+                    if (cnpj.charAt(i) != cnpj.charAt(i + 1))
+                    {
+                        equal_digits = 0;
+                        break;
+                    }
+                }
+                if (!equal_digits) {
+                    size = cnpj.length - 2
+                    numbersVal = cnpj.substring(0,size);
+                    digits = cnpj.substring(size);
+                    sum = 0;
+                    pos = size - 7;
+                    for (i = size; i >= 1; i--)
+                    {
+                        sum += numbersVal.charAt(size - i) * pos--;
+                        if (pos < 2)
+                            pos = 9;
+                    }
+                    result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+                    if (result != digits.charAt(0))
+                        return false;
+                    size = size + 1;
+                    numbersVal = cnpj.substring(0,size);
+                    sum = 0;
+                    pos = size - 7;
+                    for (i = size; i >= 1; i--)
+                    {
+                        sum += numbersVal.charAt(size - i) * pos--;
+                        if (pos < 2)
+                            pos = 9;
+                    }
+                    result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+                    if (result != digits.charAt(1)) {
+                        return false;
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            /**
+             * Get installments when the sixth digit of the credit card is typed
+             */
             ;(function()
             {
                 var kbinValue,
@@ -353,6 +587,187 @@
                 $('#card_num').on('paste', function (e) {
                     e.preventDefault();
                     return false;
+                });
+            }($));
+
+            /**
+             * Show error form validation message / highlight status (in red)
+             */
+            function showFormErrorValidation(validationMessageReference)
+            {
+                $(validationMessageReference).parents('.form-group').removeClass('has-success').addClass('has-error');
+                $(validationMessageReference).show();
+                return false;
+            }
+
+            /**
+             * Show success form validation message / highlight status (in green)
+             */
+            function showFormSuccessValidation(validationMessageReference)
+            {
+                $(validationMessageReference).parents('.form-group').removeClass('has-error').addClass('has-success');
+                $(validationMessageReference).hide();
+                return true;
+            }
+
+            /**
+             * Validate sender document (CPF or CNPJ)
+             * @return true || false
+             */
+            function validateSenderDocument(value, validationMessageReference)
+            {
+                value = unmaskField(value);
+                 if(value == '' 
+                    || (value.length <= 11 && validateCpf(value) === false)
+                    || (value.length > 11 && value.length < 15 && validateCnpj(value) === false)
+                ) {
+                    return showFormErrorValidation(validationMessageReference);
+                } else {
+                    return showFormSuccessValidation(validationMessageReference);
+                }
+            }
+
+            /**
+             * Validate credit card number]
+             * @return 
+             */
+            function validateCardNumber(value, validationMessageReference)
+            {
+                if (value == '' || value.length !== 19) {
+                    return showFormErrorValidation(validationMessageReference);
+                } else {
+                    return showFormSuccessValidation(validationMessageReference);
+                }
+            }
+
+            /**
+             * Validate if @value it's the same as the @invalidValueParameter
+             * @return true || false
+             */
+            function fieldValidationWithParameter(value, validationMessageReference, invalidValueParameter)
+            {
+                if (value == invalidValueParameter) {
+                    return showFormErrorValidation(validationMessageReference);
+                } else {
+                    return showFormSuccessValidation(validationMessageReference);
+                }
+            }
+
+            /**
+             * Validate birthdate (with 'mask')
+             * @return true || false
+             */
+            function validateBirthDate(value, validationMessageReference)
+            {
+                if (value == '' || value.length !== 10) {
+                    return showFormErrorValidation(validationMessageReference);
+                } else {
+                    return showFormSuccessValidation(validationMessageReference);   
+                }
+            }
+
+            /**
+             * Validate credit card code
+             * @return true || false
+             */
+            function validateCardCode(value, validationMessageReference)
+            {
+                if (value == '' || value.length < 3 || value.length > 4 ) {
+                    return showFormErrorValidation(validationMessageReference);
+                } else {
+                    return showFormSuccessValidation(validationMessageReference);
+                }
+            }
+
+            /**
+             * On blur form validations 
+             */
+
+            //validate credit card sender cpf/cnpj
+            ;(function()
+            {
+                $('#document-credit-card').on('blur', function (e) {
+                    validateSenderDocument($('#document-credit-card'), '.document-credit-card-error-message');
+                });
+            }($));
+
+            //validate card number
+            ;(function()
+            {
+                $('#card_num').on('blur', function (e) {
+                    validateCardNumber($('#card_num').val(), '.card_num-error-message');
+                });
+            }($));
+
+            //validate card name
+            ;(function()
+            {
+                $('#card_holder_name').on('blur', function (e) {
+                    fieldValidationWithParameter($('#card_holder_name').val(), '.card_holder_name-error-message', '');
+                });
+            }($));
+
+            //validate card holder birthdate
+            ;(function()
+            {
+                $('#card_holder_birthdate').on('blur', function (e) {
+                    validateBirthDate($('#card_holder_birthdate').val(), '.card_holder_birthdate-error-message');
+                });
+            }($));
+
+            //validate card expiration month
+            ;(function()
+            {
+                $('#card_expiration_month').on('blur', function (e) {
+                    fieldValidationWithParameter($('#card_expiration_month').val(), '.card_expiration_month-error-message', null);
+                });
+            }($));
+            
+            //validate card expiration year
+            ;(function()
+            {
+                $('#card_expiration_year').on('blur', function (e) {
+                    fieldValidationWithParameter($('#card_expiration_year').val(), '.card_expiration_year-error-message', null);
+                });
+            }($));
+            
+            //validate card installments
+            ;(function()
+            {
+                $('#card_installments').on('blur', function (e) {
+                    fieldValidationWithParameter($('#card_installments').val(), '.card_installments-error-message', null);
+                });
+            }($));
+            
+            //validate card code
+            ;(function()
+            {
+                $('#card_cod').on('blur', function (e) {
+                    validateCardCode($('#card_cod').val(), '.card_cod-error-message');
+                });
+            }($));
+
+            //validate online debit sender cpf/cnpj
+            ;(function()
+            {
+                $('#document-debit').on('blur', function (e) {
+                    validateSenderDocument($('#document-debit'), '.document-debit-error-message');
+                });
+            }($));
+
+            //validate online debit bank
+            ;(function()
+            {
+                $('#bankList').on('click', function (e) {
+                    validateBank($("#bankList input[type='radio']:checked").length, '#bankList');
+                });
+            }($));
+
+            //validate boleto sender cpf/cnpj
+            ;(function()
+            {
+                $('#document-boleto').on('blur', function (e) {
+                    validateSenderDocument($('#document-boleto'), '.document-boleto-error-message');
                 });
             }($));
         }
