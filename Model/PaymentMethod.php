@@ -160,7 +160,7 @@ class PaymentMethod
             $this->getShippingAddress($address[3]),
             \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']),
             $shipping['city'],
-            $this->getRegionAbbreviation($shipping['region']),
+            $this->getRegionAbbreviation($shipping['region_code']),
             $country,
             $this->getShippingAddress($address[2])
         );
