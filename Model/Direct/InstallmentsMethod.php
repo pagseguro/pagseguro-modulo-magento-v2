@@ -89,11 +89,11 @@ class InstallmentsMethod
         try {
             $this->config();
             $this->setOptions($this->getTotalAmount($amount), $this->getBrand());
-            
             $installments = \PagSeguro\Services\Installment::create(
                 $this->_library->getPagSeguroCredentials(),
                 $this->getOptions()
             );
+
             return $this->output($installments->getInstallments(), $maxInstallment);
         } catch (PagSeguroServiceException $exception) {
             throw $exception;

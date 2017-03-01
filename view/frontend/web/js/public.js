@@ -79,32 +79,35 @@ var WS = {
                         type: 'POST',
                         showLoader: true,
                     }).success(function (response) {
+                        if (response.success) {
+                            //remove if already exists installment options
+                          jQuery('#card_installments option').each(function(){
+                              if (!jQuery(this).val() === false) {
+                                 jQuery(this).remove();
+                              }
+                          });
 
-                        //remove if already exists installment options
-                        jQuery('#card_installments option').each(function(){
-                            if (!jQuery(this).val() === false) {
-                               jQuery(this).remove();
-                            }
-                        });
+                          //add installments options
+                          jQuery.each(response.payload.data.installments, function (i, item) {
+                              jQuery('#card_installments').append(jQuery('<option>', { 
+                                  value: item.totalAmount,
+                                  text : item.text,
+                                  'data-amount': item.amount,
+                                  'data-quantity': item.quantity
+                              }));
+                          });
 
-                        //add installments options
-                        jQuery.each(response.payload.data.installments, function (i, item) {
-                            jQuery('#card_installments').append(jQuery('<option>', { 
-                                value: item.totalAmount,
-                                text : item.text,
-                                'data-amount': item.amount,
-                                'data-quantity': item.quantity
-                            }));
-                        });
+                          //add card international status
+                          jQuery('#card-international').attr('data-target', response.payload.data.cardInternational);
+                          
+                          //add card brand
+                          jQuery('#card-brand').attr('data-target', response.payload.data.cardBrand);
 
-                        //add card international status
-                        jQuery('#card-international').attr('data-target', response.payload.data.cardInternational);
-                        
-                        //add card brand
-                        jQuery('#card-brand').attr('data-target', response.payload.data.cardBrand);
-
-                        //show installments option and total amount of it
-                        jQuery('.display-none').show();
+                          //show installments option and total amount of it
+                          jQuery('#card_installments').parents('.form-group').show();
+                        } else {
+                          window.location.href = response.payload.redirect;
+                        }
                     });
                 },
 

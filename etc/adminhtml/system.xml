@@ -69,7 +69,12 @@
                 </field>
                 <field id="log_file" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>NOME DO ARQUIVO DE LOG</label>
-                    <comment>Nome do arquivo de log a ser utilizado, com caminho relativo ou absoluto e que tenham permissões de leitura e escrita (Ex.: var/log/pagseguro.log).</comment>
+                    <depends>
+                        <field id="*/*/log">1</field>
+                    </depends>
+                    <comment>
+                        Nome do arquivo de log a ser utilizado, com caminho relativo ou absoluto, que tenha permissões de leitura e escrita (Ex.: var/log/pagseguro.log).
+                    </comment>
                     <tooltip>
                         Para que ocorra normalmente a geração de logs é estritamente necessário que o diretório e o arquivo de log configurados tenham permissões de leitura e escrita.
                     </tooltip>
