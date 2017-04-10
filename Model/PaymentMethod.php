@@ -152,16 +152,16 @@ class PaymentMethod
     private function setShippingInformation()
     {
         $shipping = $this->getShippingData();
-		$country = $this->getCountryName($shipping['country_id']);
         $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
+
         $this->_paymentRequest->setShipping()->setAddress()->withParameters(
             $this->getShippingAddress($address[0], $shipping),
             $this->getShippingAddress($address[1]),
             $this->getShippingAddress($address[3]),
-            \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']),
-            $shipping['city'],
-            $this->getRegionAbbreviation($shipping['region']),
-            $country,
+            \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
+            $shipping->getCity(),
+            $this->getRegionAbbreviation($shipping),
+            $this->getCountryName($shipping['country_id']),
             $this->getShippingAddress($address[2])
         );
     }
@@ -234,13 +234,20 @@ class PaymentMethod
     /**
      * Get a brazilian region name and return the abbreviation if it exists
      *
-     * @param string $regionName
+     * @param shipping $shipping
      * @return string
      */
-    private function getRegionAbbreviation($regionName)
+    private function getRegionAbbreviation($shipping)
     {
+        if (strlen($shipping->getRegionCode()) == 2) {
+            return $shipping->getRegionCode();
+        }
+
         $regionAbbreviation = new \PagSeguro\Enum\Address();
-        return (is_string($regionAbbreviation->getType($regionName))) ? $regionAbbreviation->getType($regionName) : $regionName;
+
+        return (is_string($regionAbbreviation->getType($shipping->getRegion()))) ?
+            $regionAbbreviation->getType($shipping->getRegion()) :
+            $shipping->getRegion();
     }
     
     /**

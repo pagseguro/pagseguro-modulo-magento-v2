@@ -105,6 +105,7 @@ var WS = {
 
                           //show installments option and total amount of it
                           jQuery('#card_installments').parents('.form-group').show();
+                          jQuery('.form-group.credit-total').show()
                         } else {
                           window.location.href = response.payload.redirect;
                         }
