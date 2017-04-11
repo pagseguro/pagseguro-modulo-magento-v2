@@ -25,15 +25,33 @@ Requisitos
 
 Instalação
 -----------
+Navegue até o diretório raíz da sua instalação do Magento 2 e siga os seguintes passos:
 
 1. Instale via packagist 
-	 - ```composer require pagseguro/magento2```
-2. Execute os comandos: 
-	 - ```php bin/magento setup:upgrade```
-	 - ```php bin/magento setup:static-content:deploy```
+   - ```composer require pagseguro/magento2```
+       - Neste momento, podem ser solicitadas suas credenciais de autenticação do Magento. Caso tenha alguma dúvida, há uma descrição de como proceder nesse [link da documentação oficial](http://devdocs.magento.com/guides/v2.0/install-gde/prereq/connect-auth.html).
+2. Execute os comandos:
+   - ```php bin/magento setup:upgrade```
+   - ```php bin/magento setup:static-content:deploy``` ou ```php bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
 3. Dê permissões as pastas var/ pub/
-	 - ```chmod 777 -R var/ pub/```
-	
+   - ```chmod 777 -R var/ pub/```
+
+
+Atualização
+-----------
+É altamente recomendado que você tenha um ambiente de testes para validar alterações e atualizações antes de atualizar sua loja em produção. É recomendado também que seja feito um **backup** da sua loja e informações importantes antes de executar qualquer procedimento de atualização/instalação.
+
+A atualização do módulo do PagSeguro é feita através do **composer** e pode ser feita de diversas maneiras, de acordo com suas preferências. Uma forma é através dos comandos:
+1. ```composer update pagseguro/magento2```
+2. ```composer update pagseguro/pagseguro-php-sdk```
+3. ```php bin/magento setup:upgrade```
+4. ```php bin/magento setup:static-content:deploy``` ou ```php bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
+
+**Observações** 
+- Em alguns casos, o Magento não atualiza os arquivos estáticos gerados, podendo ser necessário atualizar os mesmos via interface administrativa, comandos do terminal ou removendo diretamente conteúdo da pasta *pub/static/frontend/Magento/seu_tema/seu_idioma/UOL_PagSeguro*.
+- Em seguida, executar novamente o comando ```php bin/magento setup:static-content:deploy``` ou ```bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
+
+
 Inputs
 ---------
 ---
@@ -62,6 +80,19 @@ Caso tenha dúvidas ou precise de suporte, acesse nosso [fórum].
 
 Changelog
 ---------
+1.3.0
+- Adicionada validação e mensagens de erro (frontend) nos formulários do checkout transparente
+
+1.2.6
+- Melhoria na configuração do log na interface administrativa
+- Adicionada seção de atualização do módulo e atualização geral da documentação (README.md)
+- Correção de bugs quando o pedido deixava de existir ou a sessão era encerrada
+- Correçao para aceitar CVV de 4 digitos
+- Melhoria no acesso aos dados do endereço do cliente
+
+1.2.1
+- Alterada a biblioteca JavaScript utilizada nas máscaras.
+
 1.2.0
 - Adicionada opção para utilizar o Checkout Transparente.
 
@@ -120,4 +151,3 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
   [cURL]: http://php.net/manual/en/book.curl.php
   [DOM]: http://php.net/manual/en/book.dom.php
   [GitHub]: https://github.com/pagseguro/magento2
-

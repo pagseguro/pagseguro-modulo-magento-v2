@@ -41,6 +41,9 @@ class Boleto extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Framework\Controller\Result\Json  */
     protected $result;
 
+    /** @var Magento\Sales\Model\Order */
+    protected $order;
+
     /**
      * Boleto payment constructor.
      * @param \Magento\Framework\App\Action\Context $context
@@ -62,12 +65,13 @@ class Boleto extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         try {
+            $this->order = $this->loadOrder();
             /** @var \UOL\PagSeguro\Model\Direct\BoletoMethod $boleto */
             $boleto = new BoletoMethod(
                 $this->_objectManager->create('Magento\Directory\Api\CountryInformationAcquirerInterface'),
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
                 $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
-                $this->loadOrder(),
+                $this->order,
                 $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
                 $data = [
                     'sender_document' => $this->helperData()->formatDocument($this->getRequest()->getParam('sender_document')),
@@ -77,7 +81,9 @@ class Boleto extends \Magento\Framework\App\Action\Action
             );
             return $this->placeOrder($boleto);
         } catch (\Exception $exception) {
-            $this->changeOrderHistory('pagseguro_cancelada');
+            if (!is_null($this->order)) {
+                $this->changeOrderHistory('pagseguro_cancelada');
+            }
             $this->clearSession();
             return $this->whenError($exception->getMessage());
         }
@@ -189,7 +195,13 @@ class Boleto extends \Magento\Framework\App\Action\Action
      */
     private function lastRealOrderId()
     {
-        return $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
+        $lastRealOrderId = $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
+
+        if (is_null($lastRealOrderId)) {
+            throw new \Exception("There is no order associated with this session.");
+        } 
+        
+        return $lastRealOrderId;
     }
 
     /**
@@ -209,10 +221,9 @@ class Boleto extends \Magento\Framework\App\Action\Action
      */
     private function changeOrderHistory($status)
     {
-        $order = $this->loadOrder();
         /** change payment status in magento */
-        $order->addStatusToHistory($status, null, true);
+        $this->order->addStatusToHistory($status, null, true);
         /** save order */
-        $order->save();
+        $this->order->save();
     }
 }
