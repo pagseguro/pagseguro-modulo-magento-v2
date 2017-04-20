@@ -310,9 +310,13 @@ class CreditCardMethod
      */
     private function setSenderInformation()
     {
-        if ($this->_order->getCustomerName() == __('Guest'))
+        if (
+            $this->_order->getCustomerName() == (string)__('Guest')
+        ) {
             $this->guest();
-        $this->loggedIn();
+        } else {
+            $this->loggedIn();
+        }
 
         $this->_paymentRequest->setSender()->setEmail($this->getEmail());
     }

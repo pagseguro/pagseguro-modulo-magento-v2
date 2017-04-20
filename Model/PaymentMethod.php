@@ -136,7 +136,7 @@ class PaymentMethod
     {
         $senderName = $this->_checkoutSession->getLastRealOrder()->getCustomerName();
         // If Guest
-        if ($senderName == __('Guest')) {
+        if ($senderName == (string)__('Guest')) {
             $address = $this->getBillingAddress();
             $senderName = $address->getFirstname() . ' ' . $address->getLastname();
         }
