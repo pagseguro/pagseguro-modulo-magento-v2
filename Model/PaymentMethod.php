@@ -23,7 +23,7 @@
 namespace UOL\PagSeguro\Model;
 
 use UOL\PagSeguro\Helper\Library;
-use PagSeguro\Domains\Requests\Payment;
+use PagSeguro\Domains\Requests\Payment as PS_Payment;
 
 /**
  * Class PaymentMethod
@@ -73,7 +73,7 @@ class PaymentMethod
         /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _library */
 		$this->_library = new Library($scopeConfigInterface, $moduleList);
         /** @var  \Magento\Framework\Module\ModuleList _paymentRequest */
-        $this->_paymentRequest = new Payment();
+        $this->_paymentRequest = new PS_Payment();
     }
     /**
      * @return \PagSeguroPaymentRequest
@@ -136,7 +136,12 @@ class PaymentMethod
     {
         $senderName = $this->_checkoutSession->getLastRealOrder()->getCustomerName();
         // If Guest
-        if ($senderName == __('Guest')) {
+        if (
+            $senderName == (string)__('Guest')
+            || $senderName == 'Convidado'
+            || $senderName == 'Visitante'
+                
+        ) {
             $address = $this->getBillingAddress();
             $senderName = $address->getFirstname() . ' ' . $address->getLastname();
         }

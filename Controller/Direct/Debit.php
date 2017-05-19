@@ -183,8 +183,7 @@ class Debit extends \Magento\Framework\App\Action\Action
             1 => 'itau',
             2 => 'bradesco',
             3 => 'banrisul',
-            4 => 'bancodobrasil',
-            5 => 'hsbc'
+            4 => 'bancodobrasil'
         ];
     }
 

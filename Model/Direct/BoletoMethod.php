@@ -234,9 +234,15 @@ class BoletoMethod implements Checkout
      */
     private function setSenderInformation()
     {
-        if ($this->_order->getCustomerName() == __('Guest'))
+        if (
+            $this->_order->getCustomerName() == (string)__('Guest') 
+            || $this->_order->getCustomerName() == 'Convidado'
+            || $this->_order->getCustomerName() == 'Visitante'
+        ) {
             $this->guest();
-        $this->loggedIn();
+        } else {
+            $this->loggedIn();
+        }
 
         $this->_paymentRequest->setSender()->setEmail($this->getEmail());
     }

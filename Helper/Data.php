@@ -265,15 +265,24 @@ class Data
      */
     public static function formatPhone($phone)
     {
-        $phone = self::keepOnlyNumbers($phone);
         $ddd = '';
-        if (strlen($phone) > 9) {
-            if (substr($phone, 0, 1) == 0) {
-                $phone = substr($phone, 1);
+        $phone = self::keepOnlyNumbers($phone);
+
+        // removes leading zero
+        if (substr($phone, 0, 1) == 0) {
+            $phone = substr($phone, 1);
+        }
+
+        // verifies if have ddd
+        if (strlen($phone) > 9) {    
+            //removes country identifier
+            if (strlen($phone) > 11) {
+                $phone = substr($phone, 2);
             }
             $ddd = substr($phone, 0, 2);
             $phone = substr($phone, 2);
         }
+
         return ['areaCode' => $ddd, 'number' => $phone];
     }
 
