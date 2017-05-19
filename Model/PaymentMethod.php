@@ -62,7 +62,7 @@ class PaymentMethod
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Directory\Api\CountryInformationAcquirerInterface $countryInformation,
-        \Magento\Framework\Module\ModuleList $moduleList
+		\Magento\Framework\Module\ModuleList $moduleList
     ) {
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
@@ -71,7 +71,7 @@ class PaymentMethod
         /** @var \Magento\Checkout\Model\Session _countryInformation */
         $this->_countryInformation = $countryInformation;
         /** @var \Magento\Directory\Api\CountryInformationAcquirerInterface _library */
-        $this->_library = new Library($scopeConfigInterface, $moduleList);
+		$this->_library = new Library($scopeConfigInterface, $moduleList);
         /** @var  \Magento\Framework\Module\ModuleList _paymentRequest */
         $this->_paymentRequest = new PS_Payment();
     }
@@ -136,7 +136,12 @@ class PaymentMethod
     {
         $senderName = $this->_checkoutSession->getLastRealOrder()->getCustomerName();
         // If Guest
-        if ($senderName == (string)__('Guest')) {
+        if (
+            $senderName == (string)__('Guest')
+            || $senderName == 'Convidado'
+            || $senderName == 'Visitante'
+                
+        ) {
             $address = $this->getBillingAddress();
             $senderName = $address->getFirstname() . ' ' . $address->getLastname();
         }
@@ -295,7 +300,7 @@ class PaymentMethod
         return $this->_checkoutSession->getLastRealOrder()->getBillingAddress();
     }
 
-    /**
+	/**
      * Get the country name based on the $countryId
      * 
      * @param string $countryId

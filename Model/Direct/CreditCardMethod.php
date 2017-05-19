@@ -312,6 +312,8 @@ class CreditCardMethod
     {
         if (
             $this->_order->getCustomerName() == (string)__('Guest')
+            || $this->_order->getCustomerName() == 'Convidado'
+            || $this->_order->getCustomerName() == 'Visitante'
         ) {
             $this->guest();
         } else {

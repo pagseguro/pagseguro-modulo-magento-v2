@@ -46,13 +46,18 @@ class Response extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $nofitication = new \UOL\PagSeguro\Model\NotificationMethod(
-            $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
-            $this->_objectManager->create('\Magento\Sales\Api\OrderRepositoryInterface'),
-            $this->_objectManager->create('\Magento\Sales\Api\Data\OrderStatusHistoryInterface'),
-            $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
-            $this->_objectManager->create('\Magento\Framework\Model\ResourceModel\Db\Context')
-        );
-        $nofitication->init();
+        try {
+            $nofitication = new \UOL\PagSeguro\Model\NotificationMethod(
+                $this->_objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface'),
+                $this->_objectManager->create('\Magento\Sales\Api\OrderRepositoryInterface'),
+                $this->_objectManager->create('\Magento\Sales\Api\Data\OrderStatusHistoryInterface'),
+                $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
+                $this->_objectManager->create('\Magento\Framework\Model\ResourceModel\Db\Context')
+            );
+            $nofitication->init();
+        } catch (\Exception $ex) {
+            //log already written in your pagseguro log file if pagseguro log is enabled in admin
+            exit;
+        }
     }
 }
