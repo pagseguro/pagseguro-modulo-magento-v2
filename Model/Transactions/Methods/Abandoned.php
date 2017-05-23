@@ -61,6 +61,11 @@ class Abandoned extends Method
     protected $_scopeConfig;
 
     /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    protected $_resource;
+
+    /**
      * @var \Magento\Sales\Model\ResourceModel\Grid
      */
     protected $_salesGrid;
