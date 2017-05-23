@@ -43,6 +43,9 @@ class Installments extends \Magento\Framework\App\Action\Action
     /** @var \Magento\Framework\Controller\Result\Json  */
     protected $result;
 
+    /** @var Magento\Sales\Model\Order */
+    protected $order;
+
     /**
      * installments constructor
      * @param \Magento\Framework\App\Action\Context $context
@@ -56,6 +59,7 @@ class Installments extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->result = $this->resultJsonFactory->create();
+        $this->order = null;
     }
 
     /**
@@ -65,10 +69,11 @@ class Installments extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         try {
+            $this->order = $this->loadOrder();
             $installments = new InstallmentsMethod(
                 $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
                 $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
-                $this->loadOrder(),
+                $this->order,
                 $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
                 $data = [
                     'brand' => $this->getRequest()->getParam('credit_card_brand'),
@@ -77,9 +82,13 @@ class Installments extends \Magento\Framework\App\Action\Action
             );
             return $this->place($installments);
 
-        } catch (\Exception $exception) {
-            $this->changeOrderHistory('pagseguro_cancelada');
+        }
+        catch (\Exception $exception) {
+            if (!is_null($this->order)) {
+                $this->changeOrderHistory('pagseguro_cancelada');
+            }
             $this->clearSession();
+
             return $this->whenError($exception->getMessage());
         }
     }
@@ -170,10 +179,17 @@ class Installments extends \Magento\Framework\App\Action\Action
      * Get last real order id
      *
      * @return string id
+     * @throws \Exception
      */
     private function lastRealOrderId()
     {
-        return $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
+        $lastRealOrderId = $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
+
+        if (is_null($lastRealOrderId)) {
+            throw new \Exception("There is no order associated with this session.");
+        } 
+        
+        return $lastRealOrderId;
     }
 
     /**
@@ -193,10 +209,10 @@ class Installments extends \Magento\Framework\App\Action\Action
      */
     private function changeOrderHistory($status)
     {
-        $order = $this->loadOrder();
         /** change payment status in magento */
-        $order->addStatusToHistory($status, null, true);
+        $this->order->addStatusToHistory($status, null, true);
+
         /** save order */
-        $order->save();
+        $this->order->save();
     }
 }

@@ -106,7 +106,6 @@ class Abandoned extends Method
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-        \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Backend\Model\Session $session,
@@ -118,8 +117,6 @@ class Abandoned extends Method
     ) {
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
-        /** @var \Magento\Framework\App\ResourceConnection _resource */
-        $this->_resource = $resourceConnection;
         /** @var  \Magento\Backend\Model\Session  _session */
         $this->_session = $session;
         /** @var \Magento\Sales\Model\Order _order */

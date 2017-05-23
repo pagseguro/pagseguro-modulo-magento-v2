@@ -30,6 +30,8 @@
                 <active>0</active>
                 <model>UOL\PagSeguro\Model\Payment</model>
                 <order_status>pagseguro_iniciado</order_status>
+                <notification>{{base_url}}pagseguro/notification/response</notification>
+                <log_file>var/log/pagseguro.log</log_file>
             </pagseguro>
         </payment>
     </default>

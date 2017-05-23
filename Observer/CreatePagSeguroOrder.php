@@ -45,13 +45,13 @@ class CreatePagSeguroOrder implements ObserverInterface
     protected $_scopeConfig;
 
     /**
-     * @var UOL\PagSeguro\Model\System\Config\Environment 
+     * @var \UOL\PagSeguro\Model\System\Config\Environment
      */
     protected $_environment;
 
     /**
      * Automatic generated factory class
-     * @var UOL\PagSeguro\Model\OrdersFactory;
+     * @var \UOL\PagSeguro\Model\OrdersFactory;
      */
     protected $_ordersFactory;
 
@@ -61,14 +61,9 @@ class CreatePagSeguroOrder implements ObserverInterface
     protected $_context;
 
     /**
-     * @var Magento\Sales\Model\ResourceModel\Grid;
+     * @var \Magento\Sales\Model\ResourceModel\Grid;
      */
     protected $_grid;
-
-    /**
-     * @var Magento\Sales\Model\ResourceModel\Grid;
-     */
-    protected $_resource;
 
     /**
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
@@ -80,7 +75,6 @@ class CreatePagSeguroOrder implements ObserverInterface
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
-        \Magento\Framework\App\ResourceConnection $resourceConnection,
         \UOL\PagSeguro\Model\OrdersFactory $ordersFactory,
         \UOL\PagSeguro\Model\System\Config\Environment $environmentConfig
     ) {
@@ -88,7 +82,6 @@ class CreatePagSeguroOrder implements ObserverInterface
         $this->_scopeConfig = $scopeConfigInterface;
         $this->_environment = $environmentConfig;
         $this->_ordersFactory = $ordersFactory;
-        $this->_resource = $resourceConnection;
         // Unavaliable for DI
         $this->_grid = new Grid($context, 'pagseguro_orders', 'sales_order_grid', 'order_id');
     }
@@ -100,7 +93,7 @@ class CreatePagSeguroOrder implements ObserverInterface
      * @return void
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
-    {          
+    {
         $order = $observer->getEvent()->getOrder();
 
         //verify pagseguro transaction
@@ -154,10 +147,13 @@ class CreatePagSeguroOrder implements ObserverInterface
     private function updateSalesOrderGridEnvironment($orderId, $environment)
     {
         $environmentName = $this->getEnvironmentName($environment);
+
+        $resource = $this->_objectManager->create('Magento\Framework\App\ResourceConnection');
+
         //Getting connection
-        $connection  = $this->_resource->getConnection();
+        $connection  = $resource->getConnection();
         //Getting full table name
-        $tableName = $this->_resource->getTableName('sales_order_grid');
+        $tableName = $resource->getTableName('sales_order_grid');
         //Update sales_order_grid query
         $mapsDeleteQuery = "UPDATE $tableName SET environment='$environmentName' WHERE entity_id=$orderId";
         $connection->query($mapsDeleteQuery);

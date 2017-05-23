@@ -234,9 +234,15 @@ class BoletoMethod implements Checkout
      */
     private function setSenderInformation()
     {
-        if ($this->_order->getCustomerName() == __('Guest'))
+        if (
+            $this->_order->getCustomerName() == (string)__('Guest') 
+            || $this->_order->getCustomerName() == 'Convidado'
+            || $this->_order->getCustomerName() == 'Visitante'
+        ) {
             $this->guest();
-        $this->loggedIn();
+        } else {
+            $this->loggedIn();
+        }
 
         $this->_paymentRequest->setSender()->setEmail($this->getEmail());
     }
@@ -293,14 +299,14 @@ class BoletoMethod implements Checkout
     {
         $shipping = $this->getShippingData();
         $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
-
+        
         $this->_paymentRequest->setShipping()->setAddress()->withParameters(
             $this->getShippingAddress($address[0], $shipping),
             $this->getShippingAddress($address[1]),
             $this->getShippingAddress($address[0]),
-            \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping['postcode']),
-            $shipping['city'],
-            $this->getRegionAbbreviation($shipping['region']),
+            \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
+            $shipping->getCity(),
+            $this->getRegionAbbreviation($shipping),
             $this->getCountryName($shipping['country_id']),
             $this->getShippingAddress($address[2])
         );
@@ -360,15 +366,20 @@ class BoletoMethod implements Checkout
     /**
      * Get a brazilian region name and return the abbreviation if it exists
      *
-     * @param string $regionName
+     * @param shipping $shipping
      * @return string
      */
-    private function getRegionAbbreviation($regionName)
+    private function getRegionAbbreviation($shipping)
     {
+        if (strlen($shipping->getRegionCode()) == 2) {
+            return $shipping->getRegionCode();
+        }
+
         $regionAbbreviation = new \PagSeguro\Enum\Address();
-        return (is_string($regionAbbreviation->getType($regionName))) ?
-            $regionAbbreviation->getType($regionName) :
-            $regionName;
+
+        return (is_string($regionAbbreviation->getType($shipping->getRegion()))) ?
+            $regionAbbreviation->getType($shipping->getRegion()) :
+            $shipping->getRegion();
     }
 
     /**

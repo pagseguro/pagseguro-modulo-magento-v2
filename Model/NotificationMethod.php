@@ -118,7 +118,6 @@ class NotificationMethod
             
             $this->updateSalesOrderGridTransactionCode($orderId, $transactionCode);
             $this->updatePagSeguroOrdersTransactionCode($orderId, $transactionCode);
-            
         }
         return true;
     }
