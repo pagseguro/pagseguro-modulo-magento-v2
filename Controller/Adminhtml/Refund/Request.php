@@ -50,14 +50,14 @@ class Request extends Ajaxable
     public function execute()
     {
         $refund = new Methods\Refund(
-              $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
-              $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
-              $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
-              $this->_objectManager->create('Magento\Backend\Model\Session'),
-              $this->_objectManager->create('Magento\Sales\Model\Order'),
-              $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
-              $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
-              $this->getRequest()->getParam('days')
+            $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+            $this->_objectManager->create('Magento\Framework\App\ResourceConnection'),
+            $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
+            $this->_objectManager->create('Magento\Backend\Model\Session'),
+            $this->_objectManager->create('Magento\Sales\Model\Order'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
+            $this->getRequest()->getParam('days')
         );
 
         try {
