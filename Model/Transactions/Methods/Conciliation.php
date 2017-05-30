@@ -94,6 +94,7 @@ class Conciliation extends Method
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Backend\Model\Session $session,
         \Magento\Sales\Model\Order $order,
@@ -105,6 +106,8 @@ class Conciliation extends Method
         $this->_scopeConfig = $scopeConfigInterface;
         /** @var  \Magento\Backend\Model\Session  _session */
         $this->_session = $session;
+        /** @var  \Magento\Framework\App\ResourceConnection _resource */
+        $this->_resource = $resourceConnection;
         /** @var \Magento\Sales\Model\Order _order */
         $this->_order = $order;
         /** @var \UOL\PagSeguro\Helper\Library _library */
