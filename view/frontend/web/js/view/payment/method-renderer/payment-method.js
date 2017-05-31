@@ -61,6 +61,7 @@ define(
                 $.when(setPaymentInformationAction(this.messageContainer, {
                     'method': self.getCode()
                 })).done(function () {
+                        delete paymentData['title'];
                         $.when(placeOrder(paymentData, messageContainer)).done(function () {
                             if (window.checkoutConfig.payment.pagseguro.isDirect) {
                                 $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.direct);
