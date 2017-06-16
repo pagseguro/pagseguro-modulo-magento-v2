@@ -11,7 +11,7 @@
                     window.location.href = "<?php echo $this->getUrl('checkout/onepage/success', array('_secure' => true));?>";
                 },
                 abort: function(){
-                    window.location.href = '<?php echo $this->getBaseUrl(); ?>';
+                    window.location.href = '<?php echo $this->getUrl('pagseguro/payment/cancel'); ?>';
                 }
             });
     }
