@@ -309,7 +309,7 @@ class DebitMethod
         $this->_paymentRequest->setShipping()->setAddress()->withParameters(
             $this->getShippingAddress($address[0], $shipping),
             $this->getShippingAddress($address[1]),
-            $this->getShippingAddress($address[0]),
+            $this->getShippingAddress($address[3]),
             \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
             $shipping->getCity(),
             $this->getRegionAbbreviation($shipping),

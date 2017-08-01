@@ -254,7 +254,7 @@ class CreditCardMethod
         $this->_paymentRequest->setBilling()->setAddress()->withParameters(
             $this->getShippingAddress($address[0], $billing),
             $this->getShippingAddress($address[1]),
-            $this->getShippingAddress($address[0]),
+            $this->getShippingAddress($address[3]),
             \UOL\PagSeguro\Helper\Data::fixPostalCode($billing->getPostcode()),
             $billing->getCity(),
             $this->getRegionAbbreviation($billing),
@@ -379,7 +379,7 @@ class CreditCardMethod
         $this->_paymentRequest->setShipping()->setAddress()->withParameters(
             $this->getShippingAddress($address[0], $shipping),
             $this->getShippingAddress($address[1]),
-            $this->getShippingAddress($address[0]),
+            $this->getShippingAddress($address[3]),
             \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
             $shipping->getCity(),
             $this->getRegionAbbreviation($shipping),
