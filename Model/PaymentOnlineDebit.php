@@ -29,12 +29,12 @@ use Magento\Sales\Model\Order\Payment as PaymentOrder;
  * Class Payment
  * @package UOL\PagSeguro\Model
  */
-class Payment extends \Magento\Payment\Model\Method\AbstractMethod
+class PaymentOnlineDebit extends \Magento\Payment\Model\Method\AbstractMethod
 {
     /**
      *
      */
-    const PAYMENT_METHOD_PAGSEGURO_CODE = 'pagseguro';
+    const PAYMENT_METHOD_PAGSEGURO_CODE = 'pagseguro_online_debit';
     /**
      * @var string
      */
@@ -150,7 +150,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     }
     
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
-        return false
+        return true
         && parent::isAvailable($quote);
     }
 }
