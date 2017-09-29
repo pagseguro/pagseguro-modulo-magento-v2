@@ -35,7 +35,7 @@
                 <group>pagseguro</group>
             </pagseguro>
             <pagseguro_default_lightbox>
-                <title>PagSeguro Default Lightbox</title>
+                <title>PagSeguro</title>
                 <active>0</active>
                 <model>UOL\PagSeguro\Model\PaymentDefaultlLightbox</model>
                 <order_status>pagseguro_iniciado</order_status>

@@ -31,6 +31,19 @@
     </div>
     <div class="payment-method-content">
         <p>Cartão de crédito: Com o PagSeguro, você pode escolher como quer pagar e ainda parcelar sua compra em até 18x.</p>
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
