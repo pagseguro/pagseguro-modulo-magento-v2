@@ -17,7 +17,7 @@ Requisitos
 ----------
 ---
  - [Magento] Community 2.0 | 2.1
- - [PHP] 5.5.0+
+ - [PHP] 5.5+
  - [SPL]
  - [cURL]
  - [DOM]
@@ -34,7 +34,7 @@ Navegue até o diretório raíz da sua instalação do Magento 2 e siga os segui
    - ```php bin/magento setup:upgrade```
    - ```php bin/magento setup:static-content:deploy``` ou ```php bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
 3. Dê permissões as pastas var/ pub/
-   - ```chmod 777 -R var/ pub/```
+   - ```chmod -R 777 var/ pub/```
 
 
 Atualização
