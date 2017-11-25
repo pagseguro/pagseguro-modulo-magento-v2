@@ -38,17 +38,18 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-       
+        
         <!--<form id="boleto-form" class="form">-->
+        <form data-hasrequired="* Required Fields">
             <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
                 <!--<div class="field number required _required _error">-->
                 <input type="hidden" name="payment[boleto_hash]"
                         data-bind="attr: {
-                                id: getCode() + '_boleto_hash',
-                                'data-container': getCode() + '_boleto_hash'},
-                                value: '',
+                            id: getCode() + '_boleto_hash',
+                            'data-container': getCode() + '_boleto_hash'},
+                            value: '',
                     "/>
-                <div class="field number required _required">
+                <div class="field _required">
                     <label data-bind="attr: {for: getCode() + '_boleto_document'}" class="label">
                         <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
                     </label>
@@ -58,14 +59,24 @@
                             id="boletoDocument"
                             name="payment[boleto_document]"
                             type="text"
-                            data-validate="{required:true}"
+                            data-validate="{'required-entry':true}"
                             data-bind="attr: {
                                 id: getCode() + '_boleto_document',
                                 'data-container': getCode() + '_boleto_document'},
                                 enable: true,
                                 textInput: boletoDocument,
-                                valueUpdate: 'input'
+                                valueUpdate: 'input',
+                                event: {
+                                    blur: validateDocument(document.getElementById('pagseguro_boleto_boleto_document'))
+                                }
                         "/>
+                    
+                    
+<!--                    blur: validateDocument(document.getElementById('pagseguro_boleto_boleto_document')),
+                    keydown: documentMask(document.getElementById('pagseguro_boleto_boleto_document'))-->
+
+
+                        <div style="display: none" class="display-none validation-advice pagseguro_boleto_boleto_document-error-message">Insira um CPF ou CNPJ válido</div>
 <!--                        data-bind="attr: {
                                 id: getCode() + '_boleto_document',
                                 title: $t('Teste boleto'),
@@ -91,7 +102,7 @@
                     </div>
                 </div>
             </fieldset>
-        <!--</form>-->
+        </form>
 
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->

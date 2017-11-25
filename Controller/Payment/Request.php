@@ -97,6 +97,11 @@ class Request extends \Magento\Framework\App\Action\Action
                 if (is_null($this->orderId)) {
                     throw new \Exception("There is no order associated with this session.");
                 }
+
+                if (!isset($paymentData['additional_information']['boleto_document']) || isset($paymentData['additional_information']['hash'])) {
+                    throw new \Exception("Error passing data from checkout page to pagseguro Request Controller");
+                }
+
                 $this->order = $this->loadOrder($this->orderId);
                 /** @var \UOL\PagSeguro\Model\Direct\BoletoMethod $boleto */
                 $boleto = new BoletoMethod(
