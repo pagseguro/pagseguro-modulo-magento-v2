@@ -34,13 +34,12 @@ define(
         'UOL_PagSeguro/js/model/boleto-validator',
         window.checkoutConfig.library.directPaymentJs
     ],
-    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, boletoValidator, PagSeguroD) {
+    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, boletoValidator) {
         'use strict';
 
         return Component.extend({
             defaults: {
                 template: 'UOL_PagSeguro/payment/boleto-form',
-//                boletoDocument: '',
                 brazilFlagPath: window.checkoutConfig.brazilFlagPath
             },
 

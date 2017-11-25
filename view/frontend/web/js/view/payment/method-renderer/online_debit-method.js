@@ -31,13 +31,26 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/action/set-payment-information',
         'Magento_Checkout/js/action/place-order',
+        'UOL_PagSeguro/js/model/boleto-validator',
+        window.checkoutConfig.library.directPaymentJs
     ],
-    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder) {
+    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, boletoValidator) {
         'use strict';
 
         return Component.extend({
             defaults: {
-                template: 'UOL_PagSeguro/payment/online-debit-form'
+                template: 'UOL_PagSeguro/payment/online-debit-form',
+                brazilFlagPath: window.checkoutConfig.brazilFlagPath
+            },
+
+            initObservable: function () {
+
+                this._super()
+                    .observe([
+                        'onlineDebitDocument',
+                        'checkedBank'
+                    ]);
+                return this;
             },
 
             context: function() {
@@ -52,24 +65,30 @@ define(
              * @override
              */
             placeOrder: function () {
-
                 var self = this;
                 var paymentData = quote.paymentMethod();
                 var messageContainer = this.messageContainer;
+                /* @TODO verify if session id is already set */
+                PagSeguroDirectPayment.setSessionId(window.checkoutConfig.library.session);
                 fullScreenLoader.startLoader();
                 this.isPlaceOrderActionAllowed(false);
+                if (self.onlineDebitDocument() == '') {
+                  fullScreenLoader.stopLoader();
+                  boletoValidator.documentValidator();
+                  this.isPlaceOrderActionAllowed(true);
+                  return;
+                }
                 $.when(setPaymentInformationAction(this.messageContainer, {
-                    'method': self.getCode()
+                    'method': self.getCode(),
+                    'additional_data': {
+                        'online_debit_document': self.onlineDebitDocument(),
+                        'online_debit_hash': PagSeguroDirectPayment.getSenderHash(),
+                        'online_debit_bank' : self.checkedBank()
+                    }
                 })).done(function () {
                         delete paymentData['title'];
                         $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                            if (window.checkoutConfig.payment.pagseguro.isDirect) {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.direct);
-                            } else if (window.checkoutConfig.payment.pagseguro.isLightbox){
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
-                            } else {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);
-                            }
+                          $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
                         });
                 }).fail(function () {
                     self.isPlaceOrderActionAllowed(true);

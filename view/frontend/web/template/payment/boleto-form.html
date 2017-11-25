@@ -42,16 +42,16 @@
         <!--<form id="boleto-form" class="form">-->
             <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
                 <!--<div class="field number required _required _error">-->
-                <div class="field number required _required">
-                    <label data-bind="attr: {for: getCode() + '_boleto_document'}" class="label">
-                        <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
-                    </label>
-                    <input type="hidden" id="boletoHash" name="payment[boleto_hash]"
+                <input type="hidden" name="payment[boleto_hash]"
                         data-bind="attr: {
                                 id: getCode() + '_boleto_hash',
                                 'data-container': getCode() + '_boleto_hash'},
                                 value: '',
                     "/>
+                <div class="field number required _required">
+                    <label data-bind="attr: {for: getCode() + '_boleto_document'}" class="label">
+                        <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
+                    </label>
                     <div class="control">
                         <input
                             class="input-text required-entry required"

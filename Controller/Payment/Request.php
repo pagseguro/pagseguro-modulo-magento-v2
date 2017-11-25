@@ -25,6 +25,7 @@ namespace UOL\PagSeguro\Controller\Payment;
 
 use UOL\PagSeguro\Model\PaymentMethod;
 use UOL\PagSeguro\Model\Direct\BoletoMethod;
+use UOL\PagSeguro\Model\Direct\DebitMethod;
 
 /**
  * Class Request
@@ -110,9 +111,45 @@ class Request extends \Magento\Framework\App\Action\Action
                         'order_id' => $this->orderId
                     ]
                 );
-                $this->placeOrder($boleto);
+                $this->placeOrder($boleto, $paymentData['method']);
                 return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/direct/success'));
             } catch (\Exception $exception) {
+                if (!is_null($this->order)) {
+                    $this->changeOrderHistory('pagseguro_cancelada');
+                }
+                $this->pagseguroLogger($exception->getMessage());
+                $this->clearSession();
+                $this->whenError($exception->getMessage());
+                return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/payment/failure'));
+            }
+        }
+        
+        if ($paymentData['method'] === 'pagseguro_online_debit') {
+            try {
+                $this->orderId = $lastRealOrder->getId();
+                if (is_null($this->orderId)) {
+                    throw new \Exception("There is no order associated with this session.");
+                }
+                $this->order = $this->loadOrder($this->orderId);
+                /** @var \UOL\PagSeguro\Model\Direct\DebitMethod $debit */
+
+                $debit = new DebitMethod(
+                    $this->_objectManager->create('Magento\Directory\Api\CountryInformationAcquirerInterface'),
+                    $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+                    $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
+                    $this->order,
+                    $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+                    $data = [
+                        'sender_document' => $this->helperData()->formatDocument($paymentData['additional_information']['online_debit_document']),
+                        'sender_hash' => $paymentData['additional_information']['hash'],
+                        'bank_name' => $paymentData['additional_information']['online_debit_bank'],
+                        'order_id' => $this->orderId
+                    ]
+                );
+                $this->placeOrder($debit, $paymentData['method']);
+                return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/direct/success'));
+            } catch (\Exception $exception) {
+                $this->pagseguroLogger($exception->getMessage());
                 if (!is_null($this->order)) {
                     $this->changeOrderHistory('pagseguro_cancelada');
                 }
@@ -120,13 +157,9 @@ class Request extends \Magento\Framework\App\Action\Action
                 $this->whenError($exception->getMessage());
                 return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/payment/failure'));
             }
-
-            die('boletão');
         }
-        
-        var_dump($this->_checkoutSession->getLastRealOrder()->getEntityId());die();
+
         die('request o/');
-        
         try {
             return $this->_redirect($this->_payment->createPaymentRequest());
         } catch (\Exception $exception) {
@@ -166,13 +199,13 @@ class Request extends \Magento\Framework\App\Action\Action
     /**
      * Place order
      *
-     * @param $boleto
-     * @return Boleto
+     * @param $payment
+     * @return string
      */
-    private function placeOrder($boleto)
+    private function placeOrder($payment, $method)
     {
         $this->changeOrderHistory('pagseguro_aguardando_pagamento');
-        return $this->whenSuccess($boleto->createPaymentRequest());
+        return $this->whenSuccess($payment->createPaymentRequest(), $method);
     }
     
     /**
@@ -194,9 +227,9 @@ class Request extends \Magento\Framework\App\Action\Action
      * @param $response
      * @return $this
      */
-    private function whenSuccess($response)
+    private function whenSuccess($response, $method)
     {
-        $this->makeSession($response);
+        $this->makeSession($response, $method);
         return $this->result->setData([
             'success' => true,
             'payload' => [
@@ -210,11 +243,11 @@ class Request extends \Magento\Framework\App\Action\Action
      *
      * @param $response
      */
-    private function makeSession($response)
+    private function makeSession($response, $method)
     {
         $this->session()->setData([
             'pagseguro_payment' => ['payment_link' => $response->getPaymentLink(),
-                'payment_type'  => 'uol\pagseguro\controller\direct\boleto',//strtolower(Boleto::class),
+                'payment_type'  => $method,
                 'order_id'      => $this->orderId,
             ]
         ]);
@@ -264,5 +297,14 @@ class Request extends \Magento\Framework\App\Action\Action
     {
         return $this->_objectManager->create('Magento\Framework\Session\SessionManager');
     }
-    
+
+    /**
+     * Save error log in system.log
+     * @param string $errorMessage
+     */
+    private function pagseguroLogger($errorMessage)
+    {
+        $logger = $this->_objectManager->create('\Psr\Log\LoggerInterface');
+        $logger->addError('[Uol PagSeguro Module][Payment Error] ' .$errorMessage);
+    }
 }

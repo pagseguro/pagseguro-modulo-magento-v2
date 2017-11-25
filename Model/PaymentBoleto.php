@@ -24,7 +24,6 @@
 namespace UOL\PagSeguro\Model;
 
 use Magento\Sales\Model\Order\Payment as PaymentOrder;
-use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Model Class PaymentBoleto, it is the model from PagSeguro Boleto payment method
@@ -80,8 +79,7 @@ class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
-        \Magento\Checkout\Model\Cart $cart,
-        CheckoutSession $checkoutSession
+        \Magento\Checkout\Model\Cart $cart
     ) {
 
         parent::__construct(
@@ -95,14 +93,6 @@ class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
         );
         /** @var \Magento\Checkout\Model\Cart _cart */
         $this->_cart = $cart;
-        $this->_checkoutSession = $checkoutSession;
-    }
-    /**
-     * @return \Magento\Checkout\Model\Session
-     */
-    public function getCheckoutSession() 
-    {
-        return $this->_checkoutSession;
     }
 
     /**
@@ -119,12 +109,10 @@ class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
         $info = $this->getInfoInstance();
         if (isset($data->getData('additional_data')['boleto_document'])) {
             $info->setAdditionalInformation('boleto_document', $data->getData('additional_data')['boleto_document']);
-            $this->getCheckoutSession()->setBoletoDocument($data->getData('additional_data')['boleto_document']);
         }
 
         if (isset($data->getData('additional_data')['boleto_hash'])) {
             $info->setAdditionalInformation('hash', $data->getData('additional_data')['boleto_hash']);
-            $this->getCheckoutSession()->setHash($data->getData('additional_data')['boleto_hash']);
         }
 
         return $this;

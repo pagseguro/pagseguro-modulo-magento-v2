@@ -38,7 +38,7 @@ class PaymentOnlineDebit extends \Magento\Payment\Model\Method\AbstractMethod
     /**
      * @var string
      */
-    protected $_code       = self::PAYMENT_METHOD_PAGSEGURO_CODE;
+     protected $_code       = self::PAYMENT_METHOD_PAGSEGURO_CODE;
     /**
      * @var bool
      */
@@ -94,39 +94,30 @@ class PaymentOnlineDebit extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     * Check if checkout type is direct
+     * Assign data to info model instance
      *
-     * @return bool
+     * @param \Magento\Framework\DataObject $data
+     * @return \Magento\Payment\Model\Info
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function isDirectCheckout()
+    public function assignData(\Magento\Framework\DataObject $data)
     {
-//        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::DIRECT) {
-//            return true;
-//        }
-        return false;
-    }
+        parent::assignData($data);
 
-    /**
-     * Check if checkout type is lightbox
-     *
-     * @return bool
-     */
-    public function isLightboxCheckoutType()
-    {
-        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::LIGHTBOX) {
-            return true;
+        $info = $this->getInfoInstance();
+        if (isset($data->getData('additional_data')['online_debit_document'])) {
+            $info->setAdditionalInformation('online_debit_document', $data->getData('additional_data')['online_debit_document']);
         }
-        return false;
-    }
 
-    /**
-     * Get lightbox checkout payment url
-     *
-     * @return url
-     */
-    public function getLightboxCheckoutPaymentUrl()
-    {
-        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/checkout/");
+        if (isset($data->getData('additional_data')['online_debit_hash'])) {
+            $info->setAdditionalInformation('hash', $data->getData('additional_data')['online_debit_hash']);
+        }
+
+        if (isset($data->getData('additional_data')['online_debit_bank'])) {
+            $info->setAdditionalInformation('online_debit_bank', $data->getData('additional_data')['online_debit_bank']);
+        }
+
+        return $this;
     }
 
     /**
@@ -137,16 +128,6 @@ class PaymentOnlineDebit extends \Magento\Payment\Model\Method\AbstractMethod
     public function getStandardCheckoutPaymentUrl()
     {
         return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/request/");
-    }
-
-    /**
-     * Get direct checkout payment url
-     *
-     * @return url
-     */
-    public function getDirectCheckoutPaymentUrl()
-    {
-        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/direct/payment");
     }
     
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
