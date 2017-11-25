@@ -30,7 +30,6 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content">
-        <p>BOLETO: Com o PagSeguro, você pode escolher como quer pagar e ainda parcelar sua compra em até 18x.</p>
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
@@ -39,11 +38,67 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+       
+        <!--<form id="boleto-form" class="form">-->
+            <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
+                <!--<div class="field number required _required _error">-->
+                <div class="field number required _required">
+                    <label data-bind="attr: {for: getCode() + '_boleto_document'}" class="label">
+                        <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
+                    </label>
+                    <input type="hidden" id="boletoHash" name="payment[boleto_hash]"
+                        data-bind="attr: {
+                                id: getCode() + '_boleto_hash',
+                                'data-container': getCode() + '_boleto_hash'},
+                                value: '',
+                    "/>
+                    <div class="control">
+                        <input
+                            class="input-text required-entry required"
+                            id="boletoDocument"
+                            name="payment[boleto_document]"
+                            type="text"
+                            data-validate="{required:true}"
+                            data-bind="attr: {
+                                id: getCode() + '_boleto_document',
+                                'data-container': getCode() + '_boleto_document'},
+                                enable: true,
+                                textInput: boletoDocument,
+                                valueUpdate: 'input'
+                        "/>
+<!--                        data-bind="attr: {
+                                id: getCode() + '_boleto_document',
+                                title: $t('Teste boleto'),
+                                'data-container': getCode() + '_boleto_document',
+                                'data-validate': JSON.stringify({'required-number':true})},
+                                enable: true,
+                                value: boletoDocument-->
+                        <!-- ko if: boletoDocument() === 'a' -->
+                        <div class="mage-error" data-bind="attr: { for: getCode() + '_boleto_document' }, text: 'errinhos poxa'" generated="true" for="boleto_document">This is a required field.</div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <ul style="font-size: 11px; font-style: italic;">
+                            <li style="margin-bottom: 0px">Imprima o boleto e pague no banco ou na internet utilizando o seu c&oacute;digo de barras.</li>
+                            <li>O prazo de validade do boleto &eacute; de 1 dia &uacute;til.</li>
+                        </ul>
+                    </div>
+                    <div style="float: right; font-size: 11px; ">
+                        <span>Esta compra está sendo feita no Brasil</span>
+                        <img style="float: right; padding-left: 2px; text-align: center;" data-bind="attr:{src: brazilFlagPath}">
+                    </div>
+                </div>
+            </fieldset>
+        <!--</form>-->
+
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"

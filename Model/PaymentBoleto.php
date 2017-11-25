@@ -24,9 +24,10 @@
 namespace UOL\PagSeguro\Model;
 
 use Magento\Sales\Model\Order\Payment as PaymentOrder;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
- * Class Payment
+ * Model Class PaymentBoleto, it is the model from PagSeguro Boleto payment method
  * @package UOL\PagSeguro\Model
  */
 class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
@@ -57,6 +58,8 @@ class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
      */
     private $cart;
 
+    protected $_checkoutSession;
+    
     /**
      * Payment constructor.
      * @param \Magento\Framework\Model\Context $context
@@ -77,7 +80,8 @@ class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
-        \Magento\Checkout\Model\Cart $cart
+        \Magento\Checkout\Model\Cart $cart,
+        CheckoutSession $checkoutSession
     ) {
 
         parent::__construct(
@@ -91,42 +95,39 @@ class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
         );
         /** @var \Magento\Checkout\Model\Cart _cart */
         $this->_cart = $cart;
+        $this->_checkoutSession = $checkoutSession;
+    }
+    /**
+     * @return \Magento\Checkout\Model\Session
+     */
+    public function getCheckoutSession() 
+    {
+        return $this->_checkoutSession;
     }
 
     /**
-     * Check if checkout type is direct
+     * Assign data to info model instance
      *
-     * @return bool
+     * @param \Magento\Framework\DataObject $data
+     * @return \Magento\Payment\Model\Info
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function isDirectCheckout()
+    public function assignData(\Magento\Framework\DataObject $data)
     {
-//        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::DIRECT) {
-//            return true;
-//        }
-        return false;
-    }
+        parent::assignData($data);
 
-    /**
-     * Check if checkout type is lightbox
-     *
-     * @return bool
-     */
-    public function isLightboxCheckoutType()
-    {
-        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::LIGHTBOX) {
-            return true;
+        $info = $this->getInfoInstance();
+        if (isset($data->getData('additional_data')['boleto_document'])) {
+            $info->setAdditionalInformation('boleto_document', $data->getData('additional_data')['boleto_document']);
+            $this->getCheckoutSession()->setBoletoDocument($data->getData('additional_data')['boleto_document']);
         }
-        return false;
-    }
 
-    /**
-     * Get lightbox checkout payment url
-     *
-     * @return url
-     */
-    public function getLightboxCheckoutPaymentUrl()
-    {
-        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/checkout/");
+        if (isset($data->getData('additional_data')['boleto_hash'])) {
+            $info->setAdditionalInformation('hash', $data->getData('additional_data')['boleto_hash']);
+            $this->getCheckoutSession()->setHash($data->getData('additional_data')['boleto_hash']);
+        }
+
+        return $this;
     }
 
     /**
@@ -137,16 +138,6 @@ class PaymentBoleto extends \Magento\Payment\Model\Method\AbstractMethod
     public function getStandardCheckoutPaymentUrl()
     {
         return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/request/");
-    }
-
-    /**
-     * Get direct checkout payment url
-     *
-     * @return url
-     */
-    public function getDirectCheckoutPaymentUrl()
-    {
-        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/direct/payment");
     }
     
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){

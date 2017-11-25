@@ -178,4 +178,17 @@ class Library
             return Library::DIRECT_PAYMENT_URL;
         }
     }
+
+    /**
+     * Get image full frontend url
+     * @return type
+     */
+    public function getImageUrl($imageModulePath)
+    {
+        /** @var \Magento\Framework\App\ObjectManager $om */
+	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	/** @var \Magento\Framework\View\Asset\Repository */
+	$viewRepository = $objectManager->get('\Magento\Framework\View\Asset\Repository');
+	return $viewRepository->getUrl($imageModulePath);
+    }
 }

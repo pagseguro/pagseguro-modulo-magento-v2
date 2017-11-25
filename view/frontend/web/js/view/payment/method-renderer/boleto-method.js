@@ -31,15 +31,28 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/action/set-payment-information',
         'Magento_Checkout/js/action/place-order',
+        'UOL_PagSeguro/js/model/boleto-validator',
+        window.checkoutConfig.library.directPaymentJs
     ],
-    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder) {
+    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, boletoValidator, PagSeguroD) {
         'use strict';
 
         return Component.extend({
             defaults: {
-                template: 'UOL_PagSeguro/payment/boleto-form'
+                template: 'UOL_PagSeguro/payment/boleto-form',
+//                boletoDocument: '',
+                brazilFlagPath: window.checkoutConfig.brazilFlagPath
             },
 
+            initObservable: function () {
+
+                this._super()
+                    .observe([
+                        'boletoDocument'
+                    ]);
+                return this;
+            },
+            
             context: function() {
                 return this;
             },
@@ -47,29 +60,44 @@ define(
             getCode: function() {
                 return "pagseguro_boleto"
             },
+            
+             getData: function() {
+                return {
+                    'method': this.item.method,
+                    'additional_data': {
+                        'boleto_document': this.boletoDocument()
+                    }
+                };
+            },
 
             /**
              * @override
              */
             placeOrder: function () {
-
                 var self = this;
                 var paymentData = quote.paymentMethod();
                 var messageContainer = this.messageContainer;
+                PagSeguroDirectPayment.setSessionId(window.checkoutConfig.library.session);
                 fullScreenLoader.startLoader();
                 this.isPlaceOrderActionAllowed(false);
+                if (self.boletoDocument() == '') {
+                  fullScreenLoader.stopLoader();
+                  console.log('exibir erros e reabilitar o botão do place order');
+                  boletoValidator.documentValidator();
+                  this.isPlaceOrderActionAllowed(true);
+                  return;
+                }
                 $.when(setPaymentInformationAction(this.messageContainer, {
-                    'method': self.getCode()
+                    'method': self.getCode(),
+                    'additional_data': {
+                        'boleto_document': self.boletoDocument(),
+                        'boleto_hash': PagSeguroDirectPayment.getSenderHash()
+                    }
                 })).done(function () {
                         delete paymentData['title'];
+                        
                         $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                            if (window.checkoutConfig.payment.pagseguro.isDirect) {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.direct);
-                            } else if (window.checkoutConfig.payment.pagseguro.isLightbox){
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
-                            } else {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);
-                            }
+                          $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
                         });
                 }).fail(function () {
                     self.isPlaceOrderActionAllowed(true);
