@@ -30,7 +30,10 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content">
-        <p>DL: Com o PagSeguro, você pode escolher como quer pagar e ainda parcelar sua compra em até 18x.</p>
+        <ul>
+            <li>Com o PagSeguro, você pode escolher como quer pagar e ainda parcelar sua compra em até 18x.</li>
+            <li>Ao finalizar sua compra você será redirecionado para o PagSeguro.</li>
+        </ul>
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->

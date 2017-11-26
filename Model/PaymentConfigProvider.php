@@ -35,7 +35,7 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
     /**
      * Get payment method code for PagSeguro from Payment model.
      */
-    const PAYMENT_METHOD_PAGSEGURO_CODE = \UOL\PagSeguro\Model\Payment::PAYMENT_METHOD_PAGSEGURO_CODE;
+    const PAYMENT_METHOD_PAGSEGURO_CODE = 'pagseguro_default_lightbox';//\UOL\PagSeguro\Model\Payment::PAYMENT_METHOD_PAGSEGURO_CODE;
     
     const PAYMENT_METHOD_PAGSEGURO_BOLETO_CODE = 'pagseguro_boleto';
     
@@ -77,7 +77,7 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
             ],
             'brazilFlagPath' => $this->_library->getImageUrl('UOL_PagSeguro::images/flag-origin-country.png'),
             'payment' => [
-                self::PAYMENT_METHOD_PAGSEGURO_CODE => [
+                'pagseguro' => [
                     'isDirect'   => $this->method->isDirectCheckout(),
                     'isLightbox' => $this->method->isLightboxCheckoutType(),
                     'checkout'   => [

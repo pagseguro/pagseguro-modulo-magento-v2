@@ -68,7 +68,7 @@ define(
                     }
                 };
             },
-            
+
             doDocumentMask: function(data, event) {
               //directPaymentValidator.documentValidator(document.getElementById('pagseguro_boleto_boleto_document'));
               //value.length

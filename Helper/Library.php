@@ -83,7 +83,7 @@ class Library
      */
     public function isLightboxCheckoutType()
     {
-        if ($this->_scopeConfig->getValue('payment/pagseguro/checkout')
+        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/checkout')
             == \UOL\PagSeguro\Model\System\Config\Checkout::LIGHTBOX) {
             return true;
         }

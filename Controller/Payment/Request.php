@@ -173,7 +173,6 @@ class Request extends \Magento\Framework\App\Action\Action
             }
         }
 
-        die('request o/');
         try {
             return $this->_redirect($this->_payment->createPaymentRequest());
         } catch (\Exception $exception) {
