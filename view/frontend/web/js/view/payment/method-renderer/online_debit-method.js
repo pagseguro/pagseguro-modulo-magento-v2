@@ -31,10 +31,10 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/action/set-payment-information',
         'Magento_Checkout/js/action/place-order',
-        'UOL_PagSeguro/js/model/boleto-validator',
+        'UOL_PagSeguro/js/model/direct-payment-validator',
         window.checkoutConfig.library.directPaymentJs
     ],
-    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, boletoValidator) {
+    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, directPaymentValidator) {
         'use strict';
 
         return Component.extend({
@@ -68,16 +68,17 @@ define(
                 var self = this;
                 var paymentData = quote.paymentMethod();
                 var messageContainer = this.messageContainer;
-                /* @TODO verify if session id is already set */
-                PagSeguroDirectPayment.setSessionId(window.checkoutConfig.library.session);
                 fullScreenLoader.startLoader();
                 this.isPlaceOrderActionAllowed(false);
-                if (self.onlineDebitDocument() == '') {
+
+                if (! self.validatePlaceOrder(self.checkedBank())) {
                   fullScreenLoader.stopLoader();
-                  boletoValidator.documentValidator();
                   this.isPlaceOrderActionAllowed(true);
                   return;
                 }
+                /* @TODO verify if session id is already set */
+                PagSeguroDirectPayment.setSessionId(window.checkoutConfig.library.session);
+
                 $.when(setPaymentInformationAction(this.messageContainer, {
                     'method': self.getCode(),
                     'additional_data': {
@@ -95,6 +96,20 @@ define(
                 }).always(function(){
                     fullScreenLoader.stopLoader();
                 });
+            },
+
+            validatePlaceOrder: function(checkedBank) {
+              var invalidBank = checkedBank === undefined;
+
+              if (invalidBank) {
+                document.getElementById('debitbankNameError').style.display = "";
+              }
+              return validateDocumentFinal(document.getElementById('pagseguro_online_debit_online_debit_document')) && ! invalidBank;
+            },
+            
+            hideBankError: function() {
+              document.getElementById('debitbankNameError').style.display = 'none';
+              return false;
             }
         });
     }

@@ -42,13 +42,13 @@
         <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
                 <!--<div class="field number required _required _error">-->
                 <input type="hidden" name="payment[online_debit_hash]"
-                        data-bind="attr: {
-                                id: getCode() + '_online_debit_hash',
-                                'data-container': getCode() + '_online_debit_hash'},
-                                value: '',
+                    data-bind="attr: {
+                            id: getCode() + '_online_debit_hash',
+                            'data-container': getCode() + '_online_debit_hash'},
+                            value: '',
                 "/>
 
-                <div class="field number required _required">
+                <div class="field _required">
                     <label data-bind="attr: {for: getCode() + '_online_debit_document'}" class="label">
                         <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
                     </label>
@@ -58,13 +58,18 @@
                             class="input-text required-entry required"
                             name="payment[online_debit_document]"
                             type="text"
+                            maxlength="18"
+                            minLength="11"
                             data-validate="{required:true}"
                             data-bind="attr: {
                                 id: getCode() + '_online_debit_document',
                                 'data-container': getCode() + '_online_debit_document'},
                                 enable: true,
                                 textInput: onlineDebitDocument,
-                                valueUpdate: 'input'
+                                valueUpdate: 'input',
+                                event: {
+                                    blur: validateDocument(document.getElementById('pagseguro_online_debit_online_debit_document'))
+                                }
                         "/>
 <!--                        data-bind="attr: {
                                 id: getCode() + '_boleto_document',
@@ -73,9 +78,8 @@
                                 'data-validate': JSON.stringify({'required-number':true})},
                                 enable: true,
                                 value: boletoDocument-->
-                        <!-- ko if: onlineDebitDocument() === 'a' -->
-                        <div class="mage-error" data-bind="attr: { for: getCode() + '_online_debit_document' }, text: 'errinhos poxa'" generated="true" for="online_debit_document">This is a required field.</div>
-                        <!-- /ko -->
+
+                        <div style="display: none;" class="mage-error display-none validation-advice pagseguro_online_debit_online_debit_document-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
                     </div>
                 </div>
 
@@ -85,12 +89,26 @@
                     </label>
 
                     <div class="control">
-                        <label style="display: block;"><input type="radio" value="bancodobrasil" data-bind="checked: checkedBank" />Banco do Brasil</label>
-                        <label style="display: block;"><input type="radio" value="banrisul" data-bind="checked: checkedBank" />Banrisul</label>
-                        <label style="display: block;"><input type="radio" value="bradesco" data-bind="checked: checkedBank" />Bradesco</label>
-                        <label style="display: block;"><input type="radio" value="itau" data-bind="checked: checkedBank" />Itaú</label>
+                        <label style="display: block;">
+                            <input id="debitbankName" type="radio" value="bancodobrasil"
+                                data-bind="checked: checkedBank, event: {click : hideBankError()}
+                            " />Banco do Brasil</label>
+                        <label style="display: block;">
+                            <input id="debitbankName" type="radio" value="banrisul"
+                                data-bind="checked: checkedBank, event: {click : hideBankError()}
+                            " />Banrisul</label>
+                        <label style="display: block;">
+                            <input id="debitbankName" type="radio" value="bradesco"
+                                data-bind="checked: checkedBank, event: {click : hideBankError()}
+                            " />Bradesco</label>
+                        <label style="display: block;">
+                            <input id="debitbankName" type="radio" value="itau"
+                                data-bind="checked: checkedBank, event: {click : hideBankError()}
+                            " />Itaú</label>
                     </div>
                 </div>
+
+                    <div style="display: none; color: red;" id="debitbankNameError" class="mage-error display-none validation-advice debitbankName-error-message" data-bind="attr: {generated: true}">Escolha um banco</div>
 
                 <div>
                     <div style="float: right; font-size: 11px; ">

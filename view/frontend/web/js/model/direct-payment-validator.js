@@ -53,6 +53,18 @@ define(
  * form input masks and  validations and calls to the pagseguro js api
  */
 
+function validateDocumentFinal(self) {
+  var value = unmask(self.value)
+  if (value.length === 11) {
+    return validateCpf(self)
+  } else if (value.length === 14) {
+    return validateCnpj(self)
+  } else {
+    displayError(self)
+    return false
+  }
+}
+
 /**
  * Validate document (cpf or cnpj) according with it's length
  * @param {type} self
