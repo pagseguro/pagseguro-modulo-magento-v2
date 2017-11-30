@@ -30,7 +30,6 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content">
-        <p>Cartão de crédito: Com o PagSeguro, você pode escolher como quer pagar e ainda parcelar sua compra em até 18x.</p>
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
@@ -39,6 +38,220 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+
+        <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
+            <input type="hidden" id="creditCardHash" value="" name="payment[credit_card_hash]">
+            <input type="hidden" id="creditCardToken" value="" name="payment[credit_card_token]">
+            <input type="hidden" id="creditCardBrand" value="">
+            <input type="hidden" id="creditCardInstallment" name="payment[credit_card_installment]">
+            <input type="hidden" id="creditCardInstallmentValue" name="payment[credit_card_installment_value]">
+            <input type="text" id="grand_total" value="" data-bind="attr: {value: grandTotal()}" >
+
+            <!--cc number-->
+            <div class="field _required">
+                <label data-bind="attr: {for: getCode() + 'number'}" class="label">
+                    <span><!-- ko i18n: 'Número do cartão' --><!-- /ko --></span>
+                </label>
+
+                <div class="control">
+                    <input
+                        class="input-text required"
+                        name="payment[credit_card_number]"
+                        type="text"
+                        maxlength="19"
+                        minLength="16"
+                        data-validate="{required:true}"
+                        data-bind="attr: {
+                            id: getCode() + '_number',
+                            'data-container': getCode() + '_number'},
+                            enable: true,
+                            valueUpdate: 'input',
+                            event: {
+                                blur : getBrand.bind($data, document.getElementById('pagseguro_credit_card_number')),
+                                keydown: creditCardMask.bind($data, document.getElementById('pagseguro_credit_card_number')),
+                                click: grandTotal
+                            }
+                    "/>
+                    <div style="display: none;" class="mage-error display-none validation-advice pagseguro_credit_card_number-error-message" data-bind="attr: {generated: true}">Insira um número de cartão válido</div>
+                </div>
+            </div>
+            
+            <!--cc name-->
+            <div class="field _required">
+                <label data-bind="attr: {for: getCode() + 'number'}" class="label">
+                    <span><!-- ko i18n: 'Nome impresso no cartão' --><!-- /ko --></span>
+                </label>
+
+                <div class="control">
+                    <input
+                        class="input-text required"
+                        name="payment[credit_card_holder]"
+                        type="text"
+                        minLength="3"
+                        data-validate="{required:true}"
+                        data-bind="attr: {
+                            id: 'creditCardHolder'},
+                            enable: true,
+                            valueUpdate: 'input',
+                            event: {
+                                blur : validateCardHolder.bind($data, document.getElementById('creditCardHolder')),
+                                keydown: notNumberMask.bind($data, document.getElementById('creditCardHolder'))
+                            }
+                    "/>
+                    <div style="display: none;" class="mage-error display-none validation-advice creditCardHolder-error-message" data-bind="attr: {generated: true}">Insira um nome válido</div>
+                </div>
+            </div>
+            
+            <!--cc expiration date-->
+            <div class="field date required" data-bind="attr: {id: getCode() + '_cc_type_exp_div'}">
+                <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
+                    <span><!-- ko i18n: 'Data de Validade'--><!-- /ko --></span>
+                </label>
+                <div class="control">
+                    <div class="fields group group-2">
+                        <div class="field no-label month">
+                            <div class="control">
+                                <select  name="payment[cc_exp_month]"
+                                    class="select select-month"
+                                    data-bind="attr: {id: 'creditCardExpirationMonth'},
+                                        enable: true,
+                                        options: getPagSeguroCcMonthsValues(),
+                                        optionsValue: 'value',
+                                        optionsText: 'month',
+                                        optionsCaption: $t('Mês'),
+                                        event: {
+                                            click : validateCreditCardMonth.bind($data, document.getElementById('creditCardExpirationMonth'))
+                                        }
+                                    ">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field no-label year">
+                            <div class="control">
+                                <select name="payment[cc_exp_year]"
+                                    class="select select-year"
+                                    data-bind="attr: {id: 'creditCardExpirationYear', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
+                                        enable: true,
+                                        options: getPagSeguroCcYearsValues(),
+                                        optionsValue: 'value',
+                                        optionsText: 'year',
+                                        optionsCaption: $t('Ano'),
+                                        event: {
+                                            click : validateCreditCardYear.bind($data, document.getElementById('creditCardExpirationYear'))
+                                        }
+                                ">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fields group group-2">
+                        <div class="field no-label month">
+                            <!--<div class="control">-->
+                                    <div style="display: none;" class="mage-error display-none validation-advice creditCardExpirationMonth-error-message" data-bind="attr: {generated: true}">Escolha um mês</div>
+                            <!--</div>-->
+                        </div>
+                        <div class="field no-label year">
+                            <!--<div class="control">-->
+                                <div style="display: none;" class="mage-error display-none validation-advice creditCardExpirationYear-error-message" data-bind="attr: {generated: true}">Escolha um ano</div>
+                            <!--</div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!--cc code -->
+            <div class="field _required">
+                    <label data-bind="attr: {for: 'creditCardCode'}" class="label">
+                        <span><!-- ko i18n: 'Código de segurança (CVV)' --><!-- /ko --></span>
+                    </label>
+
+                    <div class="control">
+                        <input
+                            class="input-text required-entry required"
+                            name="payment[creditCardCode]"
+                            type="text"
+                            maxlength="4"
+                            minLength="1"
+                            data-validate="{required:true}"
+                            data-bind="attr: {
+                                id: 'creditCardCode'},
+                                enable: true,
+                                valueUpdate: 'input',
+                                event: {
+                                    blur: validateCreditCardCode.bind($data,document.getElementById('creditCardCode'), true),
+                                    keydown: creditCardCodeMask.bind($data,document.getElementById('creditCardCode'))
+                                }
+                        "/>
+                        <div style="display: none;" class="mage-error display-none validation-advice creditCardCode-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
+                    </div>
+                </div>
+
+            <!--cc document-->
+            <div class="field _required">
+                <label data-bind="attr: {for: 'creditCardDocument'}" class="label">
+                    <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
+                </label>
+
+                <div class="control">
+                    <input
+                        class="input-text required-entry required"
+                        name="payment[credit_card_document]"
+                        type="text"
+                        maxlength="18"
+                        minLength="11"
+                        data-validate="{required:true}"
+                        data-bind="attr: {
+                            id: 'creditCardDocument'},
+                            enable: true,
+                            textInput: creditCardDocument,
+                            valueUpdate: 'input',
+                            event: {
+                                blur: validateDocument(document.getElementById('creditCardDocument'))
+                            }
+                    "/>
+                    <div style="display: none;" class="mage-error display-none validation-advice creditCardDocument-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
+                </div>
+            </div>
+
+            <!--cc birthdate-->
+            <div class="field _required">
+                <label data-bind="attr: {for: 'creditCardHolderBirthdate'}" class="label">
+                    <span><!-- ko i18n: 'Data de nascimento' --><!-- /ko --></span>
+                </label>
+
+                <div class="control">
+                    <input
+                        class="input-text required-entry required"
+                        name="payment[creditCardHolderBirthdate]"
+                        type="text"
+                        maxlength="10"
+                        minLength="1"
+                        data-validate="{required:true}"
+                        placeholder="dd/mm/aaaa"
+                        data-bind="attr: {
+                            id: 'creditCardHolderBirthdate'},
+                            enable: true,
+                            valueUpdate: 'input',
+                            event: {
+                                blur: validateCreditCardHolderBirthdate.bind($data,document.getElementById('creditCardHolderBirthdate')),
+                                keydown: MascaraData.bind($data,document.getElementById('creditCardHolderBirthdate'))
+                            }
+                    "/>
+                    <div style="display: none;" class="mage-error display-none validation-advice creditCardHolderBirthdate-error-message" data-bind="attr: {generated: true}">Insira uma data de nascimento válida</div>
+                </div>
+            </div>
+            
+            <!--cc installments-->
+            
+            <!--cc total-->
+            <div>
+                <div style="float: right; font-size: 11px; ">
+                    <span>Esta compra está sendo feita no Brasil</span>
+                    <img style="float: right; padding-left: 2px; text-align: center;" data-bind="attr:{src: brazilFlagPath}">
+                </div>
+            </div>
+        </fieldset>
+        
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->

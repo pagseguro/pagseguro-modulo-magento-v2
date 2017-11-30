@@ -31,14 +31,69 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/action/set-payment-information',
         'Magento_Checkout/js/action/place-order',
+        'UOL_PagSeguro/js/model/direct-payment-validator',
+        'UOL_PagSeguro/js/model/credit-card',
+        window.checkoutConfig.library.directPaymentJs
     ],
-    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder) {
+    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, directPaymentValidator, creditCard) {
         'use strict';
+        //set pagseguro session
+        PagSeguroDirectPayment.setSessionId(window.checkoutConfig.library.session);
 
+        //console.log(quote.totals);
         return Component.extend({
             defaults: {
-                template: 'UOL_PagSeguro/payment/credit-card-form'
+                template: 'UOL_PagSeguro/payment/credit-card-form',
+                brazilFlagPath: window.checkoutConfig.brazilFlagPath
+//                totals: parseFloat(
+//                  _.findLast(q.getTotals()()['total_segments'], 'value').value
+//                )
             },
+
+            initObservable: function () {
+
+                this._super()
+                    .observe([
+                        'creditCardDocument'
+                    ]);
+                return this;
+            },
+
+            grandTotal: function() {
+              var totals = quote.getTotals()();
+              var x = (totals ? totals : quote)['grand_total'];
+              //var y = _.findLast(quote.getTotals()()['total_segments'], 'value').value;
+              console.log(x);
+              //console.log(y);
+              return parseFloat(x);
+            },
+
+            getPagSeguroCcMonthsValues: function() {
+              var months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+              return _.map(months, function (value, key) {
+                return {
+                    'value': key,
+                    'month': value
+                };
+            });
+          },
+
+          getPagSeguroCcYearsValues: function() {
+              var thisYear = (new Date()).getFullYear();
+              var maxYear = thisYear + 20;
+              var years = [];
+              var i = thisYear;
+              for (i = thisYear; i < maxYear; i++) {
+                years.push(i);
+              }
+
+              return _.map(years, function (value, key) {
+                return {
+                    'value': value,
+                    'year': value
+                };
+            });
+          },
 
             context: function() {
                 return this;
