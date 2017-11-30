@@ -23,9 +23,10 @@
 
 namespace UOL\PagSeguro\Controller\Payment;
 
-use UOL\PagSeguro\Model\PaymentMethod;
 use UOL\PagSeguro\Model\Direct\BoletoMethod;
+use UOL\PagSeguro\Model\Direct\CreditCardMethod;
 use UOL\PagSeguro\Model\Direct\DebitMethod;
+use UOL\PagSeguro\Model\PaymentMethod;
 
 /**
  * Class Request
@@ -90,7 +91,6 @@ class Request extends \Magento\Framework\App\Action\Action
         $lastRealOrder = $this->_checkoutSession->getLastRealOrder();
         $paymentData = $lastRealOrder->getPayment()->getData();
 
-//        var_dump($paymentData);exit;
         if ($paymentData['method'] === 'pagseguro_boleto') {
             try {
                 $this->orderId = $lastRealOrder->getId();
@@ -161,6 +161,62 @@ class Request extends \Magento\Framework\App\Action\Action
                     ]
                 );
                 $this->placeOrder($debit, $paymentData['method']);
+                return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/direct/success'));
+            } catch (\Exception $exception) {
+                $this->pagseguroLogger($exception->getMessage());
+                if (!is_null($this->order)) {
+                    $this->changeOrderHistory('pagseguro_cancelada');
+                }
+                $this->clearSession();
+                $this->whenError($exception->getMessage());
+                return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/payment/failure'));
+            }
+        }
+
+         if ($paymentData['method'] === 'pagseguro_credit_card') {
+            try {
+                $this->orderId = $lastRealOrder->getId();
+
+                if (is_null($this->orderId)) {
+                    throw new \Exception("There is no order associated with this session.");
+                }
+
+                if (!isset($paymentData['additional_information']['credit_card_document'])
+                    || ! isset($paymentData['additional_information']['hash'])
+                    || ! isset($paymentData['additional_information']['credit_card_token'])
+                    || ! isset($paymentData['additional_information']['credit_card_holder_name'])
+                    || ! isset($paymentData['additional_information']['credit_card_holder_birthdate'])
+                    || ! isset($paymentData['additional_information']['credit_card_installment'])
+                    || ! isset($paymentData['additional_information']['credit_card_installment_value'])
+                    ) {
+                    throw new \Exception("Error passing data from checkout page to pagseguro Request Controller");
+                }
+                $this->order = $this->loadOrder($this->orderId);
+                /** @var \UOL\PagSeguro\Model\Direct\CreditCardMethod $creditCard */
+
+                $creditCard = new CreditCardMethod(
+                    $this->_objectManager->create('Magento\Directory\Api\CountryInformationAcquirerInterface'),
+                    $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
+                    $this->_objectManager->create('Magento\Framework\Module\ModuleList'),
+                    $this->order,
+                    $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
+                    $data = [
+                        'sender_document' => $this->helperData()->formatDocument($paymentData['additional_information']['credit_card_document']),
+                        'sender_hash' => $paymentData['additional_information']['hash'],
+                        'order_id' => $this->orderId,
+                        'installment' => [
+                            'quantity' => $paymentData['additional_information']['credit_card_installment'],
+                            'amount'   => $paymentData['additional_information']['credit_card_installment_value']
+                        ],
+                        'token' => $paymentData['additional_information']['credit_card_token'],
+                        'holder' => [
+                            'name'       => $paymentData['additional_information']['credit_card_holder_name'],
+                            'birth_date' => $paymentData['additional_information']['credit_card_holder_birthdate'],
+
+                        ]
+                    ]
+                );
+                $this->placeOrder($creditCard, $paymentData['method']);
                 return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/direct/success'));
             } catch (\Exception $exception) {
                 $this->pagseguroLogger($exception->getMessage());
@@ -252,18 +308,27 @@ class Request extends \Magento\Framework\App\Action\Action
     }
     
     /**
-     * Create new pogseguro payment session data
+     * Create new pagseguro payment session data
      *
      * @param $response
      */
     private function makeSession($response, $method)
     {
-        $this->session()->setData([
-            'pagseguro_payment' => ['payment_link' => $response->getPaymentLink(),
-                'payment_type'  => $method,
-                'order_id'      => $this->orderId,
-            ]
-        ]);
+        if ($method === 'pagseguro_credit_card') {
+            $this->session()->setData([
+                'pagseguro_payment' => [
+                    'payment_type'  => $method,
+                    'order_id'      => $this->orderId,
+                ]
+            ]);
+        } else {
+            $this->session()->setData([
+                'pagseguro_payment' => ['payment_link' => $response->getPaymentLink(),
+                    'payment_type'  => $method,
+                    'order_id'      => $this->orderId,
+                ]
+            ]);
+        }
     }
     
     /**

@@ -94,39 +94,46 @@ class PaymentCreditCard extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     * Check if checkout type is direct
+     * Assign data to info model instance
      *
-     * @return bool
+     * @param \Magento\Framework\DataObject $data
+     * @return \Magento\Payment\Model\Info
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function isDirectCheckout()
+    public function assignData(\Magento\Framework\DataObject $data)
     {
-//        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::DIRECT) {
-//            return true;
-//        }
-        return false;
-    }
+        parent::assignData($data);
 
-    /**
-     * Check if checkout type is lightbox
-     *
-     * @return bool
-     */
-    public function isLightboxCheckoutType()
-    {
-        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::LIGHTBOX) {
-            return true;
+        $info = $this->getInfoInstance();
+        if (isset($data->getData('additional_data')['credit_card_document'])) {
+            $info->setAdditionalInformation('credit_card_document', $data->getData('additional_data')['credit_card_document']);
         }
-        return false;
-    }
 
-    /**
-     * Get lightbox checkout payment url
-     *
-     * @return url
-     */
-    public function getLightboxCheckoutPaymentUrl()
-    {
-        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/checkout/");
+        if (isset($data->getData('additional_data')['credit_card_hash'])) {
+            $info->setAdditionalInformation('hash', $data->getData('additional_data')['credit_card_hash']);
+        }
+
+        if (isset($data->getData('additional_data')['credit_card_token'])) {
+            $info->setAdditionalInformation('credit_card_token', $data->getData('additional_data')['credit_card_token']);
+        }
+
+        if (isset($data->getData('additional_data')['credit_card_holder_name'])) {
+            $info->setAdditionalInformation('credit_card_holder_name', $data->getData('additional_data')['credit_card_holder_name']);
+        }
+
+        if (isset($data->getData('additional_data')['credit_card_holder_birthdate'])) {
+            $info->setAdditionalInformation('credit_card_holder_birthdate', $data->getData('additional_data')['credit_card_holder_birthdate']);
+        }
+
+        if (isset($data->getData('additional_data')['credit_card_installment'])) {
+            $info->setAdditionalInformation('credit_card_installment', $data->getData('additional_data')['credit_card_installment']);
+        }
+
+        if (isset($data->getData('additional_data')['credit_card_installment_value'])) {
+            $info->setAdditionalInformation('credit_card_installment_value', $data->getData('additional_data')['credit_card_installment_value']);
+        }
+
+        return $this;
     }
 
     /**
@@ -139,16 +146,7 @@ class PaymentCreditCard extends \Magento\Payment\Model\Method\AbstractMethod
         return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/payment/request/");
     }
 
-    /**
-     * Get direct checkout payment url
-     *
-     * @return url
-     */
-    public function getDirectCheckoutPaymentUrl()
-    {
-        return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/direct/payment");
-    }
-    
+
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
         return true
         && parent::isAvailable($quote);

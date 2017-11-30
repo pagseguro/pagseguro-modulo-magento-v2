@@ -19,40 +19,19 @@
  *  @copyright 2016 PagSeguro Internet Ltda.
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
-
-//define(
-//    [],
-//    function () {
-//        'use strict';
-//        return {
-//            /**
-//             * Validate something
-//             *
-//             * @returns {boolean}
-//             */
-//            validate: function() {
-//                //Put your validation logic here
-//                console.log('validated');
-//                return true;
-//            }
-//        }
-//    }
-//);
-
-
-function setCreditCardSessionId(session) {
-  return PagSeguroDirectPayment.setSessionId(session)
-}
-
-function getSenderHash() {
-  return PagSeguroDirectPayment.getSenderHash()
-}
-
-function assignCreditCardHash() {
-  setTimeout(function () {
-    document.getElementById('creditCardHash').value = getSenderHash()
-  }, 500)
-}
+//function setCreditCardSessionId(session) {
+//  return PagSeguroDirectPayment.setSessionId(session)
+//}
+//
+//function getSenderHash() {
+//  return PagSeguroDirectPayment.getSenderHash()
+//}
+//
+//function assignCreditCardHash() {
+//  setTimeout(function () {
+//    document.getElementById('creditCardHash').value = getSenderHash()
+//  }, 500)
+//}
 
 function validateCreditCard(self) {
   if (self.validity.valid && removeNumbers(unmask(self.value)) === "" && (self.value.length >= 14 && self.value.length <= 22)) {
@@ -107,7 +86,7 @@ function validateCardHolder (self) {
   }
 
 function cardInstallmentOnChange(data) {
-  data = JSON.parse(data)
+  data = JSON.parse(data.value)
   document.getElementById('creditCardInstallment').value = data.quantity
   document.getElementById('creditCardInstallmentValue').value = data.installmentAmount
   document.getElementById('card_total').innerHTML = 'R$ ' + data.totalAmount
@@ -157,17 +136,15 @@ function getBrand(self) {
     PagSeguroDirectPayment.getBrand({
       cardBin: unmask(document.getElementById('pagseguro_credit_card_number').value),
       success: function (response) {
-        console.log('sucesso na chamada');////
         document.getElementById('creditCardBrand').value = response.brand.name
         getInstallments(response.brand.name)
         displayError(document.getElementById('pagseguro_credit_card_number'), false)
       },
       error: function () {
-        console.log('erro na chamada');////
-        displayError(document.getElementById('pagseguro_credit_card_number'))
+        console.log('erro na chamada');
       },
       complete: function(response) {
-          console.log('tratamento comum para todas chamadas');////
+          //console.log('tratamento comum para todas chamadas');////
       }
     });
   } else {
@@ -212,7 +189,7 @@ function validateCreditCardCode(self, createToken) {
 function validateCreditCardForm() {
   if (
    validateCreditCard(document.querySelector('#pagseguro_credit_card_number')) &&
-   validateDocument(document.querySelector('#creditCardDocument')) &&
+   validateDocumentFinal(document.querySelector('#creditCardDocument')) &&
    validateCardHolder(document.querySelector('#creditCardHolder')) &&
    validateCreditCardHolderBirthdate(document.querySelector('#creditCardHolderBirthdate')) &&
    validateCreditCardMonth(document.querySelector('#creditCardExpirationMonth')) &&
@@ -228,7 +205,7 @@ function validateCreditCardForm() {
   }
   
   validateCreditCard(document.querySelector('#pagseguro_credit_card_number'))
-  validateDocument(document.querySelector('#creditCardDocument'))
+  validateDocumentFinal(document.querySelector('#creditCardDocument'))
   validateCardHolder(document.querySelector('#creditCardHolder'))
   validateCreditCardHolderBirthdate(document.querySelector('#creditCardHolderBirthdate'))
   validateCreditCardMonth(document.querySelector('#creditCardExpirationMonth'))

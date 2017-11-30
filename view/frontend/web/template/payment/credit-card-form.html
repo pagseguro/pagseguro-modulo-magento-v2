@@ -40,12 +40,11 @@
         </div>
 
         <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
-            <input type="hidden" id="creditCardHash" value="" name="payment[credit_card_hash]">
-            <input type="hidden" id="creditCardToken" value="" name="payment[credit_card_token]">
+            <input type="hidden" id="creditCardToken" name="payment[credit_card_token]">
             <input type="hidden" id="creditCardBrand" value="">
             <input type="hidden" id="creditCardInstallment" name="payment[credit_card_installment]">
             <input type="hidden" id="creditCardInstallmentValue" name="payment[credit_card_installment_value]">
-            <input type="text" id="grand_total" value="" data-bind="attr: {value: grandTotal()}" >
+            <input type="hidden" id="grand_total" value="" data-bind="attr: {value: getGrandTotal()}" >
 
             <!--cc number-->
             <div class="field _required">
@@ -59,7 +58,7 @@
                         name="payment[credit_card_number]"
                         type="text"
                         maxlength="19"
-                        minLength="16"
+                        minlength="16"
                         data-validate="{required:true}"
                         data-bind="attr: {
                             id: getCode() + '_number',
@@ -68,8 +67,7 @@
                             valueUpdate: 'input',
                             event: {
                                 blur : getBrand.bind($data, document.getElementById('pagseguro_credit_card_number')),
-                                keydown: creditCardMask.bind($data, document.getElementById('pagseguro_credit_card_number')),
-                                click: grandTotal
+                                keydown: creditCardMask.bind($data, document.getElementById('pagseguro_credit_card_number'))
                             }
                     "/>
                     <div style="display: none;" class="mage-error display-none validation-advice pagseguro_credit_card_number-error-message" data-bind="attr: {generated: true}">Insira um número de cartão válido</div>
@@ -87,8 +85,9 @@
                         class="input-text required"
                         name="payment[credit_card_holder]"
                         type="text"
-                        minLength="3"
+                        minlength="3"
                         data-validate="{required:true}"
+                        required
                         data-bind="attr: {
                             id: 'creditCardHolder'},
                             enable: true,
@@ -146,14 +145,10 @@
                     </div>
                     <div class="fields group group-2">
                         <div class="field no-label month">
-                            <!--<div class="control">-->
-                                    <div style="display: none;" class="mage-error display-none validation-advice creditCardExpirationMonth-error-message" data-bind="attr: {generated: true}">Escolha um mês</div>
-                            <!--</div>-->
+                            <div style="display: none;" class="mage-error display-none validation-advice creditCardExpirationMonth-error-message" data-bind="attr: {generated: true}">Escolha um mês</div>
                         </div>
                         <div class="field no-label year">
-                            <!--<div class="control">-->
-                                <div style="display: none;" class="mage-error display-none validation-advice creditCardExpirationYear-error-message" data-bind="attr: {generated: true}">Escolha um ano</div>
-                            <!--</div>-->
+                            <div style="display: none;" class="mage-error display-none validation-advice creditCardExpirationYear-error-message" data-bind="attr: {generated: true}">Escolha um ano</div>
                         </div>
                     </div>
                 </div>
@@ -161,30 +156,31 @@
             
             <!--cc code -->
             <div class="field _required">
-                    <label data-bind="attr: {for: 'creditCardCode'}" class="label">
-                        <span><!-- ko i18n: 'Código de segurança (CVV)' --><!-- /ko --></span>
-                    </label>
+                <label data-bind="attr: {for: 'creditCardCode'}" class="label">
+                    <span><!-- ko i18n: 'Código de segurança (CVV)' --><!-- /ko --></span>
+                </label>
 
-                    <div class="control">
-                        <input
-                            class="input-text required-entry required"
-                            name="payment[creditCardCode]"
-                            type="text"
-                            maxlength="4"
-                            minLength="1"
-                            data-validate="{required:true}"
-                            data-bind="attr: {
-                                id: 'creditCardCode'},
-                                enable: true,
-                                valueUpdate: 'input',
-                                event: {
-                                    blur: validateCreditCardCode.bind($data,document.getElementById('creditCardCode'), true),
-                                    keydown: creditCardCodeMask.bind($data,document.getElementById('creditCardCode'))
-                                }
-                        "/>
-                        <div style="display: none;" class="mage-error display-none validation-advice creditCardCode-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
-                    </div>
+                <div class="control">
+                    <input
+                        class="input-text required-entry required"
+                        name="payment[creditCardCode]"
+                        type="text"
+                        maxlength="4"
+                        minlength="1"
+                        required
+                        data-validate="{required:true}"
+                        data-bind="attr: {
+                            id: 'creditCardCode'},
+                            enable: true,
+                            valueUpdate: 'input',
+                            event: {
+                                blur: validateCreditCardCode.bind($data,document.getElementById('creditCardCode'), true),
+                                keydown: creditCardCodeMask.bind($data,document.getElementById('creditCardCode'))
+                            }
+                    "/>
+                    <div style="display: none;" class="mage-error display-none validation-advice creditCardCode-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
                 </div>
+            </div>
 
             <!--cc document-->
             <div class="field _required">
@@ -198,15 +194,17 @@
                         name="payment[credit_card_document]"
                         type="text"
                         maxlength="18"
-                        minLength="11"
+                        minlength="11"
                         data-validate="{required:true}"
+                        required
                         data-bind="attr: {
                             id: 'creditCardDocument'},
                             enable: true,
                             textInput: creditCardDocument,
                             valueUpdate: 'input',
                             event: {
-                                blur: validateDocument(document.getElementById('creditCardDocument'))
+                                blur: validateDocumentFinal.bind($data, document.getElementById('creditCardDocument')),
+                                keydown: mascaraMutuario(document.getElementById('creditCardDocument'), cpfCnpj)
                             }
                     "/>
                     <div style="display: none;" class="mage-error display-none validation-advice creditCardDocument-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
@@ -225,12 +223,14 @@
                         name="payment[creditCardHolderBirthdate]"
                         type="text"
                         maxlength="10"
-                        minLength="1"
+                        minlength="1"
                         data-validate="{required:true}"
                         placeholder="dd/mm/aaaa"
+                        required
                         data-bind="attr: {
                             id: 'creditCardHolderBirthdate'},
                             enable: true,
+                            textInput: creditCardHolderBirthdate,
                             valueUpdate: 'input',
                             event: {
                                 blur: validateCreditCardHolderBirthdate.bind($data,document.getElementById('creditCardHolderBirthdate')),
@@ -242,8 +242,39 @@
             </div>
             
             <!--cc installments-->
+            <div class="field _required">
+                <label data-bind="attr: {for: 'card_installment_option'}" class="label">
+                    <span><!-- ko i18n: 'Parcelas' --><!-- /ko --></span>
+                </label>
+
+                <div class="control">
+                   <select class="pagseguro-cc-select required-entry" id="card_installment_option" title="Nº de parcelas" required
+                        disabled
+                        data-bind="
+                            event: {
+                                click : validateCreditCardInstallment.bind($data, document.getElementById('card_installment_option')),
+                                change: cardInstallmentOnChange.bind($data, document.getElementById('card_installment_option'))
+                            }
+                    ">
+                        <option value="null" disabled selected>Escolha o N° de parcelas</option>
+                    </select>
+                    <div style="display: none;" class="mage-error display-none validation-advice card_installment_option-error-message" data-bind="attr: {generated: true}">Escolha uma opção de parcelamento</div>
+                </div>
+            </div>
             
             <!--cc total-->
+            <div class="field _required">
+                <label data-bind="attr: {for: 'card_total'}" class="label">
+                    <span><!-- ko i18n: 'Total' --><!-- /ko --></span>
+                </label>
+
+                <!--<div class="control">-->
+                    <span>
+                        <span id="card_total">selecione o número de parcelas</span>
+                    </span>
+                <!--</div>-->
+            </div>
+            
             <div>
                 <div style="float: right; font-size: 11px; ">
                     <span>Esta compra está sendo feita no Brasil</span>

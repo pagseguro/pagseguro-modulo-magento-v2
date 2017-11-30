@@ -37,6 +37,7 @@ define(
     ],
     function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder, directPaymentValidator, creditCard) {
         'use strict';
+        /* @TODO verify if session id is already set */
         //set pagseguro session
         PagSeguroDirectPayment.setSessionId(window.checkoutConfig.library.session);
 
@@ -59,11 +60,11 @@ define(
                 return this;
             },
 
-            grandTotal: function() {
+            getGrandTotal: function() {
               var totals = quote.getTotals()();
               var x = (totals ? totals : quote)['grand_total'];
               //var y = _.findLast(quote.getTotals()()['total_segments'], 'value').value;
-              console.log(x);
+              //console.log(x);
               //console.log(y);
               return parseFloat(x);
             },
@@ -107,30 +108,43 @@ define(
              * @override
              */
             placeOrder: function () {
-
                 var self = this;
                 var paymentData = quote.paymentMethod();
                 var messageContainer = this.messageContainer;
                 fullScreenLoader.startLoader();
                 this.isPlaceOrderActionAllowed(false);
+
+                if (! self.validatePlaceOrder()) {
+                  fullScreenLoader.stopLoader();
+                  this.isPlaceOrderActionAllowed(true);
+                  return;
+                }
+
                 $.when(setPaymentInformationAction(this.messageContainer, {
-                    'method': self.getCode()
+                    'method': self.getCode(),
+                    'additional_data': {
+                        'credit_card_document': self.creditCardDocument(),
+                        'credit_card_hash' : PagSeguroDirectPayment.getSenderHash(),
+                        'credit_card_token' : document.getElementById('creditCardToken').value,
+                        'credit_card_holder_name' : document.getElementById('creditCardHolder').value,
+                        'credit_card_holder_birthdate' : document.getElementById('creditCardHolderBirthdate').value,
+                        'credit_card_installment' : document.getElementById('creditCardInstallment').value,
+                        'credit_card_installment_value' : document.getElementById('creditCardInstallmentValue').value
+                    }
                 })).done(function () {
                         delete paymentData['title'];
                         $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                            if (window.checkoutConfig.payment.pagseguro.isDirect) {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.direct);
-                            } else if (window.checkoutConfig.payment.pagseguro.isLightbox){
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
-                            } else {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);
-                            }
+                          $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
                         });
                 }).fail(function () {
                     self.isPlaceOrderActionAllowed(true);
                 }).always(function(){
                     fullScreenLoader.stopLoader();
                 });
+            },
+
+            validatePlaceOrder: function() {
+              return validateCreditCardForm();
             }
         });
     }
