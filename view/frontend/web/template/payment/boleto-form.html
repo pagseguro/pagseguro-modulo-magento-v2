@@ -38,17 +38,9 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-        
-        <!--<form id="boleto-form" class="form">-->
+
         <form data-hasrequired="* Required Fields">
             <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
-                <!--<div class="field number required _required _error">-->
-                <input type="hidden" name="payment[boleto_hash]"
-                        data-bind="attr: {
-                            id: getCode() + '_boleto_hash',
-                            'data-container': getCode() + '_boleto_hash'},
-                            value: '',
-                    "/>
                 <div class="field _required">
                     <label data-bind="attr: {for: getCode() + '_boleto_document'}" class="label">
                         <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
@@ -68,25 +60,12 @@
                                 textInput: boletoDocument,
                                 valueUpdate: 'input',
                                 event: {
-                                    blur: validateDocument(document.getElementById('pagseguro_boleto_boleto_document'))
+                                    blur: validateDocumentFinal.bind($data, document.getElementById('pagseguro_boleto_boleto_document')),
+                                    keydown: mascaraMutuario(document.getElementById('pagseguro_boleto_boleto_document'), cpfCnpj)
                                 }
                         "/>
-                    
-                    
-<!--                    blur: validateDocument(document.getElementById('pagseguro_boleto_boleto_document')),
-                    keydown: documentMask(document.getElementById('pagseguro_boleto_boleto_document'))-->
 
-                <div style="display: none;" class="mage-error display-none validation-advice pagseguro_boleto_boleto_document-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
-<!--                        data-bind="attr: {
-                                id: getCode() + '_boleto_document',
-                                title: $t('Teste boleto'),
-                                'data-container': getCode() + '_boleto_document',
-                                'data-validate': JSON.stringify({'required-number':true})},
-                                enable: true,
-                                value: boletoDocument-->
-                        <!-- ko if: boletoDocument() === 'a' -->
-                        <div class="mage-error" data-bind="attr: { for: getCode() + '_boleto_document' }, text: 'errinhos poxa'" generated="true" for="boleto_document">This is a required field.</div>
-                        <!-- /ko -->
+                        <div style="display: none;" class="mage-error display-none validation-advice pagseguro_boleto_boleto_document-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
                     </div>
                 </div>
                 <div>
