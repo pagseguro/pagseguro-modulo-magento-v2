@@ -97,7 +97,7 @@ define(
                 $.when(setPaymentInformationAction(this.messageContainer, {
                     'method': self.getCode(),
                     'additional_data': {
-                        'boleto_document': self.boletoDocument(),
+                        'boleto_document': (self.boletoDocument()) ? self.boletoDocument() : document.getElementById('pagseguro_boleto_boleto_document').value,
                         'boleto_hash': PagSeguroDirectPayment.getSenderHash()
                     }
                 })).done(function () {

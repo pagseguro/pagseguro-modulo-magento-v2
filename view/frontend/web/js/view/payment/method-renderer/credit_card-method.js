@@ -73,7 +73,7 @@ define(
               var months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
               return _.map(months, function (value, key) {
                 return {
-                    'value': key,
+                    'value': key + 1,
                     'month': value
                 };
             });
@@ -123,7 +123,7 @@ define(
                 $.when(setPaymentInformationAction(this.messageContainer, {
                     'method': self.getCode(),
                     'additional_data': {
-                        'credit_card_document': self.creditCardDocument(),
+                        'credit_card_document': (self.creditCardDocument()) ? self.creditCardDocument() : document.getElementById('creditCardDocument').value,
                         'credit_card_hash' : PagSeguroDirectPayment.getSenderHash(),
                         'credit_card_token' : document.getElementById('creditCardToken').value,
                         'credit_card_holder_name' : document.getElementById('creditCardHolder').value,

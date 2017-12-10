@@ -89,6 +89,11 @@ class Request extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $lastRealOrder = $this->_checkoutSession->getLastRealOrder();
+
+        if (is_null($lastRealOrder->getPayment())) {
+            throw new \Magento\Framework\Exception\NotFoundException(__('No order associated.'));
+        }
+
         $paymentData = $lastRealOrder->getPayment()->getData();
 
         if ($paymentData['method'] === 'pagseguro_boleto') {
@@ -98,7 +103,7 @@ class Request extends \Magento\Framework\App\Action\Action
                     throw new \Exception("There is no order associated with this session.");
                 }
 
-                if (!isset($paymentData['additional_information']['boleto_document'])
+                if (! isset($paymentData['additional_information']['boleto_document'])
                     || ! isset($paymentData['additional_information']['hash'])) {
                     throw new \Exception("Error passing data from checkout page to pagseguro Request Controller");
                 }
@@ -129,7 +134,7 @@ class Request extends \Magento\Framework\App\Action\Action
                 return $this->_redirect(sprintf('%s%s', $this->baseUrl(), 'pagseguro/payment/failure'));
             }
         }
-        
+
         if ($paymentData['method'] === 'pagseguro_online_debit') {
             try {
                 $this->orderId = $lastRealOrder->getId();

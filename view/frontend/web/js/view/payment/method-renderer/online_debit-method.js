@@ -82,7 +82,7 @@ define(
                 $.when(setPaymentInformationAction(this.messageContainer, {
                     'method': self.getCode(),
                     'additional_data': {
-                        'online_debit_document': self.onlineDebitDocument(),
+                        'online_debit_document': (self.onlineDebitDocument()) ? self.onlineDebitDocument() : document.getElementById('pagseguro_online_debit_online_debit_document').value,
                         'online_debit_hash': PagSeguroDirectPayment.getSenderHash(),
                         'online_debit_bank' : self.checkedBank()
                     }
