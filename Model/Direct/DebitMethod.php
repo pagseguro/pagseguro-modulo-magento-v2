@@ -278,9 +278,9 @@ class DebitMethod
      */
     private function getEmail()
     {
-        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
-            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
-        }
+//        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
+//            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
+//        }
         return $this->_order->getCustomerEmail();
     }
 

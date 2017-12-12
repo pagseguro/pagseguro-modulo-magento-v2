@@ -127,11 +127,13 @@ function getInstallments(brand) {
   })
 }
 
-function test(id) {
-  console.log(id);
-}
-
 function getBrand(self) {
+  var select = document.getElementById('card_installment_option');
+  select.options.length = 0;
+  select.options[0] = new Option('Escolha o N° de parcelas', null, true, true);
+  select.options[0].disabled = true
+  document.getElementById('card_total').innerHTML = 'selecione o número de parcelas';
+  PagSeguroDirectPayment.setSessionId(document.getElementById('pagseguroCcSessionId').value);
   if (validateCreditCard(self)) {
     PagSeguroDirectPayment.getBrand({
       cardBin: unmask(document.getElementById('pagseguro_credit_card_number').value),
@@ -153,35 +155,13 @@ function getBrand(self) {
   return false;
 }
 
-function createCardToken() {
-    if (validateCreateToken()) {
-      var param = {
-        cardNumber: unmask(document.getElementById('pagseguro_credit_card_number').value),
-        brand: document.getElementById('creditCardBrand').value,
-        cvv: document.getElementById('creditCardCode').value,
-        expirationMonth: document.getElementById('creditCardExpirationMonth').value,
-        expirationYear: document.getElementById('creditCardExpirationYear').value,
-        success: function (response) {
-          document.getElementById('creditCardToken').value = response.card.token;
-        },
-        error: function (error) {
-          console.log(error);
-        },
-    }
 
-    PagSeguroDirectPayment.createCardToken(param)
-  }
-}
-
-function validateCreditCardCode(self, createToken) {
+function validateCreditCardCode(self) {
   if (self.validity.tooLong || self.validity.tooShort || !self.validity.valid) {
     displayError(self)
     return false
   } else {
     displayError(self, false)
-    if (createToken === true && validateCreateToken()) {
-      createCardToken();
-    }
     return true
   }
 }
@@ -194,13 +174,9 @@ function validateCreditCardForm() {
    validateCreditCardHolderBirthdate(document.querySelector('#creditCardHolderBirthdate')) &&
    validateCreditCardMonth(document.querySelector('#creditCardExpirationMonth')) &&
    validateCreditCardYear(document.querySelector('#creditCardExpirationYear')) &&
-   validateCreditCardCode(document.querySelector('#creditCardCode'), false) &&
+   validateCreditCardCode(document.querySelector('#creditCardCode')) &&
    validateCreditCardInstallment(document.querySelector('#card_installment_option'))
   ) {
-
-   if (document.getElementById('creditCardToken').value === "") {
-     createCardToken();
-   }
    return true;
   }
   
@@ -219,7 +195,7 @@ function validateCreateToken() {
   if(validateCreditCard(document.querySelector('#pagseguro_credit_card_number')) 
     && validateCreditCardMonth(document.querySelector('#creditCardExpirationMonth'))
     && validateCreditCardYear(document.querySelector('#creditCardExpirationYear'))
-    && validateCreditCardCode(document.querySelector('#creditCardCode'), false)
+    && validateCreditCardCode(document.querySelector('#creditCardCode'))
     && document.getElementById('creditCardBrand').value !== ""
     ) {
       return true
@@ -228,7 +204,7 @@ function validateCreateToken() {
   validateCreditCard(document.querySelector('#pagseguro_credit_card_number'));
   validateCreditCardMonth(document.querySelector('#creditCardExpirationMonth'));
   validateCreditCardYear(document.querySelector('#creditCardExpirationYear'));
-  validateCreditCardCode(document.querySelector('#creditCardCode'), false);
+  validateCreditCardCode(document.querySelector('#creditCardCode'));
 
   return false;
 }
