@@ -48,13 +48,21 @@ define(
                 return "pagseguro"
             },
 
+            getData: function() {
+                return {
+                    "method": this.item.method,
+                    "po_number": null,
+                    "additional_data": null
+                };
+            },
+
             /**
              * @override
              */
             placeOrder: function () {
 
                 var self = this;
-                var paymentData = quote.paymentMethod();
+                var paymentData = this.getData();
                 var messageContainer = this.messageContainer;
                 fullScreenLoader.startLoader();
                 this.isPlaceOrderActionAllowed(false);
