@@ -26,8 +26,8 @@ namespace UOL\PagSeguro\Controller\Direct;
 use UOL\PagSeguro\Model\PaymentMethod;
 
 /**
- * Class Checkout
- * @package UOL\PagSeguro\Controller\Payment
+ * Class Payment
+ * @package UOL\PagSeguro\Controller\Direct\Payment
  */
 class Payment extends \Magento\Framework\App\Action\Action
 {

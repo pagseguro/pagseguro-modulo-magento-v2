@@ -83,7 +83,7 @@ class Library
      */
     public function isLightboxCheckoutType()
     {
-        if ($this->_scopeConfig->getValue('payment/pagseguro/checkout')
+        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/checkout')
             == \UOL\PagSeguro\Model\System\Config\Checkout::LIGHTBOX) {
             return true;
         }
@@ -177,5 +177,18 @@ class Library
         } else {
             return Library::DIRECT_PAYMENT_URL;
         }
+    }
+
+    /**
+     * Get image full frontend url
+     * @return type
+     */
+    public function getImageUrl($imageModulePath)
+    {
+        /** @var \Magento\Framework\App\ObjectManager $om */
+	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	/** @var \Magento\Framework\View\Asset\Repository */
+	$viewRepository = $objectManager->get('\Magento\Framework\View\Asset\Repository');
+	return $viewRepository->getUrl($imageModulePath);
     }
 }

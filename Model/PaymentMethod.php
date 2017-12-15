@@ -82,9 +82,11 @@ class PaymentMethod
     {
         // Currency
         $this->_paymentRequest->setCurrency("BRL");
-        
         // Order ID
         $this->_paymentRequest->setReference($this->getOrderStoreReference());
+        // Cart discount
+        $lastRealOrder = $this->_checkoutSession->getLastRealOrder();
+        $this->_paymentRequest->setExtraAmount(round($lastRealOrder->getDiscountAmount(), 2));
         //Shipping
         $this->setShippingInformation();
         $this->_paymentRequest->setShipping()->setType()
