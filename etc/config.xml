@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * 2007-2016 [PagSeguro Internet Ltda.]
+ * 2007-2017 [PagSeguro Internet Ltda.]
  *
  * NOTICE OF LICENSE
  *
@@ -32,7 +32,36 @@
                 <order_status>pagseguro_iniciado</order_status>
                 <notification>{{base_url}}pagseguro/notification/response</notification>
                 <log_file>var/log/pagseguro.log</log_file>
+                <group>pagseguro</group>
             </pagseguro>
+            <pagseguro_default_lightbox>
+                <title>PagSeguro</title>
+                <active>0</active>
+                <model>UOL\PagSeguro\Model\PaymentDefaultlLightbox</model>
+                <order_status>pagseguro_iniciado</order_status>
+                <group>pagseguro</group>
+            </pagseguro_default_lightbox>
+            <pagseguro_boleto>
+                <title>Boleto Bancário</title>
+                <active>0</active>
+                <model>UOL\PagSeguro\Model\PaymentBoleto</model>
+                <order_status>pagseguro_iniciado</order_status>
+                <group>pagseguro</group>
+            </pagseguro_boleto>
+            <pagseguro_credit_card>
+                <title>Cartão de Crédito</title>
+                <active>0</active>
+                <model>UOL\PagSeguro\Model\PaymentCreditCard</model>
+                <order_status>pagseguro_iniciado</order_status>
+                <group>pagseguro</group>
+            </pagseguro_credit_card>
+            <pagseguro_online_debit>
+                <title>Débito Online</title>
+                <active>0</active>
+                <model>UOL\PagSeguro\Model\PaymentOnlineDebit</model>
+                <order_status>pagseguro_iniciado</order_status>
+                <group>pagseguro</group>
+            </pagseguro_online_debit>
         </payment>
     </default>
 </config>

@@ -1,0 +1,130 @@
+<!--
+/**
+ * 2007-2016 [PagSeguro Internet Ltda.]
+ *
+ * NOTICE OF LICENSE
+ *
+ *Licensed under the Apache License, Version 2.0 (the "License");
+ *you may not use this file except in compliance with the License.
+ *You may obtain a copy of the License at
+ *
+ *http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *
+ *  @author    PagSeguro Internet Ltda.
+ *  @copyright 2016 PagSeguro Internet Ltda.
+ *  @license   http://www.apache.org/licenses/LICENSE-2.0
+ */
+-->
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+    </div>
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <fieldset class="fieldset payment method" data-bind='attr: {id: "payment_form_" + getCode()}'>
+            <div class="field _required">
+                <label data-bind="attr: {for: getCode() + '_online_debit_document'}" class="label">
+                    <span><!-- ko i18n: 'CPF ou CNPJ' --><!-- /ko --></span>
+                </label>
+
+                <div class="control">
+                    <input
+                        class="input-text required-entry required"
+                        name="payment[online_debit_document]"
+                        type="text"
+                        maxlength="18"
+                        minlength="11"
+                        data-validate="{required:true}"
+                        required
+                        data-bind="attr: {
+                            id: getCode() + '_online_debit_document',
+                            'data-container': getCode() + '_online_debit_document'},
+                            enable: true,
+                            textInput: onlineDebitDocument,
+                            valueUpdate: 'input',
+                            event: {
+                                blur: validateDocumentFinal.bind($data, document.getElementById('pagseguro_online_debit_online_debit_document')),
+                                keydown: mascaraMutuario(document.getElementById('pagseguro_online_debit_online_debit_document'), cpfCnpj)
+                            }
+                        "/>
+
+                    <div style="display: none;" class="mage-error display-none validation-advice pagseguro_online_debit_online_debit_document-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
+                </div>
+            </div>
+
+            <div class="field required">
+                <label data-bind="attr: {for: getCode() + '_online_debit_bank'}" class="label">
+                    <span><!-- ko i18n: 'Selecione abaixo seu banco' --><!-- /ko --></span>
+                </label>
+
+                <div class="control">
+                    <label style="display: block;">
+                        <input id="debitbankName" type="radio" value="bancodobrasil"
+                               data-bind="checked: checkedBank, event: {click : hideBankError()}
+                               " />Banco do Brasil</label>
+                    <label style="display: block;">
+                        <input id="debitbankName" type="radio" value="banrisul"
+                               data-bind="checked: checkedBank, event: {click : hideBankError()}
+                               " />Banrisul</label>
+                    <label style="display: block;">
+                        <input id="debitbankName" type="radio" value="bradesco"
+                               data-bind="checked: checkedBank, event: {click : hideBankError()}
+                               " />Bradesco</label>
+                    <label style="display: block;">
+                        <input id="debitbankName" type="radio" value="itau"
+                               data-bind="checked: checkedBank, event: {click : hideBankError()}
+                               " />Itaú</label>
+                </div>
+            </div>
+
+            <div style="display: none; color: red;" id="debitbankNameError" class="mage-error display-none validation-advice debitbankName-error-message" data-bind="attr: {generated: true}">Escolha um banco</div>
+
+            <div>
+                <div style="float: right; font-size: 11px; ">
+                    <span>Esta compra está sendo feita no Brasil</span>
+                    <img style="float: right; padding-left: 2px; text-align: center;" data-bind="attr:{src: brazilFlagPath}">
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                        click: placeOrder,
+                        attr: {title: $t('Place Order')},
+                        css: {disabled: !isPlaceOrderActionAllowed()},
+                        enable: (getCode() == isChecked())
+                        "
+                        disabled>
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
