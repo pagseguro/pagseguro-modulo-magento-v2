@@ -35,10 +35,6 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: 'pagseguro',
-                component: 'UOL_PagSeguro/js/view/payment/method-renderer/payment-method'
-            },
-            {
                 type: 'pagseguro_default_lightbox',
                 component: 'UOL_PagSeguro/js/view/payment/method-renderer/default_lightbox-method'
             },
