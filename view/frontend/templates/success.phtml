@@ -24,33 +24,33 @@
     <?php echo $block->getAdditionalInfoHtml() ?>
 
 	<?php switch($this->getPaymentType()):
-			case 'uol\pagseguro\controller\direct\debit':?>
-				<?php if(!is_null($this->getPaymentLink())): ?>
-					<div class="actions-toolbar">
-					<div class="primary">
-						<a class="action primary continue" target="_blank" href="<?php /* @escapeNotVerified */ echo $this->getPaymentLink() ?>"><span><?php /* @escapeNotVerified */ echo __('Ir para o site do banco') ?></span></a>
-					</div>
-				</div>
-				<?php endif; ?>
-		<?php break; ?>
+            case 'pagseguro_online_debit':?>
+                <?php if(!is_null($this->getPaymentLink())): ?>
+                        <div class="actions-toolbar">
+                        <div class="primary">
+                            <a class="action primary continue" target="_blank" href="<?php /* @escapeNotVerified */ echo $this->getPaymentLink() ?>"><span><?php /* @escapeNotVerified */ echo __('Ir para o site do banco') ?></span></a>
+                        </div>
+                </div>
+                <?php endif; ?>
+            <?php break; ?>
 
-		<?php case 'uol\pagseguro\controller\direct\boleto':?>
-				<?php if(!is_null($this->getPaymentLink())): ?>
-					<div class="actions-toolbar">
-					<div class="primary">
-						<a class="action primary continue" target="_blank" href="<?php /* @escapeNotVerified */ echo $this->getPaymentLink() ?>"><span><?php /* @escapeNotVerified */ echo __('Imprimir boleto') ?></span></a>
-					</div>
-				</div>
-				<?php endif; ?>
-		<?php break; ?>
+            <?php case 'pagseguro_boleto':?>
+                <?php if(!is_null($this->getPaymentLink())): ?>
+                        <div class="actions-toolbar">
+                        <div class="primary">
+                            <a class="action primary continue" target="_blank" href="<?php /* @escapeNotVerified */ echo $this->getPaymentLink() ?>"><span><?php /* @escapeNotVerified */ echo __('Imprimir boleto') ?></span></a>
+                        </div>
+                </div>
+                <?php endif; ?>
+            <?php break; ?>
 
-		<?php default:?>
-			<div class="actions-toolbar">
-				<div class="primary">
-				    <a class="action primary continue" href="<?php /* @escapeNotVerified */ echo $block->getUrl() ?>"><span><?php /* @escapeNotVerified */ echo __('Continue comprando') ?></span></a>
-				</div>
-			</div>
-		<?php break; ?>
+            <?php default:?>
+                <div class="actions-toolbar">
+                        <div class="primary">
+                            <a class="action primary continue" href="<?php /* @escapeNotVerified */ echo $block->getUrl() ?>"><span><?php /* @escapeNotVerified */ echo __('Continue comprando') ?></span></a>
+                        </div>
+                </div>
+            <?php break; ?>
 
 	<?php endswitch; ?>
 

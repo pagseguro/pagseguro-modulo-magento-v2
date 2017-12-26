@@ -37,7 +37,7 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'UOL_PagSeguro/payment/payment-form'
+                template: 'UOL_PagSeguro/payment/default-lightbox-form'
             },
 
             context: function() {
@@ -45,7 +45,7 @@ define(
             },
 
             getCode: function() {
-                return "pagseguro"
+                return "pagseguro_default_lightbox"
             },
 
             /**
@@ -61,10 +61,9 @@ define(
                 $.when(setPaymentInformationAction(this.messageContainer, {
                     'method': self.getCode()
                 })).done(function () {
+                        delete paymentData['title'];
                         $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                            if (window.checkoutConfig.payment.pagseguro.isDirect) {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.direct);
-                            } else if (window.checkoutConfig.payment.pagseguro.isLightbox){
+                           if (window.checkoutConfig.payment.pagseguro.isLightbox){
                                 $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
                             } else {
                                 $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);

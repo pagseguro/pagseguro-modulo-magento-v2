@@ -30,7 +30,24 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content">
-        <p>Com o PagSeguro, você pode escolher como quer pagar e ainda parcelar sua compra em até 18x.</p>
+        <ul>
+            <li>Com o PagSeguro, você pode escolher como quer pagar e ainda parcelar sua compra em até 18x.</li>
+            <li>Ao finalizar sua compra você será redirecionado para o PagSeguro.</li>
+        </ul>
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"

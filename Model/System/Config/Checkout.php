@@ -43,10 +43,6 @@ class Checkout implements ArrayInterface
      *
      */
     const LIGHTBOX = "lightbox";
-    /**
-     *
-     */
-    const DIRECT = "direct_payment";
 
     /**
      * @return array of options
@@ -55,8 +51,7 @@ class Checkout implements ArrayInterface
     {
         return [
             self::STANDARD => __('Padrão'),
-            self::LIGHTBOX => __('Lightbox'),
-            self::DIRECT   => __('Checkout Transparente')
+            self::LIGHTBOX => __('Lightbox')
         ];
     }
 }

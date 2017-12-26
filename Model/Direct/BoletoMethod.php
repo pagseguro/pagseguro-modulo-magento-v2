@@ -99,6 +99,7 @@ class BoletoMethod implements Checkout
         try {
             $this->currency();
             $this->reference();
+            $this->discounts();
             $this->shipping();
             $this->sender();
             $this->urls();
@@ -271,9 +272,9 @@ class BoletoMethod implements Checkout
      */
     private function getEmail()
     {
-        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
-            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
-        }
+//        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
+//            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
+//        }
         return $this->_order->getCustomerEmail();
     }
 
@@ -423,5 +424,13 @@ class BoletoMethod implements Checkout
         return (!empty($countryId)) ?
             $this->_countryInformation->getCountryInfo($countryId)->getFullNameLocale() :
             $countryId;
+    }
+
+    /**
+     * Set discounts using PagSeguro "extra amount" parameter
+     */
+    private function discounts()
+    {
+        $this->_paymentRequest->setExtraAmount(round($this->_order->getDiscountAmount(), 2));
     }
 }
