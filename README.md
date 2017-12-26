@@ -16,7 +16,7 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 Requisitos
 ----------
 ---
- - [Magento] Community 2.0 | 2.1
+ - [Magento] Community 2.0.8 | 2.1.0 até a versão 2.1.9
  - [PHP] 5.5.0+
  - [SPL]
  - [cURL]
@@ -25,7 +25,11 @@ Requisitos
 
 Instalação
 -----------
+> É altamente recomendado que você tenha um ambiente de testes para validar alterações e atualizações antes de atualizar sua loja em produção. É recomendado também que seja feito um **backup** da sua loja e informações importantes antes de executar qualquer procedimento de atualização/instalação.
+
 Navegue até o diretório raíz da sua instalação do Magento 2 e siga os seguintes passos:
+
+> A instalação do módulo é feita utilizando o Composer. Para baixar e instalar o Composer no seu ambiente acesse https://getcomposer.org/download/ e caso tenha dúvidas de como utilizá-lo consulte a [documentação oficial do Composer](https://getcomposer.org/doc/).
 
 1. Instale via packagist 
    - ```composer require pagseguro/magento2```
@@ -33,24 +37,91 @@ Navegue até o diretório raíz da sua instalação do Magento 2 e siga os segui
 2. Execute os comandos:
    - ```php bin/magento setup:upgrade```
    - ```php bin/magento setup:static-content:deploy``` ou ```php bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
-3. Dê permissões as pastas var/ pub/
+3. Cheque e, caso necessário, configure as permissões corretas para seus diretórios. Por exemplo, para configrar a permissão 777 para as pastas var/ pub/ execute:
    - ```chmod 777 -R var/ pub/```
+4. Pode ser necessário atualizar o cache da sua loja ao finalizar o processo.
+5. Acesse a seção do PagSeguro através da interface administrativa da sua loja e configure suas credenciais e meios de pagamento.
 
 
 Atualização
 -----------
-É altamente recomendado que você tenha um ambiente de testes para validar alterações e atualizações antes de atualizar sua loja em produção. É recomendado também que seja feito um **backup** da sua loja e informações importantes antes de executar qualquer procedimento de atualização/instalação.
+> É altamente recomendado que você tenha um ambiente de testes para validar alterações e atualizações antes de atualizar sua loja em produção. É recomendado também que seja feito um **backup** da sua loja e informações importantes antes de executar qualquer procedimento de atualização/instalação.
 
 A atualização do módulo do PagSeguro é feita através do **composer** e pode ser feita de diversas maneiras, de acordo com suas preferências. Uma forma é através dos comandos:
 1. ```composer update pagseguro/magento2```
 2. ```composer update pagseguro/pagseguro-php-sdk```
 3. ```php bin/magento setup:upgrade```
 4. ```php bin/magento setup:static-content:deploy``` ou ```php bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
+5. Cheque e, caso necessário, configure as permissões corretas para seus diretórios.
+6. Pode ser necessário atualizar o cache da sua loja ao finalizar o processo.
+5. Acesse a seção do PagSeguro através da interface administrativa da sua loja, confira as informações e configurações do PagSeguro e seus meios de pagamento e clique no botão para salvar.
 
 **Observações** 
 - Em alguns casos, o Magento não atualiza os arquivos estáticos gerados, podendo ser necessário atualizar os mesmos via interface administrativa, comandos do terminal ou removendo diretamente conteúdo da pasta *pub/static/frontend/Magento/seu_tema/seu_idioma/UOL_PagSeguro*.
 - Em seguida, executar novamente o comando ```php bin/magento setup:static-content:deploy``` ou ```bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
 
+Configuração
+------------
+---
+Para acessar e configurar o módulo acesse o menu PagSeguro -> Configurações. As opções disponíveis estão descritas abaixo.
+
+ -------------------------
+ **Configurações Gerais**
+ 
+ - **ambiente**: especifica em que ambiente as transações serão feitas *(produção/sandbox)*.
+ - **e-mail**: e-mail cadastrado no PagSeguro.
+ - **token**: token cadastrado no PagSeguro.
+ - **url de redirecionamento**: ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado automaticamente para a página de confirmação em sua loja ou então para a URL que você informar neste campo. Para ativar o redirecionamento ao final do pagamento é preciso ativar o serviço de [Pagamentos via API]. Obs.: Esta URL é informada automaticamente e você só deve alterá-la caso deseje que seus clientes sejam redirecionados para outro local.
+ - **url de notificação**: sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja. **O valor padrão que deve ser utilizado pelo módulo é: http://www.minhaloja.com.br/index.php/pagseguro/notification/response**
+     - *Observação: Esta URL só deve ser alterada caso você deseje receber as notificações em outro local.*
+ - **charset**: codificação do seu sistema (ISO-8859-1 ou UTF-8).
+ - **ativar log**: ativa/desativa a geração de logs.
+ - **diretório**: informe o local e nome do arquivo a partir da raíz de instalação do Magento onde se deseja criar o arquivo de log. Ex.: var/log/pagseguro.log. 
+     - *Por padrão o módulo virá configurado para salvar o arquivo de log em var/log/pagseguro.log*.
+ - **listar transações abandonadas?**: ativa/desativa a pesquisa de transações que foram abandonadas no checkout do PagSeguro.
+ - **transações -> abandonadas**: permite consultar as transações que foram abandonadas nos últimos 10 dias, desta forma você pode enviar emails de recuperação de venda. O e-mail conterá um link que redirecionará o comprador para o fluxo de pagamento, exatamente no ponto onde ele parou.
+ - **listar parcelamento**: Habilita a exibição de uma listagem de parcelas na tela de visualização do produto. (Irá exibir o maior parcelamento disponível para o produto na tela de exibição do mesmo)
+ 
+ -------------------------
+ **Configurar Tipos de Checkout**
+ Nesta seção você irá configurar os meios de pagamento do PagSeguro que deseja disponibilizar na sua loja.
+ > Consulte na sua conta do PagSeguro os meios de pagamento que estão habilitados.
+ 
+ - *PagSeguro (Padrão ou Lightbox)*
+   - **ativar**: ativa/desativa o meio de pagamento PagSeguro (padrão ou lightbox).
+   - **checkout**: especifica o modelo de checkout que será utilizado. É possível escolher entre checkout padrão ou checkout lightbox.
+   - **nome de exibição**: define o nome que será utilizado para o meio de pagamento na tela de checkout.
+   - **posição na tela de checkout (Sort Order)**: Configura a ordem de exibição deste meio de pagamento na sua loja. Esta ordem é  relativa à todos os outros meios de pagamento configurados na sua loja.
+ 
+ - *Checkout Transparente - Cartão de Crédito*
+   - **ativar**: ativa/desativa o meio de pagamento Checkout Transparente - Cartão de Crédito.
+   - **nome de exibição**: define o nome que será utilizado para esse meio de pagamento na tela de checkout.
+   - **posição na tela de checkout (Sort Order)**: Configura a ordem de exibição deste meio de pagamento na sua loja. Esta ordem é  relativa à todos os outros meios de pagamento configurados na sua loja.
+ 
+ 
+ - *Checkout Transparente - Boleto Bancário*
+   - **ativar**: ativa/desativa o meio de pagamento Checkout Transparente - Boleto Bancário.
+   - **nome de exibição**: define o nome que será utilizado para esse meio de pagamento na tela de checkout.
+   - **posição na tela de checkout (Sort Order)**: Configura a ordem de exibição deste meio de pagamento na sua loja. Esta ordem é  relativa à todos os outros meios de pagamento configurados na sua loja.
+ 
+ 
+ - *Checkout Transparente - Débito Online*
+   - **ativar**: ativa/desativa o meio de pagamento Checkout Transparente - Débito Online.
+   - **nome de exibição**: define o nome que será utilizado para esse meio de pagamento na tela de checkout.
+   - **posição na tela de checkout (Sort Order)**: Configura a ordem de exibição deste meio de pagamento na sua loja. Esta ordem é  relativa à todos os outros meios de pagamento configurados na sua loja.
+ 
+ 
+ Transações
+------------
+---
+ Para realizar consultas e outras operações acesse o menu PagSeguro -> *Transação*, onde *Transação* pode ser escolhida as opções: Conciliação, Abandonadas, Cancelamento, Estorno. As opções disponíveis estão descritas abaixo:
+ 
+ - **abandonadas**: permite pesquisar as transações que foram abandonadas dentro da quantidade de dias definidos para a pesquisa.
+ - **cancelamento**: esta pesquisa retornará todas as transações que estejam com status "em análise" e "aguardando pagamento", dentro da quantidade de dias definidos para a pesquisa. Desta forma você pode solicitar o cancelamento destas transações.
+ - **conciliação**: permite consultar as transações efetivadas no PagSeguro nos últimos 30 dias. A pesquisa retornará um comparativo com o status das transações em sua base local e o status atual da transação no PagSeguro, desta forma você pode identificar e atualizar transações com status divergentes.
+ - **estorno**: esta pesquisa retornará todas as transações que estejam com status "paga", "disponível" e "em disputa", dentro da quantidade de dias definidos para a pesquisa. Desta forma você pode solicitar o estorno dos valores pagos para seus compradores.
+
+ >  É aconselhável que antes de usar as funcionalidades de **estorno** ou **cancelamento** você faça a **conciliação** de suas transações para obter os status mais atuais.
 
 Inputs
 ---------
@@ -80,6 +151,11 @@ Caso tenha dúvidas ou precise de suporte, acesse nosso [fórum].
 
 Changelog
 ---------
+1.4.0
+- Alterado o fluxo do checkout transparente (na própria tela de checkout do Magento)
+- Alterada a forma de configurar o módulo e os meios de pagamento do PagSeguro, que agora são configurados individualmente.
+- Melhorias gerais e correções de bugs: transações do admin, css muito abrangente, remoção de arquivos velhos e desnecessários, refatorações.
+
 1.3.0
 - Adicionada validação e mensagens de erro (frontend) nos formulários do checkout transparente
 
