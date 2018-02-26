@@ -254,7 +254,7 @@ function displayError(target, error = true) {
  * @param {this} document
  * @returns {bool}
  */
-function documentMask(document) {
+function documentMask(document, event) {  
   if (document.value.length < 14 
           || (document.value.length == 14 && (event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 46))
       ) {
@@ -274,7 +274,7 @@ function documentMask(document) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function MascaraCNPJ(cnpj) {
+function MascaraCNPJ(cnpj, event) {
   if (mascaraInteiro(cnpj) == false) {
     event.returnValue = false;
   }
@@ -286,7 +286,7 @@ function MascaraCNPJ(cnpj) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function MascaraData(data) {
+function MascaraData(data, event) {
   if (mascaraInteiro(data) == false) {
     event.returnValue = false;
   }
@@ -298,7 +298,7 @@ function MascaraData(data) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function MascaraCPF(cpf) {
+function MascaraCPF(cpf, event) {
   if (mascaraInteiro(cpf) == false) {
     event.returnValue = false;
   }
@@ -310,7 +310,7 @@ function MascaraCPF(cpf) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function creditCardMask(cc) {
+function creditCardMask(cc, event) {
   if (mascaraInteiro(cc) == false) {
     event.returnValue = false;
   }
@@ -322,7 +322,7 @@ function creditCardMask(cc) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function notNumberMask(someString) {
+function notNumberMask(someString, event) {
   if (maskNotNumber(someString) == false) {
     event.returnValue = false;
   }
@@ -333,7 +333,7 @@ function notNumberMask(someString) {
  * Validate and prevent key typed event if it is a numbers
  * @returns {Boolean}
  */
-function maskNotNumber() {
+function maskNotNumber(event) {
   if (event.keyCode == 8
           || event.keyCode == 9
           || event.keyCode == 46
@@ -352,7 +352,7 @@ function maskNotNumber() {
  * backspace(8), tab(9), or del(46)
  * @returns {Boolean}
  */
-function mascaraInteiro() {
+function mascaraInteiro(event) {
   if (event.keyCode == 8
           || event.keyCode == 9
           || event.keyCode == 46
@@ -410,7 +410,7 @@ function formataCampo(campo, Mascara, evento) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function creditCardCodeMask(code) {
+function creditCardCodeMask(code, event) {
   if (mascaraInteiro(code) == false) {
     event.returnValue = false;
   }
