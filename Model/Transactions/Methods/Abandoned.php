@@ -106,7 +106,6 @@ class Abandoned extends Method
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface,
-        \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Backend\Model\Session $session,
