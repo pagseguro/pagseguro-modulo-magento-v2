@@ -670,3 +670,69 @@ function validateSearchByDate() {
 
     return true;
 }
+
+/**
+ *
+ * Money
+ *
+ */
+
+function formatReal( int )
+{
+    var tmp = int+'';
+    tmp = tmp.replace(".", "");
+    tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+    if ( tmp.length > 6 ) {
+        tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+    }
+    return tmp;
+}
+
+function formatRealInput( field )
+{
+    var tmp = field.value;
+    tmp = tmp.replace(",", "");
+    tmp = tmp.replace(".", "");
+
+    valueIsNumber(tmp);
+
+    tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+
+    if ( tmp.length > 6 ) {
+        tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+    }
+    field.value = tmp;
+}
+
+function valueIsNumber(tmp){
+
+    if(tmp.indexOf(",") == 0){
+        jQuery('#refund-value').addClass('field-error');
+        jQuery('.error').text('Valor inválido.');
+        return false;
+    }
+
+    tmp = tmp.replace(",", "");
+    tmp = tmp.replace(".", "");
+
+    if(isNaN(tmp)) {
+        jQuery('#refund-value').addClass('field-error');
+        jQuery('.error').text('Valor inválido.');
+        return false;
+    } else if(tmp.indexOf('-') != -1) {
+        jQuery('#refund-value').addClass('field-error');
+        jQuery('.error').text('Valor não pode ser negativo.');
+        return false;
+    } else {
+        jQuery('.error').text('');
+        jQuery('#refund-value').removeClass('field-error');
+        return true;
+    }
+}
+
+function getMoney( strMoney )
+{
+    strMoney = strMoney.replace(".", "");
+    strMoney = strMoney.replace(",", ".");
+    return parseFloat(strMoney);
+}

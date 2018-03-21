@@ -17,6 +17,31 @@
             <tbody class="admin__table-secondary">
             </tbody>
         </table>
+
+        <div class="modals-overlay"></div>
+        <div id="modal-partial-refund" class="modal-popup">
+            <div class="modal-inner-wrap">
+                <button class="action-close" type="button">
+                    <span>Close</span>
+                </button>
+                <div class="modal-content">
+                    <h2>Estorno parcial</h2>
+                    <h5 id="id-magento">ID magento: 01</h5>
+                    <h5 id="transaction-value">Valor total da venda: R$ 4.000,00</h5>
+                    <form>
+                        <p>Informe o valor a ser estornado:</p>
+                        <div class="admin__scope-old">
+                            <label for="refund-value" >R$</label>
+                            <input type="text" onkeyup="formatRealInput(this)" onblur="formatRealInput(this)" name="refund-value" id="refund-value" placeholder="0,00"/>
+                            <p class="error"></p>
+                        </div>
+                        <p>Obs: O valor do estorno deve ser menor que o valor total da venda.</p>
+                        <button type="button" class="align-right action-secondary" id="partial-refund">Estornar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <button id="teste">Modal</button>
     </div>
 </div>
 <input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
@@ -78,7 +103,47 @@
         // Search button observer
         $('#refund-search').on('click', function(){
             var url = $('#adminurl').attr('data-target');
+            console.log(url);
             WS.Ajax.Refund.Search(url);
+        });
+
+        $('#partial-refund').click(function(){
+            var valueInput = $('#refund-value').val();
+            if(getMoney(valueInput) > 3000/*refund[3]*/){
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Valor maior que o valor total da venda.');
+            } else if (getMoney(valueInput) == 0) {
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Valor de estorno não pode ser zero.');
+            } else {
+                if(valueIsNumber(valueInput)){
+                    refund[3] = valueInput;
+                    clearModal();
+                    doRefund(refund, true);
+                }
+            }
+        });
+
+        function clearModal(){
+            $('#refund-value').val('');
+            clearValueError();
+        }
+
+        function clearValueError(){
+            $('.error').text('');
+            $('#refund-value').removeClass('field-error');
+        }
+
+        $(document).on('click', '.action-close', function(){
+            clearModal();
+            $('.modals-overlay').css('display', 'none');
+            $('.modal-popup').removeClass('_show');
+        });
+
+        $('#teste').click(function(){
+            WS.Ajax.Transactions.Details();
+            $('.modals-overlay').css('display', 'block');
+            $('#modal-partial-refund').addClass('_show');
         });
     });
 </script>

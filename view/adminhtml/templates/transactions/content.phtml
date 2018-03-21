@@ -13,14 +13,14 @@
                     </tr>
                 <tr>
                         <th class="data-grid-th admin__scope-old data">
-                            <input type="text" class="" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/>
-                            <input type="text" class="" name="date_end" id="date_end" OnKeyUp="dateMask(this.value, 'date_end')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="Até"/>
+                            <input type="text" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/>
+                            <input type="text" name="date_end" id="date_end" OnKeyUp="dateMask(this.value, 'date_end')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="Até"/>
                         </th>
                         <th class="data-grid-th admin__scope-old">
-                            <input type="text" class="" name="id_magento" id="id_magento" placeholder="ID Magento"/>
+                            <input type="text" name="id_magento" id="id_magento" placeholder="ID Magento"/>
                         </th>
                         <th class="data-grid-th admin__scope-old">
-                            <input type="text" class="" name="id_pagseguro" id="id_pagseguro" placeholder="ID PagSeguro"/>
+                            <input type="text" name="id_pagseguro" id="id_pagseguro" placeholder="ID PagSeguro"/>
                         </th>
                         <th class="data-grid-th"></th>
                         <th class="data-grid-th">
@@ -36,7 +36,7 @@
                             </select>
                         </th>
                         <th class="data-grid-th">
-                            <input type="button" class="pagseguro-button" id="transactions-filter" value="Filtrar">
+                            <input type="button" class="action-secondary" id="transactions-filter" value="Filtrar">
                         </th>
                 </tr> 
             </thead>
@@ -133,7 +133,7 @@
             if (document.querySelectorAll('.field-error').length > 0){
                 Modal.Load('Atenção', 'Data inválida!');
             } else if (validateSearchByDate() == true) {
-                //var url = $('#adminurl').attr('data-target');
+                var url = $('#adminurl').attr('data-target');
                 WS.Ajax.Transactions.Details();
                 jQuery('.modals-overlay').css('display', 'block');
                 jQuery('#modal-details').addClass('_show');
