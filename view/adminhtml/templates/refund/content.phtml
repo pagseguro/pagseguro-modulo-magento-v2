@@ -46,6 +46,9 @@
 </div>
 <input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
 <script type="text/javascript">
+    
+    var id, block, url, row, transactionValue;
+
     require(["jquery", 'Magento_Ui/js/modal/confirm', "datatables", "public"],function($, confirmation) {
 
         // DataTable config
@@ -78,11 +81,11 @@
                     $('#pagseguro-datatable_paginate')[0].style.display = "none";
                 }
 
-                jQuery('#pagseguro-datatable tbody tr').unbind('click');
-                jQuery('#pagseguro-datatable tbody tr').bind('click', function () {
+                jQuery('#pagseguro-datatable tbody tr td .refund').unbind('click');
+                jQuery('#pagseguro-datatable tbody tr td .refund').bind('click', function () {
 
                     var id = jQuery(this).find('td')[1];
-                    var block = jQuery(this).find('.refund').attr('data-block');
+                    var block = jQuery(this).attr('data-block');
                     var url = $('#adminurl').attr('data-target');
                     var row = $(this);
                     confirmation({
@@ -97,31 +100,51 @@
                     });
 
                 });
+
+                jQuery('#pagseguro-datatable tbody tr td .partial-refund').unbind('click');
+                jQuery('#pagseguro-datatable tbody tr td .partial-refund').bind('click', function () {
+
+                    var idMagento = jQuery(this).attr('data-id');
+                    transactionValue = jQuery(this).attr('data-value');
+                    jQuery('#id-magento').text('ID magento: ' + idMagento);
+                    jQuery('#transaction-value').text('Valor total da venda: R$ ' + formatReal(transactionValue));
+                    $('.modals-overlay').css('display', 'block');
+                    $('#modal-partial-refund').addClass('_show');
+                    id = jQuery(this).find('td')[1];
+                    block = jQuery(this).attr('data-block');
+                    url = $('#adminurl').attr('data-target');
+                    row = $(this);
+                });
+            }
+        });
+
+        $('#partial-refund').click(function(){
+            var valueInput = $('#refund-value').val();
+            if(getMoney(valueInput) > transactionValue){
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Valor maior que o valor total da venda.');
+            } else if (getMoney(valueInput) == 0) {
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Valor de estorno não pode ser zero.');
+            } else if(valueInput == "") {
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Informe o valor a ser estornado.');
+            } else {
+                if(valueIsNumber(valueInput)){
+                    valueInput = valueInput.replace(".", "");
+                    valueInput = valueInput.replace(",", ".");
+                    clearModal();
+                    $('.modals-overlay').css('display', 'none');
+                    $('.modal-popup').removeClass('_show');
+                    WS.Ajax.Refund.Refund(url, block, row, valueInput);
+                }
             }
         });
 
         // Search button observer
         $('#refund-search').on('click', function(){
             var url = $('#adminurl').attr('data-target');
-            console.log(url);
             WS.Ajax.Refund.Search(url);
-        });
-
-        $('#partial-refund').click(function(){
-            var valueInput = $('#refund-value').val();
-            if(getMoney(valueInput) > 3000/*refund[3]*/){
-                $('#refund-value').addClass('field-error');
-                $('.error').text('Valor maior que o valor total da venda.');
-            } else if (getMoney(valueInput) == 0) {
-                $('#refund-value').addClass('field-error');
-                $('.error').text('Valor de estorno não pode ser zero.');
-            } else {
-                if(valueIsNumber(valueInput)){
-                    refund[3] = valueInput;
-                    clearModal();
-                    doRefund(refund, true);
-                }
-            }
         });
 
         function clearModal(){
@@ -138,12 +161,6 @@
             clearModal();
             $('.modals-overlay').css('display', 'none');
             $('.modal-popup').removeClass('_show');
-        });
-
-        $('#teste').click(function(){
-            WS.Ajax.Transactions.Details();
-            $('.modals-overlay').css('display', 'block');
-            $('#modal-partial-refund').addClass('_show');
         });
     });
 </script>

@@ -133,18 +133,28 @@ class Refund extends Method
      * @return bool
      * @throws \Exception
      */
-    public function execute($data) {
-
+    public function execute($data, $value = null) {
         try {
             $config = $this->sanitizeConfig($data);
-            $this->isConciliate($config);
+            $config->value = $value;
+            if (!$config->needConciliate){
+                return json_encode(array(
+                    "status" => false,
+                    "err"    => "Need to conciliate",
+                ));
+            }
+        
             if (!$this->doRefund($config))
                 throw new \Exception('impossible to refund');
 
             $this->doUpdates($config);
             return true;
         } catch (\Exception $exception) {
-            throw $exception;
+            $error = simplexml_load_string($exception->getMessage());
+            return json_encode(array(
+                "status" => false,
+                "err"    => trim(current($error->error->code)),
+            ));
         }
     }
 
@@ -216,7 +226,8 @@ class Refund extends Method
         try {
             return \PagSeguro\Services\Transactions\Refund::create(
                 $this->_library->getPagSeguroCredentials(),
-                $config->pagseguro_id
+                $config->pagseguro_id,
+                $config->value
             );
         } catch (\Exception $exception) {
             throw $exception;
@@ -285,7 +296,8 @@ class Refund extends Method
             'magento_status'   => $this->formatMagentoStatus($order),
             'pagseguro_id'     => $payment->getCode(),
             'order_id'         => $order->getId(),
-            'details'          => $this->details($order, $payment, ['conciliate' => $conciliate])
+            'details'          => $this->details($order, $payment, ['conciliate' => $conciliate]),
+            'value'            => $payment->getGrossAmount(),
         ];
     }
 
@@ -304,7 +316,8 @@ class Refund extends Method
                 'order_id'         => $order->getId(),
                 'pagseguro_status' => $payment->getStatus(),
                 'pagseguro_id'     => $payment->getCode(),
-                'needConciliate'   => $options['conciliate']
+                'needConciliate'   => $options['conciliate'],
+                'value'            => null
             ])
         );
     }
