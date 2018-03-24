@@ -89,10 +89,6 @@ class PaymentMethod
         $this->_paymentRequest->setExtraAmount(round($lastRealOrder->getDiscountAmount(), 2));
         //Shipping
         $this->setShippingInformation();
-        $this->_paymentRequest->setShipping()->setType()
-            ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
-        $this->_paymentRequest->setShipping()->setCost()
-            ->withParameters(number_format($this->getShippingAmount(), 2, '.', '')); //Shipping Coast
         // Sender
         $this->setSenderInformation();
         // Itens
@@ -158,19 +154,44 @@ class PaymentMethod
      */
     private function setShippingInformation()
     {
-        $shipping = $this->getShippingData();
-        $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
+        if ($this->_checkoutSession->getLastRealOrder()->getIsVirtual()) {
+            $this->_paymentRequest->setShipping()->setAddressRequired()->withParameters('false');
+        } else {
+            $this->_paymentRequest->setShipping()->setAddressRequired()->withParameters('true');
+            $shipping = $this->_checkoutSession->getLastRealOrder()->getShippingAddress();
+            if ($shipping) {
+                if (count($shipping->getStreet()) === 4) {
+                    $this->_paymentRequest->setShipping()->setAddress()->withParameters(
+                        $shipping->getStreetLine(1),
+                        $shipping->getStreetLine(2),
+                        $shipping->getStreetLine(4),
+                        \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
+                        $shipping->getCity(),
+                        $this->getRegionAbbreviation($shipping),
+                        $this->getCountryName($shipping['country_id']),
+                        $shipping->getStreetLine(3)
+                    );
+                } else {
+                    $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
 
-        $this->_paymentRequest->setShipping()->setAddress()->withParameters(
-            $this->getShippingAddress($address[0], $shipping),
-            $this->getShippingAddress($address[1]),
-            $this->getShippingAddress($address[3]),
-            \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
-            $shipping->getCity(),
-            $this->getRegionAbbreviation($shipping),
-            $this->getCountryName($shipping['country_id']),
-            $this->getShippingAddress($address[2])
-        );
+                    $this->_paymentRequest->setShipping()->setAddress()->withParameters(
+                        $this->getShippingAddress($address[0], $shipping),
+                        $this->getShippingAddress($address[1]),
+                        $this->getShippingAddress($address[3]),
+                        \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
+                        $shipping->getCity(),
+                        $this->getRegionAbbreviation($shipping),
+                        $this->getCountryName($shipping['country_id']),
+                        $this->getShippingAddress($address[2])
+                    );
+                }
+
+                $this->_paymentRequest->setShipping()->setType()
+                    ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
+                $this->_paymentRequest->setShipping()->setCost()
+                    ->withParameters(number_format($this->getShippingAmount(), 2, '.', '')); //Shipping Coast
+            }
+        }
     }
     /**
      * Get shipping address
@@ -188,19 +209,6 @@ class PaymentMethod
             return \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
         }
         return null;
-    }
-
-    /**
-     * Get the shipping Data of the Order
-     *
-     * @return object $orderParams - Return parameters, of shipping of order
-     */
-    private function getShippingData()
-    {
-        if ($this->_checkoutSession->getLastRealOrder()->getIsVirtual()) {
-            return $this->getBillingAddress();
-        }
-        return $this->_checkoutSession->getLastRealOrder()->getShippingAddress();
     }
 
     /**
@@ -282,13 +290,16 @@ class PaymentMethod
      */
     private function setSenderPhone()
     {
-        $shipping = $this->getShippingData();
-        if (! empty($shipping['telephone'])) {
-            $phone = \UOL\PagSeguro\Helper\Data::formatPhone($shipping['telephone']);
+        $addressData = ($this->getBillingAddress())
+            ? $this->getBillingAddress()
+            : $this->_checkoutSession->getLastRealOrder()->getShippingAddress();
+
+        if (! empty($addressData['telephone'])) {
+            $phone = \UOL\PagSeguro\Helper\Data::formatPhone($addressData['telephone']);
             $this->_paymentRequest->setSender()->setPhone()->withParameters(
                 $phone['areaCode'],
                 $phone['number']
-            ); 
+            );
         }
     }
     
