@@ -97,6 +97,8 @@ class PaymentMethod
         $this->_paymentRequest->setRedirectUrl($this->getRedirectUrl());
         // Notification Url
         $this->_paymentRequest->setNotificationUrl($this->getNotificationUrl());
+        // Shopping cart recovery
+        $this->setShoppingCartRecovery();
         try {
             $this->_library->setEnvironment();
             $this->_library->setCharset();
@@ -324,5 +326,19 @@ class PaymentMethod
         return (!empty($countryId)) ?
             $this->_countryInformation->getCountryInfo($countryId)->getFullNameLocale() :
             $countryId;
+    }
+
+    /**
+     * Set PagSeguro recovery shopping cart value
+     *
+     * @return void
+     */
+    private function setShoppingCartRecovery()
+    {
+        if ($this->_scopeConfig->getValue('payment/pagseguro/shopping_cart_recovery') == true) {
+            $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'true');
+        } else {
+            $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'false');
+        }
     }
 }

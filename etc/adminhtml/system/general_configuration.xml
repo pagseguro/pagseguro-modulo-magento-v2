@@ -61,6 +61,13 @@
             <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
             <config_path>payment/pagseguro/abandoned_active</config_path>
         </field>
+        <field id="shopping_cart_recovery" translate="label" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>HABILITAR RECUPERAÇÃO DE CARRINHO</label>
+            <tooltip>Habilita/desabilita a recuperação de carrinho do PagSeguro.</tooltip>
+             <comment>Para saber mais sobre a recuperação de carrinho do PagSeguro, clique &lt;a href=&quot;https://pagseguro.uol.com.br/para-seu-negocio/online/recuperacao-de-carrinho&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt;.</comment>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro/shopping_cart_recovery</config_path>
+        </field>
         <field id="installments" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>LISTAR PARCELAMENTO</label>
             <tooltip>Ativar a exibição da listagem de parcelas na tela de visualização do produto. (Irá exibir o maior parcelamento disponível para o produto no pagamento com cartão de crédito)</tooltip>

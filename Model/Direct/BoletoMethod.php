@@ -105,6 +105,7 @@ class BoletoMethod implements Checkout
             $this->urls();
             $this->items();
             $this->config();
+            $this->setShoppingCartRecovery();
             return $this->register();
         } catch (\Exception $exception) {
             throw $exception;
@@ -437,5 +438,19 @@ class BoletoMethod implements Checkout
     private function discounts()
     {
         $this->_paymentRequest->setExtraAmount(round($this->_order->getDiscountAmount(), 2));
+    }
+
+    /**
+     * Set PagSeguro recovery shopping cart value
+     *
+     * @return void
+     */
+    private function setShoppingCartRecovery()
+    {
+        if ($this->_scopeConfig->getValue('payment/pagseguro/shopping_cart_recovery') == true) {
+            $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'true');
+        } else {
+            $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'false');
+        }
     }
 }
