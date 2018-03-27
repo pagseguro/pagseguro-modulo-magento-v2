@@ -3,41 +3,41 @@
     <div class="admin__data-grid-wrap" data-role="grid-wrapper">
         <table id="pagseguro-datatable" class="data-grid data-grid-draggable" data-role="grid">
             <thead>
-                    <tr>
-                        <th class="data-grid-th _sortable _draggable">Data</th>
-                        <th class="data-grid-th _sortable _draggable">ID Magento</th>
-                        <th class="data-grid-th _sortable _draggable">ID PagSeguro</th>
-                        <th class="data-grid-th _sortable _draggable">Ambiente</th>
-                        <th class="data-grid-th _sortable _draggable">Status Magento</th>
-                        <th class="data-grid-th _sortable _draggable">Ação</th>
-                    </tr>
                 <tr>
-                        <th class="data-grid-th admin__scope-old data">
-                            <input type="text" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/>
-                            <input type="text" name="date_end" id="date_end" OnKeyUp="dateMask(this.value, 'date_end')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="Até"/>
-                        </th>
-                        <th class="data-grid-th admin__scope-old">
-                            <input type="text" name="id_magento" id="id_magento" placeholder="ID Magento"/>
-                        </th>
-                        <th class="data-grid-th admin__scope-old">
-                            <input type="text" name="id_pagseguro" id="id_pagseguro" placeholder="ID PagSeguro"/>
-                        </th>
-                        <th class="data-grid-th"></th>
-                        <th class="data-grid-th">
-                            <select class="admin__control-select" id="status">
-                                <option value="">Todos</option>
-                                <option value="1">Aguardando Pagamento</option>
-                                <option value="2">Em análise</option>
-                                <option value="3">Paga</option>
-                                <option value="4">Disponível</option>
-                                <option value="5">Em disputa</option>
-                                <option value="6">Devolvida</option>
-                                <option value="7">Cancelada</option>
-                            </select>
-                        </th>
-                        <th class="data-grid-th">
-                            <input type="button" class="action-secondary" id="transactions-filter" value="Filtrar">
-                        </th>
+                    <th class="data-grid-th _sortable _draggable">Data</th>
+                    <th class="data-grid-th _sortable _draggable">ID Magento</th>
+                    <th class="data-grid-th _sortable _draggable">ID PagSeguro</th>
+                    <th class="data-grid-th _sortable _draggable">Ambiente</th>
+                    <th class="data-grid-th _sortable _draggable">Status Magento</th>
+                    <th class="data-grid-th _sortable _draggable">Ação</th>
+                </tr>
+                <tr>
+                    <th class="data-grid-th admin__scope-old data">
+                        <input type="text" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/>
+                        <input type="text" name="date_end" id="date_end" OnKeyUp="dateMask(this.value, 'date_end')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="Até"/>
+                    </th>
+                    <th class="data-grid-th admin__scope-old">
+                        <input type="text" name="id_magento" id="id_magento" placeholder="ID Magento"/>
+                    </th>
+                    <th class="data-grid-th admin__scope-old">
+                        <input type="text" name="id_pagseguro" id="id_pagseguro" placeholder="ID PagSeguro"/>
+                    </th>
+                    <th class="data-grid-th"></th>
+                    <th class="data-grid-th">
+                        <select class="admin__control-select" id="status">
+                            <option value="">Todos</option>
+                            <option value="1">Aguardando Pagamento</option>
+                            <option value="2">Em análise</option>
+                            <option value="3">Paga</option>
+                            <option value="4">Disponível</option>
+                            <option value="5">Em disputa</option>
+                            <option value="6">Devolvida</option>
+                            <option value="7">Cancelada</option>
+                        </select>
+                    </th>
+                    <th class="data-grid-th">
+                        <input type="button" class="action-secondary" id="transactions-filter" value="Filtrar">
+                    </th>
                 </tr> 
             </thead>
             <tbody class="admin__table-secondary">

@@ -313,7 +313,7 @@ var WS = {
                                     item.magento_id,
                                     item.pagseguro_id,
                                     item.magento_status,
-                                    '<a class="refund" data-target="refund_'+ i +'" data-block="'+item.details+'">Estornar</a><br/>'+
+                                    '<a class="refund" data-target="refund_'+ i +'" data-block="'+item.details+'">Estorno total</a><br/>'+
                                     '<a class="partial-refund" data-target="refund_'+ i +'" data-block="'+item.details+'" data-value="'+item.value+'" data-id="'+item.magento_id+'">Estorno Parcial</a>',
                                     
                                 ] );
@@ -334,45 +334,22 @@ var WS = {
             },
             'Refund' : function(url, data, row, value = null)
             {
+                console.log(data)
                 var t = jQuery('#pagseguro-datatable').DataTable();
                 jQuery.ajax( {
                     url: url + '/pagseguro/refund/refund',
-                    data: {form_key: window.FORM_KEY, data: data, value: value},
+                    data: {form_key: window.FORM_KEY, data: data},
                     type: 'POST',
                     showLoader: true,
                 }).success(function(response) {
                     if (response.success) {
-                        var data = JSON.parse(response.payload.data);
-                        if (!data.status) {
-                            if (data.err == 14002) {
-                                Modal.Load('Estorno', 'Valor do estorno está em um formato inválido!.');
-                            } else if (data.err == 14003) {
-                                Modal.Load('Estorno', 'Valor do estorno inválido! O valor não pode ser negativo.');
-                            } else if (data.err == 14004) {
-                                Modal.Load('Estorno', 'Valor do estorno é menor do que o permitido.');
-                            } else if (data.err == 14005) {
-                                Modal.Load('Estorno', 'Valor do estorno é maior do que o permitido.');
-                            } else if (data.err == 14006) {
-                                Modal.Load('Estorno', 'Saldo insuficiente para estornar a transação.');
-                            } else if (data.err == 14007) {
-                                Modal.Load('Estorno', 'Status da transação é inválido para ser estornada.');
-                            } else if (data.err == 14008) {
-                                Modal.Load('Estorno', 'Transação não encontrada.');
-                            } else if (data.err == 14009) {
-                                Modal.Load('Estorno', "Sua conta PagSeguro não tem permissão para realizar esta ação. Em caso de dúvidas acesse <a href='http://forum.pagseguro.uol.com.br' target='_blank'>http://forum.pagseguro.uol.com.br</a>");
-                            } else {
-                                Modal.Load('Estorno', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
-                            }
-                        }else{
-                            t.row( row ).remove().draw();
-                            if (value == null) {
-                                Modal.Load('Estorno', 'Transações estornada com sucesso!');
-                            } else {
-                                Modal.Load('Estorno', 'Estorno parcial realizado com sucesso!');
-                            }
-                        }
+
+                        t.row( row ).remove().draw();
+
+                        Modal.Load('Estorno', 'Transações estornada com sucesso!');
+
                     } else {
-                        if (response.message == 'Need to conciliate') {
+                        if (response.payload.error == 'Need to conciliate') {
                             //Alert
                             Modal.Load('Estorno', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
                         } else {

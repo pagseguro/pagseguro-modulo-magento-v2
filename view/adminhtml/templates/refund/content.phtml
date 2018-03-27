@@ -41,7 +41,6 @@
                 </div>
             </div>
         </div>
-        <button id="teste">Modal</button>
     </div>
 </div>
 <input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
@@ -113,7 +112,7 @@
                     id = jQuery(this).find('td')[1];
                     block = jQuery(this).attr('data-block');
                     url = $('#adminurl').attr('data-target');
-                    row = $(this);
+                    row = $(this).parents('tr');
                 });
             }
         });

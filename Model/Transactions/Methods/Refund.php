@@ -137,24 +137,14 @@ class Refund extends Method
         try {
             $config = $this->sanitizeConfig($data);
             $config->value = $value;
-            if (!$config->needConciliate){
-                return json_encode(array(
-                    "status" => false,
-                    "err"    => "Need to conciliate",
-                ));
-            }
-        
+            $this->isConciliate($config);
             if (!$this->doRefund($config))
-                throw new \Exception('impossible to refund');
+            throw new \Exception('impossible to refund');
 
             $this->doUpdates($config);
             return true;
         } catch (\Exception $exception) {
-            $error = simplexml_load_string($exception->getMessage());
-            return json_encode(array(
-                "status" => false,
-                "err"    => trim(current($error->error->code)),
-            ));
+            throw $exception;
         }
     }
 
@@ -345,14 +335,14 @@ class Refund extends Method
      */
     private function compareStatus($order, $payment)
     {
-        if (! (in_array($order->getStatus(), [
+        if ((in_array($order->getStatus(), [
                 $this->getStatusFromPaymentKey(3),
                 $this->getStatusFromPaymentKey(4),
                 $this->getStatusFromPaymentKey(5),
-            ]) || in_array($payment->getStatus(), [3, 4, 5]))) {
-            return false;
+            ]) == 1 && in_array($payment->getStatus(), [3, 4, 5]) == 1)) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
