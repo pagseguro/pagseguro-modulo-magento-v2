@@ -638,8 +638,10 @@ function dateVerifyOnLosesFocus(fieldName){
 
     if(mydate.length > 0 && mydate.length < 10){
         fieldName.classList.add('field-error');
-    }else{
+    }else if(mydate.length == 0) {
         fieldName.classList.remove('field-error');
+    } else {
+        dateVerify(fieldName);
     }
 }
 
