@@ -32,7 +32,7 @@
                         <p>Informe o valor a ser estornado:</p>
                         <div class="admin__scope-old">
                             <label for="refund-value" >R$</label>
-                            <input type="text" onkeyup="formatRealInput(this)" onblur="formatRealInput(this)" name="refund-value" id="refund-value" placeholder="0,00"/>
+                            <input type="text" onkeyup="formatRealInput(this)" onblur="valueHasThreeDigits(this)" name="refund-value" id="refund-value" placeholder="0,00"/>
                             <p class="error"></p>
                         </div>
                         <p>Obs: O valor do estorno deve ser menor que o valor total da venda.</p>
@@ -82,11 +82,10 @@
 
                 jQuery('#pagseguro-datatable tbody tr td .refund').unbind('click');
                 jQuery('#pagseguro-datatable tbody tr td .refund').bind('click', function () {
-
-                    var id = jQuery(this).find('td')[1];
-                    var block = jQuery(this).attr('data-block');
-                    var url = $('#adminurl').attr('data-target');
-                    var row = $(this);
+                    id = jQuery(this).find('td')[1];
+                    block = jQuery(this).attr('data-block');
+                    url = $('#adminurl').attr('data-target');
+                    row = $(this).parents('tr');
                     confirmation({
                         title: 'Tem certeza que deseja estornar?',
                         content: 'Order: ' + $(id).html() + '<br> Clique em OK para estornar.',

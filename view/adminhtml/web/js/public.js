@@ -314,8 +314,7 @@ var WS = {
                                     item.pagseguro_id,
                                     item.magento_status,
                                     '<a class="refund" data-target="refund_'+ i +'" data-block="'+item.details+'">Estorno total</a><br/>'+
-                                    '<a class="partial-refund" data-target="refund_'+ i +'" data-block="'+item.details+'" data-value="'+item.value+'" data-id="'+item.magento_id+'">Estorno Parcial</a>',
-                                    
+                                    '<a class="partial-refund" data-target="refund_'+ i +'" data-block="'+item.details+'" data-value="'+item.value+'" data-id="'+item.magento_id+'">Estorno parcial</a>', 
                                 ] );
                                 //Adjust column width
                                 t.columns.adjust().draw(false);
@@ -334,26 +333,36 @@ var WS = {
             },
             'Refund' : function(url, data, row, value = null)
             {
-                console.log(data)
                 var t = jQuery('#pagseguro-datatable').DataTable();
                 jQuery.ajax( {
                     url: url + '/pagseguro/refund/refund',
-                    data: {form_key: window.FORM_KEY, data: data},
+                    data: {form_key: window.FORM_KEY, data: data, value: value},
                     type: 'POST',
                     showLoader: true,
                 }).success(function(response) {
                     if (response.success) {
-
                         t.row( row ).remove().draw();
-
                         Modal.Load('Estorno', 'Transações estornada com sucesso!');
-
                     } else {
                         if (response.payload.error == 'Need to conciliate') {
-                            //Alert
                             Modal.Load('Estorno', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
-                        } else {
-                            //Alert
+                        } else if(response.payload.error == '14002' || response.payload.error == '14013') {
+                            Modal.Load('Estorno', 'Valor do estorno está em um formato inválido!');
+                        } else if (response.payload.error == '14003') {
+                            Modal.Load('Estorno', 'Valor do estorno inválido! O valor não pode ser negativo.');
+                        } else if (response.payload.error == '14004') {
+                            Modal.Load('Estorno', 'Valor do estorno é menor do que o permitido.');
+                        } else if (response.payload.error == '14005') {
+                            Modal.Load('Estorno', 'Valor do estorno é maior do que o permitido.');
+                        } else if (response.payload.error == '14006') {
+                            Modal.Load('Estorno', 'Saldo insuficiente para estornar a transação.');
+                        } else if (response.payload.error == '14007') {
+                            Modal.Load('Estorno', 'Status da transação é inválido para ser estornada.');
+                        } else if (response.payload.error == '14008') {
+                            Modal.Load('Estorno', 'Transação não encontrada.');
+                        } else if (response.payload.error == '14009') {
+                            Modal.Load('Estorno', "Sua conta PagSeguro não tem permissão para realizar esta ação. Em caso de dúvidas acesse <a href='http://forum.pagseguro.uol.com.br' target='_blank'>http://forum.pagseguro.uol.com.br</a>");
+                        }else {
                             Modal.Load('Estorno', 'Não foi possível executar esta ação. Tente novamente mais tarde.');
                         }
                     }
@@ -420,9 +429,9 @@ var WS = {
                 //    success: function (result) {
                 //        result = JSON.parse(result);
                 //        if (result.status == false && result.err == "conciliate") {
-                //            //Modal.message('error', 'É necessário utilizar a conciliação de transações primeiro.');
+                //            //Modal.Load('error', 'É necessário utilizar a conciliação de transações primeiro.');
                 //        } else if (result.status == false) {
-                //            //Modal.message('error', result.err);
+                //            //Modal.Load('error', result.err);
                 //        } else {
                             jQuery('#transaction-group').append('<div></div>');
                             jQuery('#transaction-group').append('<div></div>');
@@ -699,6 +708,14 @@ function formatRealInput( field )
         tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
     }
     field.value = tmp;
+}
+
+function valueHasThreeDigits( field ){
+    var tmp = field.value;
+    if(tmp.length == 1){
+        field.value = tmp + "00";
+    }
+    formatRealInput( field )
 }
 
 function valueIsNumber(tmp){

@@ -136,7 +136,8 @@ class Refund extends Method
     public function execute($data, $value = null) {
         try {
             $config = $this->sanitizeConfig($data);
-            $config->value = $value;
+            if ($value != null)
+                $config->value = $value;
             $this->isConciliate($config);
             if (!$this->doRefund($config))
             throw new \Exception('impossible to refund');
@@ -144,7 +145,8 @@ class Refund extends Method
             $this->doUpdates($config);
             return true;
         } catch (\Exception $exception) {
-            throw $exception;
+            $error = simplexml_load_string($exception->getMessage());
+            throw new \Exception((string)$error->error->code);
         }
     }
 
