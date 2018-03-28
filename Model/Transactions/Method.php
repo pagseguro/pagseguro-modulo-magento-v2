@@ -79,6 +79,11 @@ abstract class Method
         return $this->_PagSeguroPaymentList;
     }
 
+    /**
+     * Get all transactions where there is a pagseguro transaction code
+     * @return array
+     * @throws \Exception
+     */
     public function searchTransactions()
     {
         try {
@@ -89,9 +94,9 @@ abstract class Method
                 ->where('ps.transaction_code != ?', '')
                 ->order('order.created_at DESC');
 
-//            if (!is_null(Mage::getSingleton('core/session')->getData("store_id"))) {
-//                $select = $select->where('store_id = ?', Mage::getSingleton('core/session')->getData("store_id"));
-//            }
+            if (!is_null($this->_session->getData('store_id'))) {
+                $select = $select->where('order.store_id = ?', $this->_session->getData('store_id'));
+            }
 
             if ($this->_scopeConfig->getValue('payment/pagseguro/environment')) {
                 $select = $select->where('ps.environment = ?', $this->_scopeConfig->getValue('payment/pagseguro/environment'));
@@ -116,33 +121,34 @@ abstract class Method
             }
 
             $connection->prepare($select);
-            $result = $connection->fetchAll($select);
-            return $result;
+            return $connection->fetchAll($select);
         } catch (\Exception $exception) {
             throw $exception;
         }
     }
 
+    /** Get and formats transaction details
+     * @param $transactionCode
+     * @throws Exception
+     */
     public function getDetailsTransaction($transactionCode)
     {
         $this->_detailsTransactionByCode = $this->getTransactionsByCode($transactionCode);
 
         if(!empty($this->_detailsTransactionByCode)){
-            $orderId = \UOL\PagSeguro\Helper\Data::getReferenceDecryptOrderID($this->_detailsTransactionByCode->getReference());
+            $order = $this->decryptOrderById($this->_detailsTransactionByCode);
 
-
-
-            //if ($this->getStoreReference() == $this->getReferenceDecrypt($this->_detailsTransactionByCode->getReference())) {
-//                if ($order->getStatus() == $this->getPaymentStatusFromKey($this->_detailsTransactionByCode->getStatus())) {
+            if ($this->getStoreReference() == $this->decryptReference($this->_detailsTransactionByCode)) {
+                if ($this->_detailsTransactionByCode->getStatus() == $this->getKeyFromOrderStatus($order->getStatus())) {
                     $this->_detailsTransactionByCode = $this->buildDetailsTransaction();
-//                }else{
-                    $this->_needConciliate = true;
-//                }
-            //}
+                    $this->_needConciliate = false;
+                }
+            }
         }
     }
 
     /**
+     * Request PagSeguroTransaction details by code
      * @param $code
      *
      * @return null|object
@@ -163,7 +169,6 @@ abstract class Method
 
             return $response;
         } catch (Exception $e) {
-
             throw new Exception($e->getMessage());
         }
     }
@@ -396,7 +401,10 @@ abstract class Method
      */
     abstract protected function build($payment, $order);
 
-
+    /**
+     * Build and format the transaction data for the listing
+     * @return array
+     */
     public function buildDetailsTransaction()
     {
         return array(
@@ -425,6 +433,10 @@ abstract class Method
         );
     }
 
+    /**
+     * Format transaction CreditorFees
+     * @return array|string
+     */
     private function prepareCreditorFees()
     {
         $creditorFees = "";
@@ -441,6 +453,10 @@ abstract class Method
         return $creditorFees;
     }
 
+    /**
+     * Format transaction Items
+     * @return array
+     */
     private function prepareItems()
     {
         $itens = array();
@@ -461,9 +477,14 @@ abstract class Method
         return $itens;
     }
 
+    /**
+     * Format transaction PaymentMethod
+     * @return array|string
+     */
     private function preparePaymentMethod()
     {
         $paymentMethod = "";
+
         if(!empty($this->_detailsTransactionByCode->getPaymentMethod()))
         {
             $paymentMethod = array(
@@ -476,6 +497,10 @@ abstract class Method
         return $paymentMethod;
     }
 
+    /**
+     * Format transaction Sender
+     * @return array
+     */
     private function prepareSender()
     {
         $documents = array();
@@ -504,6 +529,10 @@ abstract class Method
         return $sender;
     }
 
+    /**
+     * Format transaction Shipping
+     * @return array
+     */
     private function prepareShipping()
     {
         $shipping = array();

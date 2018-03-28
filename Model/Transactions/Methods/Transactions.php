@@ -88,7 +88,9 @@ class Transactions extends Method
      */
     protected $_detailsTransactionByCode;
 
-    protected $_needConciliate;
+    protected $_needConciliate = true;
+
+
 
     /**
      * Conciliation constructor.
@@ -144,27 +146,27 @@ class Transactions extends Method
         );
     }
 
-
-    //COLOCAR NO EXECUTE()
     /**
-     * Get list transactions pagseguro with filters
+     * Get all transactions and return formatted data
      *
      * @return array
      * @throws \Exception
      */
-    public function searchTransactionsPagseguro()
+    public function request()
     {
         $transactions = $this->searchTransactions();
 
-        foreach ($transactions as $transaction) {
-            $this->_arrayTransactions[] = array(
-                'date'           => $this->formatDate($transaction['created_at']),
-                'magento_id'     => $transaction['increment_id'], //formatMagentoId
-                'pagseguro_id'   => $transaction['transaction_code'],
-                'environment'    => $transaction['environment'],
-                'magento_status' => $this->formatMagentoStatus($transaction['status']),
-                'order_id'       => $transaction['entity_id']
-            );
+        if(count($transactions) > 0) {
+            foreach ($transactions as $transaction) {
+                $this->_arrayTransactions[] = array(
+                    'date'           => $this->formatDate($transaction['created_at']),
+                    'magento_id'     => $transaction['increment_id'],
+                    'pagseguro_id'   => $transaction['transaction_code'],
+                    'environment'    => $transaction['environment'],
+                    'magento_status' => $this->formatMagentoStatus($transaction['status']),
+                    'order_id'       => $transaction['entity_id']
+                );
+            }
         }
         return $this->_arrayTransactions;
     }
@@ -172,12 +174,13 @@ class Transactions extends Method
     /**
      * Get details transactions
      *
+     * @param $data
      * @return array
      * @throws \Exception
      */
-    public function detailsTransaction($transactionCode)
-    {
-        $this->getDetailsTransaction(str_replace('-', '', $transactionCode));
+    public function execute($data) {
+
+        $this->getDetailsTransaction(str_replace('-', '', $data));
 
         if(!empty($this->_detailsTransactionByCode) && $this->_needConciliate){
             throw new \Exception('need to conciliate');
@@ -189,23 +192,6 @@ class Transactions extends Method
         return $this->_detailsTransactionByCode;
     }
 
-
-
-
-
-
-
-
-    /**
-     * Search transactions
-     *
-     * @param $data
-     * @return bool
-     * @throws \Exception
-     */
-    public function execute($data) {
-        throw new NotImplementedException();
-    }
 
     /**
      * Build data for dataTable
@@ -232,14 +218,4 @@ class Transactions extends Method
         throw new NotImplementedException();
     }
 
-    /**
-     * Get all transactions and return formatted data
-     *
-     * @return array
-     * @throws \Exception
-     */
-    public function request()
-    {
-        throw new NotImplementedException();
-    }
 }
