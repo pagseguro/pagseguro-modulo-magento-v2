@@ -27,10 +27,10 @@ use UOL\PagSeguro\Controller\Ajaxable;
 use UOL\PagSeguro\Model\Transactions\Methods\Transactions;
 
 /**
- * Class Conciliation
+ * Class Transaction
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Cancel extends Ajaxable
+class Transaction extends Ajaxable
 {
 
     /**
@@ -60,9 +60,12 @@ class Cancel extends Ajaxable
             $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
             $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt')
         );
-        
+
         try {
-            return $this->whenSuccess($transactions->execute());
+            return $this->whenSuccess(
+                $transactions->detailsTransaction(
+                    $this->getRequest()->getParam('transaction') )
+            );
         } catch (\Exception $exception) {
             return $this->whenError($exception->getMessage());
         }

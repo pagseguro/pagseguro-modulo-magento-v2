@@ -53,6 +53,7 @@ abstract class Method
         if (is_null($page)) $page = 1;
 
         try {
+
             //check if is the first step, if is just add the response object to local var
             if (is_null($this->_PagSeguroPaymentList)) {
                 $this->_PagSeguroPaymentList = $this->requestPagSeguroPayments($page);
@@ -76,6 +77,95 @@ abstract class Method
             throw $exception;
         }
         return $this->_PagSeguroPaymentList;
+    }
+
+    public function searchTransactions()
+    {
+        try {
+            $connection = $this->getConnection();
+            $select = $connection->select()
+                ->from( ['order' => 'sales_order'], ['status', 'created_at', 'increment_id', 'store_id', 'entity_id'] )
+                ->join( ['ps' => 'pagseguro_orders'], 'order.entity_id = ps.order_id')
+                ->where('ps.transaction_code != ?', '')
+                ->order('order.created_at DESC');
+
+//            if (!is_null(Mage::getSingleton('core/session')->getData("store_id"))) {
+//                $select = $select->where('store_id = ?', Mage::getSingleton('core/session')->getData("store_id"));
+//            }
+
+            if ($this->_scopeConfig->getValue('payment/pagseguro/environment')) {
+                $select = $select->where('ps.environment = ?', $this->_scopeConfig->getValue('payment/pagseguro/environment'));
+            }
+
+            if (!empty($this->_idMagento)) {
+                $select = $select->where('order.increment_id = ?', $this->_idMagento);
+            }
+
+            if (!empty($this->_idPagseguro)) {
+                $select = $select->where('ps.transaction_code = ?', $this->_idPagseguro);
+            }
+
+            if (!empty($this->_status)) {
+                $select = $select->where('order.status = ?', $this->getStatusFromPaymentKey($this->_status));
+            }
+
+            if (!empty($this->_dateBegin) && !empty($this->_dateEnd)) {
+                $startDate = date('Y-m-d H:i:s', strtotime(str_replace("/", "-", $this->_dateBegin)));
+                $endDate = date('Y-m-d'.' 23:59:59', strtotime(str_replace("/", "-", $this->_dateEnd)));
+                $select = $select->where('order.created_at >= ?', $startDate)->where('order.created_at <= ?', $endDate);
+            }
+
+            $connection->prepare($select);
+            $result = $connection->fetchAll($select);
+            return $result;
+        } catch (\Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function getDetailsTransaction($transactionCode)
+    {
+        $this->_detailsTransactionByCode = $this->getTransactionsByCode($transactionCode);
+
+        if(!empty($this->_detailsTransactionByCode)){
+            $orderId = \UOL\PagSeguro\Helper\Data::getReferenceDecryptOrderID($this->_detailsTransactionByCode->getReference());
+
+
+
+            //if ($this->getStoreReference() == $this->getReferenceDecrypt($this->_detailsTransactionByCode->getReference())) {
+//                if ($order->getStatus() == $this->getPaymentStatusFromKey($this->_detailsTransactionByCode->getStatus())) {
+                    $this->_detailsTransactionByCode = $this->buildDetailsTransaction();
+//                }else{
+                    $this->_needConciliate = true;
+//                }
+            //}
+        }
+    }
+
+    /**
+     * @param $code
+     *
+     * @return null|object
+     * @throws Exception
+     */
+    public function getTransactionsByCode($code)
+    {
+        $this->_library->setEnvironment();
+        $this->_library->setCharset();
+        $this->_library->setLog();
+
+        $response = null;
+        try {
+            $response = \PagSeguro\Services\Transactions\Search\Code::search(
+                $this->_library->getPagSeguroCredentials(),
+                $code
+            );
+
+            return $response;
+        } catch (Exception $e) {
+
+            throw new Exception($e->getMessage());
+        }
     }
 
     /**
@@ -167,9 +257,10 @@ abstract class Method
      * @param $order
      * @return mixed
      */
-    protected function getKeyFromOrderStatus($order)
+    protected function getKeyFromOrderStatus($status)
     {
-        return \UOL\PagSeguro\Helper\Data::getKeyFromStatus($order->getStatus());
+        $param = is_object($status) ? $status->getStatus() : $status;
+        return \UOL\PagSeguro\Helper\Data::getKeyFromStatus($param);
     }
 
     /**
@@ -205,7 +296,8 @@ abstract class Method
      */
     protected function formatDate($order)
     {
-        return date("d/m/Y H:i:s", strtotime($order->getCreatedAt()));
+        $param = is_object($order) ? $order->getCreatedAt() : $order;
+        return date("d/m/Y H:i:s", strtotime($param));
     }
 
     /**
@@ -303,4 +395,135 @@ abstract class Method
      * @return mixed
      */
     abstract protected function build($payment, $order);
+
+
+    public function buildDetailsTransaction()
+    {
+        return array(
+            'date'              => $this->formatDate($this->_detailsTransactionByCode->getDate()),
+            'code'              => $this->_detailsTransactionByCode->getCode(),
+            'reference'         => $this->_detailsTransactionByCode->getReference(),
+            'type'              => \UOL\PagSeguro\Helper\Data::getTransactionTypeName($this->_detailsTransactionByCode->getType()),
+            'status'            => \UOL\PagSeguro\Helper\Data::getPaymentStatusToString($this->_detailsTransactionByCode->getStatus()),
+            'lastEventDate'     => $this->formatDate($this->_detailsTransactionByCode->getLastEventDate()),
+            'installmentCount'  => $this->_detailsTransactionByCode->getInstallmentCount(),
+            'cancelationSource' => \UOL\PagSeguro\Helper\Data::getTitleCancellationSourceTransaction($this->_detailsTransactionByCode->getCancelationSource()),
+            'discountAmount'    => $this->_detailsTransactionByCode->getDiscountAmount(),
+            'escrowEndDate'     => $this->formatDate($this->_detailsTransactionByCode->getEscrowEndDate()),
+            'extraAmount'       => $this->_detailsTransactionByCode->getExtraAmount(),
+            'feeAmount'         => $this->_detailsTransactionByCode->getFeeAmount(),
+            'grossAmount'       => $this->_detailsTransactionByCode->getGrossAmount(),
+            'netAmount'         => $this->_detailsTransactionByCode->getNetAmount(),
+            'creditorFees'      => $this->prepareCreditorFees(),
+            'itemCount'         => $this->_detailsTransactionByCode->getItemCount(),
+            'items'             => $this->prepareItems(),
+            'paymentMethod'     => $this->preparePaymentMethod(),
+            'sender'            => $this->prepareSender(),
+            'shipping'          => $this->prepareShipping(),
+            'paymentLink'       => $this->_detailsTransactionByCode->getPaymentLink(),
+            'promoCode'         => $this->_detailsTransactionByCode->getPromoCode()
+        );
+    }
+
+    private function prepareCreditorFees()
+    {
+        $creditorFees = "";
+        if(!empty($this->_detailsTransactionByCode->getCreditorFees()))
+        {
+            $creditorFees = array(
+                'intermediationRateAmount'  => $this->_detailsTransactionByCode->getCreditorFees()->getIntermediationRateAmount(),
+                'intermediationFeeAmount'   => $this->_detailsTransactionByCode->getCreditorFees()->getIntermediationFeeAmount(),
+                'installmentFeeAmount'      => $this->_detailsTransactionByCode->getCreditorFees()->getInstallmentFeeAmount(),
+                'operationalFeeAmount'      => $this->_detailsTransactionByCode->getCreditorFees()->getOperationalFeeAmount(),
+                'commissionFeeAmount'       => $this->_detailsTransactionByCode->getCreditorFees()->getCommissionFeeAmount()
+            );
+        }
+        return $creditorFees;
+    }
+
+    private function prepareItems()
+    {
+        $itens = array();
+
+        if($this->_detailsTransactionByCode->getItemCount() > 0) {
+            foreach ($this->_detailsTransactionByCode->getItems() as $item)
+            {
+                $itens[] = array(
+                    'id'            => $item->getId(),
+                    'description'   => $item->getDescription(),
+                    'quantity'      => $item->getQuantity(),
+                    'amount'        => $item->getAmount(),
+                    'weight'        => $item->getWeight(),
+                    'shippingCost'  => $item->getShippingCost()
+                );
+            }
+        }
+        return $itens;
+    }
+
+    private function preparePaymentMethod()
+    {
+        $paymentMethod = "";
+        if(!empty($this->_detailsTransactionByCode->getPaymentMethod()))
+        {
+            $paymentMethod = array(
+                'code' => $this->_detailsTransactionByCode->getPaymentMethod()->getCode(),
+                'type' => $this->_detailsTransactionByCode->getPaymentMethod()->getType(),
+                'titleType' => \UOL\PagSeguro\Helper\Data::getTitleTypePaymentMethod($this->_detailsTransactionByCode->getPaymentMethod()->getType()),
+                'titleCode' => \UOL\PagSeguro\Helper\Data::getTitleCodePaymentMethod($this->_detailsTransactionByCode->getPaymentMethod()->getCode())
+            );
+        }
+        return $paymentMethod;
+    }
+
+    private function prepareSender()
+    {
+        $documents = array();
+        if(count($this->_detailsTransactionByCode->getSender()->getDocuments()) > 0) {
+            foreach ($this->_detailsTransactionByCode->getSender()->getDocuments() as $doc)
+            {
+                $documents[] = array(
+                    'type'      => $doc->getType(),
+                    'identifier' => $doc->getIdentifier()
+                );
+            }
+        }
+
+        $sender = array();
+        if(!empty($this->_detailsTransactionByCode->getSender())){
+            $sender = array(
+                'name'  => $this->_detailsTransactionByCode->getSender()->getName(),
+                'email' => $this->_detailsTransactionByCode->getSender()->getEmail(),
+                'phone' => array(
+                    'areaCode' => $this->_detailsTransactionByCode->getSender()->getPhone()->getAreaCode(),
+                    'number' => $this->_detailsTransactionByCode->getSender()->getPhone()->getNumber()
+                ),
+                'documents' => $documents
+            );
+        }
+        return $sender;
+    }
+
+    private function prepareShipping()
+    {
+        $shipping = array();
+        if(!empty($this->_detailsTransactionByCode->getShipping())){
+            $shipping = array(
+                'addres' => array(
+                    'street'    => $this->_detailsTransactionByCode->getShipping()->getAddress()->getStreet(),
+                    'number'    => $this->_detailsTransactionByCode->getShipping()->getAddress()->getNumber(),
+                    'complement' => $this->_detailsTransactionByCode->getShipping()->getAddress()->getComplement(),
+                    'district'  => $this->_detailsTransactionByCode->getShipping()->getAddress()->getDistrict(),
+                    'postalCode' => $this->_detailsTransactionByCode->getShipping()->getAddress()->getPostalCode(),
+                    'city'      => $this->_detailsTransactionByCode->getShipping()->getAddress()->getCity(),
+                    'state'     => $this->_detailsTransactionByCode->getShipping()->getAddress()->getState(),
+                    'country'   => $this->_detailsTransactionByCode->getShipping()->getAddress()->getCountry()
+                ),
+                'type' => $this->_detailsTransactionByCode->getShipping()->getType()->getType(),
+                'cost' => $this->_detailsTransactionByCode->getShipping()->getCost()->getCost()
+            );
+        }
+        return $shipping;
+    }
+
 }

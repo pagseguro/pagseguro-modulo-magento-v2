@@ -36,12 +36,12 @@ class Transactions extends Method
     /**
      * @var integer
      */
-    protected $_days;
+    protected $_idMagento;
 
     /**
      * @var array
      */
-    protected $_arrayPayments = array();
+    protected $_arrayTransactions = array();
 
     /**
      * @var \PagSeguro\Parsers\Transaction\Search\Date\Response
@@ -84,6 +84,13 @@ class Transactions extends Method
     protected $_crypt;
 
     /**
+     * @var array
+     */
+    protected $_detailsTransactionByCode;
+
+    protected $_needConciliate;
+
+    /**
      * Conciliation constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigInterface
@@ -100,7 +107,11 @@ class Transactions extends Method
         \Magento\Sales\Model\Order $order,
         \UOL\PagSeguro\Helper\Library $library,
         \UOL\PagSeguro\Helper\Crypt $crypt,
-        $days = null
+        $idMagento = null,
+        $idPagseguro = null,
+        $dateBegin = null,
+        $dateEnd = null,
+        $status = null
     ) {
         /** @var \Magento\Framework\App\Config\ScopeConfigInterface _scopeConfig */
         $this->_scopeConfig = $scopeConfigInterface;
@@ -114,8 +125,16 @@ class Transactions extends Method
         $this->_library = $library;
         /** @var \UOL\PagSeguro\Helper\Crypt _crypt */
         $this->_crypt = $crypt;
-        /** @var int _days */
-        $this->_days = $days;
+        /** @var int _idMagento */
+        $this->_idMagento = $idMagento;
+        /** @var int _idPagseguro */
+        $this->_idPagseguro = $idPagseguro;
+        /** @var int _dateBegin */
+        $this->_dateBegin = $dateBegin;
+        /** @var int _dateEnd */
+        $this->_dateEnd = $dateEnd;
+        /** @var int _status */
+        $this->_status = $status;
         /** @var \Magento\Sales\Model\ResourceModel\Grid _salesGrid */
         $this->_salesGrid = new \Magento\Sales\Model\ResourceModel\Grid(
             $context,
@@ -125,111 +144,67 @@ class Transactions extends Method
         );
     }
 
+
+    //COLOCAR NO EXECUTE()
     /**
-     * Cancels one transaction
+     * Get list transactions pagseguro with filters
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function searchTransactionsPagseguro()
+    {
+        $transactions = $this->searchTransactions();
+
+        foreach ($transactions as $transaction) {
+            $this->_arrayTransactions[] = array(
+                'date'           => $this->formatDate($transaction['created_at']),
+                'magento_id'     => $transaction['increment_id'], //formatMagentoId
+                'pagseguro_id'   => $transaction['transaction_code'],
+                'environment'    => $transaction['environment'],
+                'magento_status' => $this->formatMagentoStatus($transaction['status']),
+                'order_id'       => $transaction['entity_id']
+            );
+        }
+        return $this->_arrayTransactions;
+    }
+
+    /**
+     * Get details transactions
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function detailsTransaction($transactionCode)
+    {
+        $this->getDetailsTransaction(str_replace('-', '', $transactionCode));
+
+        if(!empty($this->_detailsTransactionByCode) && $this->_needConciliate){
+            throw new \Exception('need to conciliate');
+        }
+
+        if (empty($this->_detailsTransactionByCode)) {
+            throw new \Exception('empty');
+        }
+        return $this->_detailsTransactionByCode;
+    }
+
+
+
+
+
+
+
+
+    /**
+     * Search transactions
      *
      * @param $data
      * @return bool
      * @throws \Exception
      */
     public function execute($data) {
-
-        try {
-            $config = $this->sanitizeConfig($data);
-            $this->isConciliate($config);
-            if (! $this->doCancel($config))
-                throw new \Exception('impossible to cancel.');
-
-            $this->doUpdates($config);
-            return true;
-        } catch (\Exception $exception) {
-            throw $exception;
-        }
-    }
-
-    private function isConciliate($config)
-    {
-        if (!$config->needConciliate)
-            throw new \Exception('Need to conciliate');
-        return true;
-    }
-
-    /**
-     * Execute magento data updates
-     *
-     * @param $config
-     * @throws \Exception
-     */
-    private function doUpdates($config)
-    {
-        try {
-            $this->addStatusToOrder($config->order_id, 'pagseguro_cancelada');
-            $this->updateSalesOrder($config->order_id, $config->pagseguro_id);
-            $this->updatePagSeguroOrders($config->order_id, $config->pagseguro_id);
-        } catch (\Exception $exception) {
-            throw $exception;
-        }
-    }
-
-    /**
-     * Change the magento order status
-     *
-     * @param $id int of order id
-     * @param $status string of payment status
-     */
-    private function addStatusToOrder($id, $status)
-    {
-        $order = $this->_order->load($id);
-        $order->addStatusToHistory($status, null, true);
-        $order->save();
-    }
-
-    /**
-     * Execute cancellation
-     *
-     * @param $config
-     * @return bool
-     * @throws \Exception
-     */
-    private function doCancel($config)
-    {
-        if ($this->requestCancel($config)->getResult() == "OK")
-            return true;
-        throw new \Exception("an error occurred.");
-    }
-
-    /**
-     * Get all transactions and orders and return formatted data
-     *
-     * @return array
-     * @throws \Exception
-     */
-    public function request()
-    {
-        $this->getTransactions();
-        if (! is_null($this->_PagSeguroPaymentList->getTransactions())) {
-            foreach ($this->_PagSeguroPaymentList->getTransactions() as $payment) {
-                if (! $this->addPayment($this->decryptOrderById($payment), $payment))
-                    continue;
-            }
-        }
-        return $this->_arrayPayments;
-    }
-
-    /**
-     * Add a needle conciliate payment to a list
-     *
-     * @param $order
-     * @param $payment
-     * @return bool
-     */
-    private function addPayment($order, $payment)
-    {
-        if ($this->compareStore($payment) && $this->hasOrder($order) && $this->compareStatus($order, $payment)){
-            array_push($this->_arrayPayments, $this->build($payment, $order));
-            return true;
-        }
-        return false;
+        throw new NotImplementedException();
     }
 
     /**
@@ -241,27 +216,7 @@ class Transactions extends Method
      */
     protected function build($payment, $order)
     {
-        return $this->toArray($payment, $order, $this->checkConciliation($payment, $order));
-    }
-
-    /**
-     * Create array
-     *
-     * @param $payment
-     * @param $order
-     * @param bool $conciliate
-     * @return array
-     */
-    private function toArray($payment, $order, $conciliate = false)
-    {
-        return  [
-            'date'             => $this->formatDate($order),
-            'magento_id'       => $this->formatMagentoId($order),
-            'magento_status'   => $this->formatMagentoStatus($order),
-            'pagseguro_id'     => $payment->getCode(),
-            'order_id'         => $order->getId(),
-            'details'          => $this->details($order, $payment, ['conciliate' => $conciliate])
-        ];
+        throw new NotImplementedException();
     }
 
     /**
@@ -274,71 +229,17 @@ class Transactions extends Method
      */
     protected function details($order, $payment, $options)
     {
-        return $this->_crypt->encrypt('!QAWRRR$HU%W34tyh59yh544%',
-            json_encode([
-                'order_id'         => $order->getId(),
-                'pagseguro_status' => $payment->getStatus(),
-                'pagseguro_id'     => $payment->getCode(),
-                'needConciliate' => $options['conciliate']
-            ])
-        );
+        throw new NotImplementedException();
     }
 
     /**
-     * Check for conciliation
+     * Get all transactions and return formatted data
      *
-     * @param $payment
-     * @param $order
-     * @return bool
+     * @return array
+     * @throws \Exception
      */
-    private function checkConciliation($payment, $order)
+    public function request()
     {
-        if ($order->getStatus() == $this->getStatusFromPaymentKey($payment->getStatus()))
-            return true;
-        return false;
-    }
-
-    /**
-     * Compare between magento status and PagSeguro transaction status
-     *
-     * @param $order
-     * @param $payment
-     * @return bool
-     */
-    private function compareStatus($order, $payment)
-    {
-        if (! (in_array($order->getStatus(), [
-                $this->getStatusFromPaymentKey(1),
-                $this->getStatusFromPaymentKey(2)
-            ]) || in_array($payment->getStatus(), [1, 2]))) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Compare stores
-     *
-     * @param $payment
-     * @return bool
-     */
-    private function compareStore($payment)
-    {
-        if ($this->getStoreReference() != $this->decryptReference($payment))
-            return false;
-        return true;
-    }
-
-    /**
-     * Check if has a order
-     *
-     * @param $order
-     * @return bool
-     */
-    private function hasOrder($order)
-    {
-        if (! $order)
-            return false;
-        return true;
+        throw new NotImplementedException();
     }
 }

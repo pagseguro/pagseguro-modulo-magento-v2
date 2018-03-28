@@ -133,11 +133,16 @@
             if (document.querySelectorAll('.field-error').length > 0){
                 Modal.Load('Atenção', 'Data inválida!');
             } else if (validateSearchByDate() == true) {
-                //var url = $('#adminurl').attr('data-target');
-                WS.Ajax.Transactions.Details();
-                jQuery('.modals-overlay').css('display', 'block');
-                jQuery('#modal-details').addClass('_show');
+                var url = $('#adminurl').attr('data-target');
+                WS.Ajax.Transactions.Search(url);
             }
+        });
+
+        $('#pagseguro-datatable').on('click', 'a.details', function (e) {
+            var transaction = jQuery(this).data('transaction');
+            var order = jQuery(this).data('order');
+            var url = $('#adminurl').attr('data-target');
+            WS.Ajax.Transactions.Details(url, transaction, order);
         });
 
         function clearListDetails(){
