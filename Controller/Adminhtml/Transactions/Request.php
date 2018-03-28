@@ -67,7 +67,7 @@ class Request extends Ajaxable
         );
 
         try {
-            return $this->whenSuccess($transactions->searchTransactionsPagseguro());
+            return $this->whenSuccess($transactions->request());
         } catch (\Exception $exception) {
             return $this->whenError($exception->getMessage());
         }

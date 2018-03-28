@@ -34,7 +34,7 @@ class Transaction extends Ajaxable
 {
 
     /**
-     * Cancel constructor.
+     * Transaction constructor.
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
@@ -47,7 +47,7 @@ class Transaction extends Ajaxable
     }
 
     /**
-     * @return void
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
@@ -63,7 +63,7 @@ class Transaction extends Ajaxable
 
         try {
             return $this->whenSuccess(
-                $transactions->detailsTransaction(
+                $transactions->execute(
                     $this->getRequest()->getParam('transaction') )
             );
         } catch (\Exception $exception) {
@@ -72,7 +72,7 @@ class Transaction extends Ajaxable
     }
 
     /**
-     * Cancellation access rights checking
+     * Transactions access rights checking
      *
      * @return bool
      */

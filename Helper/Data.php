@@ -347,7 +347,7 @@ class Data
     }
 
     /**
-     * Translates the transation type code to his respective name, according with the api
+     * Translates the transaction type name to his respective name, according with the api
      *
      * @param int $transactionTypeCode
      * @return mixed string | int
@@ -406,6 +406,7 @@ class Data
     }
 
     /**
+     * Translates the transaction payment method type title to his respective name, according with the api
      * @param $type
      *
      * @return bool|string
@@ -438,6 +439,7 @@ class Data
     }
 
     /**
+     * Translates the transaction payment method code title to his respective name, according with the api
      * @param $code
      *
      * @return bool|string
