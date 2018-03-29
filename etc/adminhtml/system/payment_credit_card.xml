@@ -17,7 +17,7 @@
             <validate>required-entry</validate>
         </field>
         <field id="sort_order" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
-            <label>Posição na tela de checkout (Sort Order)</label>
+            <label>POSIÇÃO NA TELA DE CHECKOUT (SORT ORDER)</label>
             <tooltip>Irá aparecer depois de todos os meios de pagamento configurados na sua loja com valor menor e antes dos de valor maior.</tooltip>
             <config_path>payment/pagseguro_credit_card/sort_order</config_path>
             <validate>validate-zero-or-greater</validate>
