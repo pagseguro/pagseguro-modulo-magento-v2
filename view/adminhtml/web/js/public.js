@@ -425,10 +425,8 @@ var WS = {
                     },
                     showLoader: true
                 }).success(function(result) {
-                    console.log(result)
                     if (result.success) {
                         result = result.payload.data;
-                        console.log(result);
 
                             jQuery('#transaction-group').append('<div></div>');
                             jQuery('#transaction-group').append('<div></div>');
@@ -575,7 +573,6 @@ var WS = {
                         
                     }else{
                         if(result.payload.error == "need to conciliate"){
-                            console.log('teste conciliação');
                             Modal.Load('Atenção', 'É necessário utilizar a conciliação de transações primeiro.');
                         }
                     }

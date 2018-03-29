@@ -34,23 +34,48 @@
     display:none;
 }
 
-.hidden-groups { display: none; }
+.hidden-groups {
+    display: none;
+}
 
-#pagseguro-datatable thead tr th:first-child {
+#pagseguro-datatable {
+    width: 100% !important;
+}
+
+/*#pagseguro-datatable thead tr th:first-child {
     width: 120px;
 }
 
 #pagseguro-datatable thead tr th:nth-child(5) {
     width: 230px;
-}
+}*/
 
 #pagseguro-datatable thead tr th:first-child input:first-child {
     margin-bottom: 5px;
 }
 
 #pagseguro-datatable thead tr:nth-child(2) th input {
-    width: 100%;
+    width: 97%;
+}
 
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(1) input {
+    max-width: 120px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(2) input {
+    max-width: 110px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(3) input {
+    max-width: 320px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(6) input {
+    max-width: 70px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th {
+    text-align: center;
 }
 
 .link {

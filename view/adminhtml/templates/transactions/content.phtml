@@ -13,7 +13,7 @@
             </tr>
             <tr>
                 <th class="data-grid-th admin__scope-old data">
-                    <input type="text" class="" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/>
+                    <input type="text" class="" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/><br>
                     <input type="text" class="" name="date_end" id="date_end" OnKeyUp="dateMask(this.value, 'date_end')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="Até"/>
                 </th>
                 <th class="data-grid-th admin__scope-old">
@@ -62,11 +62,9 @@
                         </div>
                     </div>
                 </div>
-
-
-
             </div>
         </div>
+        
         <input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
         <script type="text/javascript">
             require(["jquery", 'Magento_Ui/js/modal/confirm', "datatables", "public"],function($, confirmation) {
@@ -92,7 +90,7 @@
                 } );
                 // DataTable config
                 $('#pagseguro-datatable').DataTable({
-                    "autoWidth": false,
+                    "autoWidth": true,
                     "info": false,
                     "lengthChange": false,
                     "searching": false,
