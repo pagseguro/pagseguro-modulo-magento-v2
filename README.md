@@ -92,6 +92,8 @@ Para acessar e configurar o módulo acesse o menu PagSeguro -> Configurações. 
    - **checkout**: especifica o modelo de checkout que será utilizado. É possível escolher entre checkout padrão ou checkout lightbox.
    - **nome de exibição**: define o nome que será utilizado para o meio de pagamento na tela de checkout.
    - **posição na tela de checkout (Sort Order)**: Configura a ordem de exibição deste meio de pagamento na sua loja. Esta ordem é  relativa à todos os outros meios de pagamento configurados na sua loja.
+   - **oferecer desconto para ...**: ativa/desativa desconto para checkouts por meio de pagamento (cartão de crédito, boleto, débito online, depósito em conta e saldo pagseguro)
+   - **percentual de desconto**: define o percentual de desconto a ser concedido para o meio de pagamento escolhido (Aceita valores de 0.01 à 99.99)
  
  - *Checkout Transparente - Cartão de Crédito*
    - **ativar**: ativa/desativa o meio de pagamento Checkout Transparente - Cartão de Crédito.
