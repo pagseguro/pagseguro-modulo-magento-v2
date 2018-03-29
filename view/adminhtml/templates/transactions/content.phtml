@@ -70,9 +70,13 @@
         <input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
         <script type="text/javascript">
             require(["jquery", 'Magento_Ui/js/modal/confirm', "datatables", "public"],function($, confirmation) {
+
                 var url = jQuery('#adminurl').attr('data-target');
-                console.log(window.FORM_KEY)
-                jQuery('#link-conciliation').attr('href', url+'/pagseguro/conciliation/index/key/5020624eaf922539f08835d4513040d67a8f6ddcba0d32487a07c99e5be3123d/');
+
+                jQuery(document).ready(function () {
+                    WS.Ajax.Transactions.Search(url);
+                });
+
                 jQuery.extend( jQuery.fn.dataTableExt.oSort, {
                     "date-br-pre": function ( a ) {
                         var x;
@@ -93,6 +97,8 @@
                     "lengthChange": false,
                     "searching": false,
                     "bStateSave": false,
+                    "bSortCellsTop": true,
+                    "orderCellsTop": true,
                     "pageLength": 10,
                     "aaSorting": [[ 0, "desc" ]],
                     "aoColumnDefs": [
@@ -131,7 +137,6 @@
                     if (document.querySelectorAll('.field-error').length > 0){
                         Modal.Load('Atenção', 'Data inválida!');
                     } else if (validateSearchByDate() == true) {
-                        var url = $('#adminurl').attr('data-target');
                         WS.Ajax.Transactions.Search(url);
                     }
                 });
@@ -139,7 +144,6 @@
                 $('#pagseguro-datatable').on('click', 'a.details', function (e) {
                     var transaction = jQuery(this).data('transaction');
                     var order = jQuery(this).data('order');
-                    var url = $('#adminurl').attr('data-target');
                     WS.Ajax.Transactions.Details(url, transaction, order);
                 });
 

@@ -396,7 +396,7 @@ var WS = {
                                     item.pagseguro_id,
                                     item.environment,
                                     item.magento_status,
-                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a class="details" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'">Ver detalhes da transação</a>'
+                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a href="" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'" target="_blank"">Ver detalhes da transação</a>'
                                 ] );
 
                                 //Adjust column width
@@ -424,7 +424,8 @@ var WS = {
                         transaction: transaction_code
                     },
                     showLoader: true
-                }).success(function(result) {  
+                }).success(function(result) {
+                    console.log(result)
                     if (result.success) {
                         result = result.payload.data;
                         console.log(result);
@@ -578,156 +579,6 @@ var WS = {
                             Modal.Load('Atenção', 'É necessário utilizar a conciliação de transações primeiro.');
                         }
                     }
-
-                        /*if (result.status == false && result.err == "conciliate") {
-                            //Modal.message('error', 'É necessário utilizar a conciliação de transações primeiro.');
-                        } else if (result.status == false) {
-                            //Modal.message('error', result.err);
-                        } else {
-                            jQuery('#transaction-group').append('<div></div>');
-                            jQuery('#transaction-group').append('<div></div>');
-                            jQuery('#payment-group').append('<div></div>');
-                            jQuery('#payment-group').append('<div></div>');
-                            var listTransactionLine1 = jQuery('#transaction-group div:eq(0)');
-                            var listTransactionLine2 = jQuery('#transaction-group div:eq(1)');
-                            var listPaymentLine1 = jQuery('#payment-group div:eq(0)');
-                            var listPaymentLine2 = jQuery('#payment-group div:eq(1)');
-
-                            if(result.date != undefined && result.date != false){
-                                listTransactionLine1.append('<dl class=""><dt>Data e hora: </dt><dd>' +' result.date '+ '</dd></dl>');
-                            }
-
-                            if(result.type != undefined && result.type != false){
-                                listTransactionLine1.append('<dl class=""><dt>Tipo: </dt><dd>' +' result.type' + '</dd></dl>');
-                            }
-
-                            if(result.status != undefined && result.status != false){
-                                listTransactionLine1.append('<dl><dt>Status: </dt><dd>' + 'result.status' + '</dd></dl>');
-                            }
-
-                            if(result.code != undefined && result.code != false){
-                                listTransactionLine1.append('<dl><dt>Código da transação: </dt><dd>' + 'result.code '+ '</dd></dl>');
-                            }
-
-                            if(result.reference != undefined && result.reference != false){
-                                listTransactionLine1.append('<dl><dt>Código de referência: </dt><dd>' + 'result.reference' + '</dd></dl>');
-                            }
-
-                            if(result.lastEventDate != undefined && result.lastEventDate != false){
-                                listTransactionLine2.append('<dl><dt>Último evento: </dt><dd>' + 'result.lastEventDate' + '</dd></dl>');
-                            }
-
-                            if(result.cancelationSource != undefined && result.cancelationSource != false){
-                                listTransactionLine2.append('<dl><dt>Origem do cancelamento: </dt><dd>' + 'result.cancelationSource' + '</dd></dl>');
-                            }
-
-                            if(result.itemCount != undefined && result.itemCount != false){
-                                listTransactionLine2.append('<dl><dt>Total de itens: </dt><dd>' + 'result.itemCount' + '</dd></dl>');
-                            }
-
-                            jQuery('#transaction-group').append('<span id="btn-hidden-itens" class="link ">Exibir todos os itens &#9660</span>');
-
-                            jQuery('#transaction-group').append('<div id="itens" class="hidden-groups table"></div>');
-
-                            if(result.paymentMethod.titleType != undefined && result.paymentMethod.titleType != false){
-                                listPaymentLine1.append('<dl><dt>Tipo de pagamento: </dt><dd>' + 'result.paymentMethod.titleType' + '</dd></dl>');
-                            }
-
-                            if(result.paymentMethod.titleCode != undefined && result.paymentMethod.titleCode != false){
-                                listPaymentLine1.append('<dl><dt>Meio de pagamento: </dt><dd>' + 'result.paymentMethod.titleCode' +'</dd></dl>');
-                            }
-
-                            if(result.paymentLink != false){
-                                listPaymentLine1.append('<dl><dt>Link para pagamento: </dt><dd>' + '<a href=' + 'result.paymentLink' + '>' + 'Clique aqui para acessar' +'</a>' + '</dd></dl>');
-                            }
-
-                            if(result.installmentCount != undefined && result.installmentCount != false){
-                                listPaymentLine1.append('<dl><dt>Nº de parcelas: </dt><dd>' + 'result.installmentCount' + '</dd></dl>');
-                            }
-
-                            if(result.extraAmount != undefined && result.extraAmount != false){
-                                listPaymentLine2.append('<dl class=""><dt>Valor extra: </dt><dd>R$ ' + 'formatReal(result.extraAmount)' + '</dd></dl>');
-                            }
-
-                            if(result.discountAmount != undefined && result.discountAmount != false){
-                                listPaymentLine2.append('<dl class=""><dt>Desconto: </dt><dd> R$' + 'formatReal(result.discountAmount)' + '</dd></dl>');
-                            }
-
-                            if(result.grossAmount != undefined && result.grossAmount != false){
-                                listPaymentLine2.append('<dl class=""><dt>Valor bruto: </dt><dd>R$ ' + 'formatReal(result.grossAmount)' +'</dd></dl>');
-                            }
-
-                            if(result.netAmount != undefined && result.netAmount != false){
-                                listPaymentLine2.append('<dl class=""><dt>Valor líquido: </dt><dd>R$ ' + 'formatReal(result.netAmount)' + '</dd></dl>');
-                            }
-
-                            if(result.promoCode != undefined && result.promoCode != false){
-                                listPaymentLine2.append('<dl><dt>Código de promoção: </dt><dd>' + 'result.promoCode' + '</dd></dl>');
-                            }
-
-                            if(result.escrowEndDate != undefined && result.escrowEndDate != false){
-                                listPaymentLine1.append('<dl><dt>Data de crédito: </dt><dd>' + 'result.escrowEndDate' +'</dd></dl>');
-                            }
-
-                            jQuery('#payment-group').append('<span id="btn-hidden-data" class="link">Exibir todos os dados de custos cobrados &#9660</span>');
-
-                            jQuery('#payment-group').append('<div id="cost-data" class="hidden-groups table"></div>');
-
-                            var listItens = jQuery('#itens');
-                            listItens.append('<h4>Itens do carrinho</h4>');
-                            listItens.append('<div class="group-title"></div>');
-                            listItens.append('<div class="group-table-itens"></div>');
-                            var listItensTitle = jQuery('.group-title');
-
-                            if(result.itemCount > 0){
-                                listItensTitle.append('<div class="itens-cell">ID</div>');
-                                listItensTitle.append('<div class="description-cell">Produto</div>');
-                                listItensTitle.append('<div class="itens-cell">Quantidade</div>');
-                                listItensTitle.append('<div class="itens-cell">Valor</div>');
-                                listItensTitle.append('<div class="itens-cell">Total</div>');
-                                for(var i = 0; i< result.itemCount; i++){
-                                    var total = (result.items[i].quantity * result.items[i].amount).toFixed(2);
-                                    listItensBody = jQuery('.group-table-itens');
-                                    listItensBody.append('<div id="item' + i + '" class="itens-line"></div>');
-                                    listItensBody = jQuery('#item' + i);
-                                    listItensBody.append('<div class="itens-cell">' + result.items[i].id +'</div>');
-                                    listItensBody.append('<div class="description-cell">' + result.items[i].description +'</div>');
-                                    listItensBody.append('<div class="itens-cell">' + result.items[i].quantity + '</div>');
-                                    listItensBody.append('<div class="itens-cell">R$ ' + formatReal(result.items[i].amount) + '</div>');
-                                    listItensBody.append('<div class="itens-cell"> R$ ' + formatReal(total) +'</div>');
-                                }
-                            }
-
-                            jQuery('#cost-data').append('<h4>Dados dos custos cobrados</h4>');
-
-                            jQuery('#cost-data').append('<div class="rate"></div>');
-
-                            var listData = jQuery('#cost-data div');
-
-                            if(result.creditorFees.installmentFeeAmount != undefined && result.creditorFees.installmentFeeAmount != false){
-                                listData.append('<dl><dt>Taxa de parcelamento: </dt><dd> R$' + formatReal(result.creditorFees.installmentFeeAmount) + '</dd></dl>');
-                            }
-
-                            if(result.creditorFees.operationalFeeAmount != undefined && result.creditorFees.operationalFeeAmount != false){
-                                listData.append('<dl><dt>Taxa de operação: </dt><dd> R$'+ formatReal(result.creditorFees.operationalFeeAmount) +'</dd></dl>');
-                            }
-
-                            if(result.creditorFees.intermediationRateAmount != undefined && result.creditorFees.intermediationRateAmount != false){
-                                listData.append('<dl><dt>Tarifa de intermediação: </dt><dd>R$ ' + formatReal(result.creditorFees.intermediationRateAmount) + '</dd></dl>');
-                            }
-
-                            if(result.creditorFees.intermediationFeeAmount != undefined && result.creditorFees.intermediationFeeAmount != false){
-                                listData.append('<dl><dt>Taxa de intermediação: </dt><dd>R$ ' + formatReal(result.creditorFees.intermediationFeeAmount) + '</dd></dl>');
-                            }
-
-                            if(result.creditorFees.comissionFeeAmount != undefined && result.creditorFees.comissionFeeAmount != false){
-                                listData.append('<dl><dt>Taxa de comissão: </dt><dd>R$ ' + formatReal(result.creditorFees.comissionFeeAmount) + '</dd></dl>');
-                            }
-
-                            Modal.hideLoading();
-                            jQuery('#modal-details').css('display', 'block');
-                        }*/
-
                 });
             }
         }
