@@ -396,7 +396,7 @@ var WS = {
                                     item.pagseguro_id,
                                     item.environment,
                                     item.magento_status,
-                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a href="" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'" target="_blank"">Ver detalhes da transação</a>'
+                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a href="" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'" target="_blank">Ver detalhes da transação</a>'
                                 ] );
 
                                 //Adjust column width
