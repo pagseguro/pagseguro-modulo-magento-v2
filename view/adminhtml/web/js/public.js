@@ -396,16 +396,17 @@ var WS = {
                                     item.pagseguro_id,
                                     item.environment,
                                     item.magento_status,
-                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a href="" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'" target="_blank">Ver detalhes da transação</a>'
+                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a class="link" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'">Ver detalhes da transação</a>'
                                 ] );
 
                                 //Adjust column width
                                 t.columns.adjust().draw(false);
                                 i++;
                             });
+                            jQuery('.loading-mask').css('display', 'none');
                         } else {
                             //Alert
-                            Modal.Load('Listar transações', 'Sem resultados para o período solicitado.');
+                            Modal.Load('Listar transações', 'Nenhum resultado para o filtro informado!.');
                         }
                     } else {
                         //Alert
