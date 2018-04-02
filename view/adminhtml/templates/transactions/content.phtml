@@ -177,6 +177,15 @@
             }
         });
 
+        window.onclick = function (event) {
+            var modal = document.getElementById('modal-details');
+            if (event.target == modal) {
+                jQuery('.modals-overlay').css('display', 'none');
+                jQuery('.modal-popup').removeClass('_show');
+                clearListDetails();
+            }
+        }
+
         $(document).on('click', '.action-close', function(){
             jQuery('.modals-overlay').css('display', 'none');
             jQuery('.modal-popup').removeClass('_show');
