@@ -44,7 +44,7 @@
             </tbody>
         </table>
 
-        <div class="modals-overlay"></div>
+        <div class="modal-overlay"></div>
         <div id="modal-details" class="modal-popup">
             <div class="modal-inner-wrap">
                 <button class="action-close" type="button">
@@ -135,7 +135,7 @@
             } else if (validateSearchByDate() == true) {
                 var url = $('#adminurl').attr('data-target');
                 WS.Ajax.Transactions.Details();
-                jQuery('.modals-overlay').css('display', 'block');
+                jQuery('.modal-overlay').css('display', 'block');
                 jQuery('#modal-details').addClass('_show');
             }
         });
@@ -172,7 +172,7 @@
         });
 
         $(document).on('click', '.action-close', function(){
-            jQuery('.modals-overlay').css('display', 'none');
+            jQuery('.modal-overlay').css('display', 'none');
             jQuery('.modal-popup').removeClass('_show');
             clearListDetails();
         });

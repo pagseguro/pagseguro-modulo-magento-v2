@@ -18,7 +18,7 @@
             </tbody>
         </table>
 
-        <div class="modals-overlay"></div>
+        <div id="teste" class="modal-overlay"></div>
         <div id="modal-partial-refund" class="modal-popup">
             <div class="modal-inner-wrap">
                 <button class="action-close" type="button">
@@ -26,8 +26,8 @@
                 </button>
                 <div class="modal-content">
                     <h2>Estorno parcial</h2>
-                    <h5 id="id-magento">ID magento: 01</h5>
-                    <h5 id="transaction-value">Valor total da venda: R$ 4.000,00</h5>
+                    <h5 id="id-magento">ID magento: </h5>
+                    <h5 id="transaction-value">Valor total da venda:</h5>
                     <form>
                         <p>Informe o valor a ser estornado:</p>
                         <div class="admin__scope-old">
@@ -106,8 +106,8 @@
                     transactionValue = jQuery(this).attr('data-value');
                     jQuery('#id-magento').text('ID magento: ' + idMagento);
                     jQuery('#transaction-value').text('Valor total da venda: R$ ' + formatReal(transactionValue));
-                    $('.modals-overlay').css('display', 'block');
-                    $('#modal-partial-refund').addClass('_show');
+                    jQuery('.modal-overlay').css('display','block');
+                    jQuery('#modal-partial-refund').addClass('_show');
                     id = jQuery(this).find('td')[1];
                     block = jQuery(this).attr('data-block');
                     url = $('#adminurl').attr('data-target');
@@ -132,7 +132,7 @@
                     valueInput = valueInput.replace(".", "");
                     valueInput = valueInput.replace(",", ".");
                     clearModal();
-                    $('.modals-overlay').css('display', 'none');
+                    $('.modal-overlay').css('display', 'none');
                     $('.modal-popup').removeClass('_show');
                     WS.Ajax.Refund.Refund(url, block, row, valueInput);
                 }
@@ -155,9 +155,18 @@
             $('#refund-value').removeClass('field-error');
         }
 
+        window.onclick = function (event) {
+            var modal = document.getElementById('modal-partial-refund');
+            if (event.target == modal) {
+                clearModal();
+                $('.modal-overlay').css('display', 'none');
+                $('.modal-popup').removeClass('_show');
+            }
+        }
+
         $(document).on('click', '.action-close', function(){
             clearModal();
-            $('.modals-overlay').css('display', 'none');
+            $('.modal-overlay').css('display', 'none');
             $('.modal-popup').removeClass('_show');
         });
     });
