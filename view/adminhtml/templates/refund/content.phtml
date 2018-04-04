@@ -82,13 +82,13 @@
 
                 jQuery('#pagseguro-datatable tbody tr td .refund').unbind('click');
                 jQuery('#pagseguro-datatable tbody tr td .refund').bind('click', function () {
-                    id = jQuery(this).find('td')[1];
+                    id = jQuery(this).attr('data-id');
                     block = jQuery(this).attr('data-block');
                     url = $('#adminurl').attr('data-target');
                     row = $(this).parents('tr');
                     confirmation({
                         title: 'Tem certeza que deseja estornar?',
-                        content: 'Order: ' + $(id).html() + '<br> Clique em OK para estornar.',
+                        content: 'Order: ' + id + '<br> Clique em OK para estornar.',
                         actions: {
                             confirm: function(){
                                 WS.Ajax.Refund.Refund(url, block, row);
