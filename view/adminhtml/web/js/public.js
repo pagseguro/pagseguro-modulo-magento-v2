@@ -313,7 +313,7 @@ var WS = {
                                     item.magento_id,
                                     item.pagseguro_id,
                                     item.magento_status,
-                                    '<a class="refund" data-target="refund_'+ i +'" data-block="'+item.details+'" style="cursor:pointer;">Estorno total</a><br/>'+
+                                    '<a class="refund" data-target="refund_'+ i +'" data-block="'+item.details+'" data-id="'+item.magento_id+'" style="cursor:pointer;">Estorno total</a><br/>'+
                                     '<a class="partial-refund" data-target="refund_'+ i +'" data-block="'+item.details+'" data-value="'+item.value+'" data-id="'+item.magento_id+'" style="cursor:pointer;">Estorno parcial</a>', 
                                 ] );
                                 //Adjust column width
