@@ -284,6 +284,49 @@ abstract class Method
     }
 
     /**
+     * Update column 'partially_refunded' the `pagseguro_orders` table
+     *
+     * @param int $orderId
+     * @return void
+     */
+    protected function updatePartiallyRefundedPagSeguro($orderId)
+    {
+        $this->getConnection()
+            ->query(sprintf(
+                "UPDATE `%s` SET partially_refunded = 1 WHERE entity_id='%s'",
+                $this->getPrefixTableName('pagseguro_orders'),
+                $orderId
+            ));
+    }
+
+    /**
+     * Get all pagseguro partially refunded orders id
+     *
+     * @return array
+     */
+    protected function getPartiallyRefundedOrders()
+    {
+        $pagseguroOrdersIdArray = array();
+
+        $connection = $this->getConnection();
+        $select = $connection->select()
+            ->from( ['ps' => $this->getPrefixTableName('pagseguro_orders')], ['order_id'] )
+            ->where('ps.partially_refunded = ?', '1');
+
+        if ($this->_scopeConfig->getValue('payment/pagseguro/environment')) {
+            $select = $select->where('ps.environment = ?', $this->_scopeConfig->getValue('payment/pagseguro/environment'));
+        }
+
+        $connection->prepare($select);
+
+        foreach ($connection->fetchAll($select) as $value) {
+            $pagseguroOrdersIdArray[] = $value['order_id'];
+        }
+
+        return $pagseguroOrdersIdArray;
+    }
+
+    /**
      * @param $order
      * @param $payment
      * @param $options

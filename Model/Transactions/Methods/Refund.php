@@ -130,6 +130,7 @@ class Refund extends Method
      * Refund one transaction
      *
      * @param $data
+     * @param $value
      * @return bool
      * @throws \Exception
      */
@@ -137,7 +138,7 @@ class Refund extends Method
         try {
             $config = $this->sanitizeConfig($data);
             if ($value != null)
-                $config->value = $value;
+                $config->value = number_format(floatval($value), 2, '.', '');
             $this->isConciliate($config);
             if (!$this->doRefund($config))
             throw new \Exception('impossible to refund');
@@ -166,9 +167,17 @@ class Refund extends Method
     private function doUpdates($config)
     {
         try {
-            $this->addStatusToOrder($config->order_id, 'pagseguro_devolvida');
-            $this->updateSalesOrder($config->order_id, $config->pagseguro_id);
-            $this->updatePagSeguroOrders($config->order_id, $config->pagseguro_id);
+            /* if have refund value is an partially refund, so the status should be keeped */
+            if ($config->value) {
+                $comment = 'Estornado valor de R$' . $config->value . ' do seu pedido.';
+                $this->setPartiallyRefundedStatus($config->order_id);
+                $this->notifyCustomer($config->order_id, $config->pagseguro_status, $comment);
+            } else {
+                $this->addStatusToOrder($config->order_id, 'pagseguro_devolvida');
+                $this->updateSalesOrder($config->order_id, $config->pagseguro_id);
+                $this->updatePagSeguroOrders($config->order_id, $config->pagseguro_id);
+            }
+
             unset($order);
         } catch (\Exception $exception) {
             throw $exception;
@@ -236,9 +245,15 @@ class Refund extends Method
     {
         $this->getTransactions();
         if (! is_null($this->_PagSeguroPaymentList->getTransactions())) {
+            $partiallyRefundedOrdersArray = $this->getPartiallyRefundedOrders();
+
             foreach ($this->_PagSeguroPaymentList->getTransactions() as $payment) {
-                if (! $this->addPayment($this->decryptOrderById($payment), $payment))
-                    continue;
+                $order = $this->decryptOrderById($payment);
+
+                if (!in_array($order->getId(), $partiallyRefundedOrdersArray)) {
+                    if (! $this->addPayment($this->decryptOrderById($payment), $payment))
+                        continue;
+                }
             }
         }
         return $this->_arrayPayments;
@@ -371,5 +386,29 @@ class Refund extends Method
         if (! $order)
             return false;
         return true;
+    }
+
+    /**
+     * Updates respective order partially refunded status to 1 in pagseguro_orders table
+     *
+     * @param string $orderId
+     * @return void
+     */
+    private function setPartiallyRefundedStatus($orderId)
+    {
+        $this->updatePartiallyRefundedPagSeguro($orderId);
+    }
+
+    /**
+     * @param $orderId
+     * @param $orderStatus
+     * @param $comment
+     */
+    public function notifyCustomer($orderId, $orderStatus, $comment = null)
+    {
+        $notify = true;
+        $order = $this->_order->load($orderId);
+        $order->addStatusToHistory($this->getStatusFromPaymentKey($orderStatus), $comment, $notify);
+        $order->save();
     }
 }

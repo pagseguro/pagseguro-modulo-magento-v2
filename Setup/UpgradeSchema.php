@@ -49,6 +49,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->integratePagSeguroAndOrdersGrid($setup);
             $this->cleanUiBookmark($setup);
         }
+
+        if (version_compare($context->getVersion(), '2.0.2') < 0) {
+            $this->addPartiallyRefundedColumnPagseguroOrders($setup);
+        }
         
         $setup->endSetup();
         
@@ -173,5 +177,26 @@ class UpgradeSchema implements UpgradeSchemaInterface
     {
         $setup->getConnection()
             ->delete($setup->getTable('ui_bookmark'), "namespace='sales_order_grid'");
+    }
+
+    private function addPartiallyRefundedColumnPagSeguroOrders($setup)
+    {
+        // Get pagseguro orders table
+        $tableName = $setup->getTable(self::PAGSEGURO_ORDERS);
+
+        // Check if the table already exists
+        if ($setup->getConnection()->isTableExists($tableName) == true && $setup->getConnection()->tableColumnExists($tableName, 'partially_refunded') === false) {
+            $setup->getConnection()
+                ->addColumn(
+                    $tableName,
+                    'partially_refunded',
+                    array(
+                        'type' => Table::TYPE_BOOLEAN,
+                        'nullable' => false,
+                        'default' => 0,
+                        'comment' => 'Show if order is already partially refunded',
+                    )
+                );
+        }
     }
 }
