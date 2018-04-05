@@ -80,6 +80,7 @@ Para acessar e configurar o módulo acesse o menu PagSeguro -> Configurações. 
      - *Por padrão o módulo virá configurado para salvar o arquivo de log em var/log/pagseguro.log*.
  - **listar transações abandonadas?**: ativa/desativa a pesquisa de transações que foram abandonadas no checkout do PagSeguro.
  - **transações -> abandonadas**: permite consultar as transações que foram abandonadas nos últimos 10 dias, desta forma você pode enviar emails de recuperação de venda. O e-mail conterá um link que redirecionará o comprador para o fluxo de pagamento, exatamente no ponto onde ele parou.
+ - **habilitar recuperação de carrinho**: Habilita a recuperação de carrinho do PagSeguro. (por padrão está desabilitada)
  - **listar parcelamento**: Habilita a exibição de uma listagem de parcelas na tela de visualização do produto. (Irá exibir o maior parcelamento disponível para o produto na tela de exibição do mesmo)
  
  -------------------------
@@ -132,6 +133,12 @@ Inputs
 | Name / Nome                | {String}                                                             | Nome           | 
 | Last Name  / Sobrenome     | {String}                                                             | Sobrenome      |  
 | Company  / Empresa         | {String}                                                             | Empresa        | 
+| Configuração de endereço de 4 linhas:
+| Address 1 / Endereço 1 / Rua         | {String}                                                    |Endereço (rua)|
+| Address 2 / Endereço 2 / Número         | {Integer}                                                |Número        |
+| Address 3 / Endereço 3 / Complemento         | {String}                                            |Complemento   |
+| Address 4 / Endereço 4 / Bairro         | {String}                                                 |Bairro        |
+| Configuração de endereço padrão Magento 2 (2 linhas):
 | Address / Endereço         | {String, Integer}                                                    |Endereço, Numero| 
 | Address 2 / Bairro /Endereço (Linha 2) | {String}                                                          | Bairro        | 
 | PostCode / CEP              | {Integer or String}                                            | 99999999 / 99999-999 |
