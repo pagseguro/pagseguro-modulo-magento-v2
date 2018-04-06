@@ -44,7 +44,8 @@ class Data
         6 => "pagseguro_devolvida",
         7 => "pagseguro_cancelada",
         8 => "pagseguro_chargeback_debitado",
-        9 => "pagseguro_em_contestacao"
+        9 => "pagseguro_em_contestacao",
+        10 => "partially_refunded"
     );
 
     /**

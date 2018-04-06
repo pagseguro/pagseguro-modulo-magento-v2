@@ -111,7 +111,9 @@ abstract class Method
             }
 
             if (!empty($this->_status)) {
-                $select = $select->where('order.status = ?', $this->getStatusFromPaymentKey($this->_status));
+                $select = $this->getStatusFromPaymentKey($this->_status) == 'partially_refunded'
+                    ? $select->where('ps.partially_refunded = ?', 1)
+                    : $select->where('order.status = ?', $this->getStatusFromPaymentKey($this->_status));
             }
 
             if (!empty($this->_dateBegin) && !empty($this->_dateEnd)) {
