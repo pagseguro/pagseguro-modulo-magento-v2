@@ -27,14 +27,14 @@ use UOL\PagSeguro\Controller\Ajaxable;
 use UOL\PagSeguro\Model\Transactions\Methods\Transactions;
 
 /**
- * Class Conciliation
+ * Class Transaction
  * @package UOL\PagSeguro\Controller\Adminhtml
  */
-class Cancel extends Ajaxable
+class Transaction extends Ajaxable
 {
 
     /**
-     * Cancel constructor.
+     * Transaction constructor.
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
@@ -47,7 +47,7 @@ class Cancel extends Ajaxable
     }
 
     /**
-     * @return void
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
@@ -60,16 +60,19 @@ class Cancel extends Ajaxable
             $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
             $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt')
         );
-        
+
         try {
-            return $this->whenSuccess($transactions->execute());
+            return $this->whenSuccess(
+                $transactions->execute(
+                    $this->getRequest()->getParam('transaction') )
+            );
         } catch (\Exception $exception) {
             return $this->whenError($exception->getMessage());
         }
     }
 
     /**
-     * Cancellation access rights checking
+     * Transactions access rights checking
      *
      * @return bool
      */

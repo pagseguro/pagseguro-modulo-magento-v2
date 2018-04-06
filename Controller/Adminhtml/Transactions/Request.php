@@ -58,8 +58,12 @@ class Request extends Ajaxable
             $this->_objectManager->create('Magento\Backend\Model\Session'),
             $this->_objectManager->create('Magento\Sales\Model\Order'),
             $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
-            $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt')
-            //$this->getRequest()->getParam('days')
+            $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt'),
+            $this->getRequest()->getParam('id_magento'),
+            $this->getRequest()->getParam('id_pagseguro'),
+            $this->getRequest()->getParam('date_begin'),
+            $this->getRequest()->getParam('date_end'),
+            $this->getRequest()->getParam('status')
         );
 
         try {

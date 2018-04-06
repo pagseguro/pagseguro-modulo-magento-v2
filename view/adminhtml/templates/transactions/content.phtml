@@ -1,44 +1,46 @@
 <!-- DataTable -->
+<div class="loading-mask" data-role="loader"><div class="popup popup-loading"><div class="popup-inner"><?php echo __('Please wait...'); ?></div></div></div>
 <div class="col-m-12">
     <div class="admin__data-grid-wrap" data-role="grid-wrapper">
         <table id="pagseguro-datatable" class="data-grid data-grid-draggable" data-role="grid">
             <thead>
-                <tr>
-                    <th class="data-grid-th _sortable _draggable">Data</th>
-                    <th class="data-grid-th _sortable _draggable">ID Magento</th>
-                    <th class="data-grid-th _sortable _draggable">ID PagSeguro</th>
-                    <th class="data-grid-th _sortable _draggable">Ambiente</th>
-                    <th class="data-grid-th _sortable _draggable">Status Magento</th>
-                    <th class="data-grid-th _sortable _draggable">Ação</th>
-                </tr>
-                <tr>
-                    <th class="data-grid-th admin__scope-old data">
-                        <input type="text" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/>
-                        <input type="text" name="date_end" id="date_end" OnKeyUp="dateMask(this.value, 'date_end')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="Até"/>
-                    </th>
-                    <th class="data-grid-th admin__scope-old">
-                        <input type="text" name="id_magento" id="id_magento" placeholder="ID Magento"/>
-                    </th>
-                    <th class="data-grid-th admin__scope-old">
-                        <input type="text" name="id_pagseguro" id="id_pagseguro" placeholder="ID PagSeguro"/>
-                    </th>
-                    <th class="data-grid-th"></th>
-                    <th class="data-grid-th">
-                        <select class="admin__control-select" id="status">
-                            <option value="">Todos</option>
-                            <option value="1">Aguardando Pagamento</option>
-                            <option value="2">Em análise</option>
-                            <option value="3">Paga</option>
-                            <option value="4">Disponível</option>
-                            <option value="5">Em disputa</option>
-                            <option value="6">Devolvida</option>
-                            <option value="7">Cancelada</option>
-                        </select>
-                    </th>
-                    <th class="data-grid-th">
-                        <input type="button" class="action-secondary" id="transactions-filter" value="Filtrar">
-                    </th>
-                </tr> 
+            <tr>
+                <th class="data-grid-th _sortable _draggable">Data</th>
+                <th class="data-grid-th _sortable _draggable">ID Magento</th>
+                <th class="data-grid-th _sortable _draggable">ID PagSeguro</th>
+                <th class="data-grid-th _sortable _draggable">Ambiente</th>
+                <th class="data-grid-th _sortable _draggable">Status PagSeguro</th>
+                <th class="data-grid-th _sortable _draggable">Ação</th>
+            </tr>
+            <tr>
+                <th class="data-grid-th admin__scope-old data">
+                    <input type="text" class="" name="date_begin" id="date_begin" OnKeyUp="dateMask(this.value, 'date_begin')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="De"/><br>
+                    <input type="text" class="" name="date_end" id="date_end" OnKeyUp="dateMask(this.value, 'date_end')" onblur="dateVerifyOnLosesFocus(this)"  maxlength="10" placeholder="Até"/>
+                </th>
+                <th class="data-grid-th admin__scope-old">
+                    <input type="text" class="" name="id_magento" id="id_magento" placeholder="ID Magento"/>
+                </th>
+                <th class="data-grid-th admin__scope-old">
+                    <input type="text" class="" name="id_pagseguro" id="id_pagseguro" placeholder="ID PagSeguro"/>
+                </th>
+                <th class="data-grid-th"></th>
+                <th class="data-grid-th">
+                    <select class="admin__control-select" id="status">
+                        <option value="">Todos</option>
+                        <option value="1">Aguardando Pagamento</option>
+                        <option value="2">Em análise</option>
+                        <option value="3">Paga</option>
+                        <option value="4">Disponível</option>
+                        <option value="5">Em disputa</option>
+                        <option value="6">Devolvida</option>
+                        <option value="7">Cancelada</option>
+                        <option value="8">Estornada Parcialmente</option>
+                    </select>
+                </th>
+                <th class="data-grid-th">
+                    <input type="button" class="pagseguro-button" id="transactions-filter" value="Filtrar">
+                </th>
+            </tr>
             </thead>
             <tbody class="admin__table-secondary">
             </tbody>
@@ -51,24 +53,28 @@
                     <span>Close</span>
                 </button>
                 <div class="modal-content">
-                        <div class="list-datails">
-                            <div class="group"><h3>Transação</h3></div>
-                            <div id="transaction-group" class="group"></div>
+                    <div class="list-datails">
+                        <div class="group"><h3>Transação</h3></div>
+                        <div id="transaction-group" class="group"></div>
 
-                            <div class="group"><h3>Pagamento</h3></div>
-                            <div id="payment-group" class="group"></div>
+                        <div class="group"><h3>Pagamento</h3></div>
+                        <div id="payment-group" class="group"></div>
                         <div>
+                        </div>
                     </div>
+                </div>
             </div>
         </div>
-
-
-
     </div>
 </div>
 <input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
 <script type="text/javascript">
     require(["jquery", 'Magento_Ui/js/modal/confirm', "datatables", "public"],function($, confirmation) {
+        var url = jQuery('#adminurl').attr('data-target');
+        
+        jQuery(document).ready(function () {
+            WS.Ajax.Transactions.Search(url);
+        });
 
         jQuery.extend( jQuery.fn.dataTableExt.oSort, {
             "date-br-pre": function ( a ) {
@@ -76,24 +82,22 @@
                 var dateParts = a.match(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+):(\d+)/);
                 return new Date(dateParts[3], parseInt(dateParts[2], 10) -1, dateParts[1], dateParts[4], dateParts[5], dateParts[6]);
             },
-
             "date-br-asc": function ( a, b ) {
                 return b - a;
             },
-
             "date-br-desc": function ( a, b ) {
                 return a - b;
             },
-
         } );
-
         // DataTable config
         $('#pagseguro-datatable').DataTable({
-            "autoWidth": false,
+            "autoWidth": true,
             "info": false,
             "lengthChange": false,
             "searching": false,
             "bStateSave": false,
+            "bSortCellsTop": true,
+            "orderCellsTop": true,
             "pageLength": 10,
             "aaSorting": [[ 0, "desc" ]],
             "aoColumnDefs": [
@@ -127,17 +131,19 @@
                 }
             }
         });
-
         // Search button observer
         $('#transactions-filter').on('click', function(){
             if (document.querySelectorAll('.field-error').length > 0){
                 Modal.Load('Atenção', 'Data inválida!');
             } else if (validateSearchByDate() == true) {
-                var url = $('#adminurl').attr('data-target');
-                WS.Ajax.Transactions.Details();
-                jQuery('.modal-overlay').css('display', 'block');
-                jQuery('#modal-details').addClass('_show');
+                WS.Ajax.Transactions.Search(url);
             }
+        });
+
+        $('#pagseguro-datatable').on('click', 'a.link', function (e) {
+            var transaction = jQuery(this).data('transaction');
+            var order = jQuery(this).data('order');
+            WS.Ajax.Transactions.Details(url, transaction, order);
         });
 
         function clearListDetails(){
@@ -158,7 +164,7 @@
                 jQuery('#itens').addClass('hidden-groups');
             }
         });
-
+        
         $(document).on('click', '#btn-hidden-data', function(){
             if(jQuery('#cost-data').hasClass('hidden-groups')){
                 jQuery('#btn-hidden-data').html('Ocultar os dados dos custos cobrados &#9650')
@@ -170,6 +176,15 @@
                 jQuery('#cost-data').addClass('hidden-groups');
             }
         });
+
+        window.onclick = function (event) {
+            var modal = document.getElementById('modal-details');
+            if (event.target == modal) {
+                jQuery('.modals-overlay').css('display', 'none');
+                jQuery('.modal-popup').removeClass('_show');
+                clearListDetails();
+            }
+        }
 
         $(document).on('click', '.action-close', function(){
             jQuery('.modal-overlay').css('display', 'none');
