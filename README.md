@@ -160,39 +160,7 @@ Caso tenha dúvidas ou precise de suporte, acesse nosso [fórum].
 
 Changelog
 ---------
-1.4.0
-- Alterado o fluxo do checkout transparente (na própria tela de checkout do Magento)
-- Alterada a forma de configurar o módulo e os meios de pagamento do PagSeguro, que agora são configurados individualmente.
-- Melhorias gerais e correções de bugs: transações do admin, css muito abrangente, remoção de arquivos velhos e desnecessários, refatorações.
-
-1.3.0
-- Adicionada validação e mensagens de erro (frontend) nos formulários do checkout transparente
-
-1.2.6
-- Melhoria na configuração do log na interface administrativa
-- Adicionada seção de atualização do módulo e atualização geral da documentação (README.md)
-- Correção de bugs quando o pedido deixava de existir ou a sessão era encerrada
-- Correçao para aceitar CVV de 4 digitos
-- Melhoria no acesso aos dados do endereço do cliente
-
-1.2.1
-- Alterada a biblioteca JavaScript utilizada nas máscaras.
-
-1.2.0
-- Adicionada opção para utilizar o Checkout Transparente.
-
-1.1.0
-- Possibilidade de consultar e solicitar o cancelamento de transações;
-- Possibilidade de consultar e solicitar o estorno de transações;
-- Possibilidade de definir descontos com base no meio de pagamento escolhido durante o checkout PagSeguro;
-
-1.0.0
-- Adicionando opção para utilização do Checkout Lightbox. 
-- Integração com API de Notificação.
-- Integração com API de Pagamento do PagSeguro.
-- Configuração do Setup do módulo.
-- Adicionado meio de pagamento ao Magento2
-- Versão inicial.
+Para consultar o log de alterações acesse o arquivo [CHANGELOG.md](CHANGELOG.md).
 
 Licença
 -------
