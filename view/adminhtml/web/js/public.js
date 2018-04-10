@@ -313,7 +313,8 @@ var WS = {
                                     item.magento_id,
                                     item.pagseguro_id,
                                     item.magento_status,
-                                    '<a class="refund" data-target="refund_'+ i +'" data-block="'+item.details+'">Estornar</a>'
+                                    '<a class="refund" data-target="refund_'+ i +'" data-block="'+item.details+'" data-id="'+item.magento_id+'" style="cursor:pointer;">Estorno total</a><br/>'+
+                                    '<a class="partial-refund" data-target="refund_'+ i +'" data-block="'+item.details+'" data-value="'+item.value+'" data-id="'+item.magento_id+'" style="cursor:pointer;">Estorno parcial</a>', 
                                 ] );
                                 //Adjust column width
                                 t.columns.adjust().draw(false);
@@ -330,29 +331,38 @@ var WS = {
                 });
 
             },
-            'Refund' : function(url, data, row)
+            'Refund' : function(url, data, row, value = null)
             {
                 var t = jQuery('#pagseguro-datatable').DataTable();
-
                 jQuery.ajax( {
                     url: url + '/pagseguro/refund/refund',
-                    data: {form_key: window.FORM_KEY, data: data},
+                    data: {form_key: window.FORM_KEY, data: data, value: value},
                     type: 'POST',
                     showLoader: true,
                 }).success(function(response) {
-
                     if (response.success) {
-
                         t.row( row ).remove().draw();
-
                         Modal.Load('Estorno', 'Transações estornada com sucesso!');
-
                     } else {
                         if (response.payload.error == 'Need to conciliate') {
-                            //Alert
                             Modal.Load('Estorno', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
-                        } else {
-                            //Alert
+                        } else if(response.payload.error == '14002' || response.payload.error == '14013') {
+                            Modal.Load('Estorno', 'Valor do estorno está em um formato inválido!');
+                        } else if (response.payload.error == '14003') {
+                            Modal.Load('Estorno', 'Valor do estorno inválido! O valor não pode ser negativo.');
+                        } else if (response.payload.error == '14004') {
+                            Modal.Load('Estorno', 'Valor do estorno é menor do que o permitido.');
+                        } else if (response.payload.error == '14005') {
+                            Modal.Load('Estorno', 'Valor do estorno é maior do que o permitido.');
+                        } else if (response.payload.error == '14006') {
+                            Modal.Load('Estorno', 'Saldo insuficiente para estornar a transação.');
+                        } else if (response.payload.error == '14007') {
+                            Modal.Load('Estorno', 'Status da transação é inválido para ser estornada.');
+                        } else if (response.payload.error == '14008') {
+                            Modal.Load('Estorno', 'Transação não encontrada.');
+                        } else if (response.payload.error == '14009') {
+                            Modal.Load('Estorno', "Sua conta PagSeguro não tem permissão para realizar esta ação. Em caso de dúvidas acesse <a href='http://forum.pagseguro.uol.com.br' target='_blank'>http://forum.pagseguro.uol.com.br</a>");
+                        }else {
                             Modal.Load('Estorno', 'Não foi possível executar esta ação. Tente novamente mais tarde.');
                         }
                     }
@@ -384,7 +394,6 @@ var WS = {
 
                         //Cleans up the table
                         t.clear().draw();
-
                         //Check the array for data, if not empty insert data else clear the table.
                         if (response.payload.data.length > 0) {
                             var i = 0;
@@ -392,11 +401,11 @@ var WS = {
                             response.payload.data.forEach(function(item){
                                 t.row.add( [
                                     item.date,
-                                    item.magento_id,
+                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">' + item.magento_id + '</a>',
                                     item.pagseguro_id,
                                     item.environment,
                                     item.magento_status,
-                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a class="link" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'">Ver detalhes da transação</a>'
+                                    '<a class="link" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'">Ver detalhes do pagamento</a>'
                                 ] );
 
                                 //Adjust column width
@@ -679,13 +688,74 @@ function validateSearchByDate() {
     return true;
 }
 
+/**
+ *
+ * Money
+ *
+ */
 function formatReal( int )
 {
     var tmp = int+'';
     tmp = tmp.replace(".", "");
     tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
     if( tmp.length > 6 )
-            tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
-
+        tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
     return tmp;
+}
+
+function formatRealInput( field )
+{
+    var tmp = field.value;
+    tmp = tmp.replace(",", "");
+    tmp = tmp.replace(".", "");
+
+    valueIsNumber(tmp);
+
+    tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+
+    if ( tmp.length > 6 ) {
+        tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+    }
+    field.value = tmp;
+}
+
+function valueHasThreeDigits( field ){
+    var tmp = field.value;
+    if(tmp.length == 1){
+        field.value = tmp + "00";
+    }
+    formatRealInput( field )
+}
+
+function valueIsNumber(tmp){
+
+    if(tmp.indexOf(",") == 0){
+        jQuery('#refund-value').addClass('field-error');
+        jQuery('.error').text('Valor inválido.');
+        return false;
+    }
+
+    tmp = tmp.replace(",", "");
+    tmp = tmp.replace(".", "");
+
+    if(isNaN(tmp)) {
+        jQuery('#refund-value').addClass('field-error');
+        jQuery('.error').text('Valor inválido.');
+        return false;
+    } else if(tmp.indexOf('-') != -1) {
+        jQuery('#refund-value').addClass('field-error');
+        jQuery('.error').text('Valor não pode ser negativo.');
+        return false;
+    } else {
+        jQuery('.error').text('');
+        jQuery('#refund-value').removeClass('field-error');
+        return true;
+    }
+}
+
+function getMoney( strMoney )
+{
+    strMoney = strMoney.replace(".", "");
+    strMoney = strMoney.replace(",", ".");
+    return parseFloat(strMoney);
 }

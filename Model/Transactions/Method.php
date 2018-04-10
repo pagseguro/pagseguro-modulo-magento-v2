@@ -111,7 +111,9 @@ abstract class Method
             }
 
             if (!empty($this->_status)) {
-                $select = $select->where('order.status = ?', $this->getStatusFromPaymentKey($this->_status));
+                $select = $this->getStatusFromPaymentKey($this->_status) == 'partially_refunded'
+                    ? $select->where('ps.partially_refunded = ?', 1)
+                    : $select->where('order.status = ?', $this->getStatusFromPaymentKey($this->_status));
             }
 
             if (!empty($this->_dateBegin) && !empty($this->_dateEnd)) {
@@ -278,12 +280,15 @@ abstract class Method
     }
 
     /**
-     * @param $order
+     * @param string $status
+     * @param integer $isPartiallyRefunded
      * @return bool|string
      */
-    protected function formatMagentoStatus($order)
+    protected function formatMagentoStatus($status, $isPartiallyRefunded = 0)
     {
-        return $this->getStatusString($this->getKeyFromOrderStatus($order));
+        return $isPartiallyRefunded
+            ? $this->getStatusString($this->getKeyFromOrderStatus($status)) . ' (estornada parcialmente)'
+            : $this->getStatusString($this->getKeyFromOrderStatus($status));
     }
 
     /**
@@ -378,6 +383,49 @@ abstract class Method
     private function getPrefixTableName($table)
     {
         return $this->_resource->getTableName($table);
+    }
+
+    /**
+     * Update column 'partially_refunded' the `pagseguro_orders` table
+     *
+     * @param int $orderId
+     * @return void
+     */
+    protected function updatePartiallyRefundedPagSeguro($orderId)
+    {
+        $this->getConnection()
+            ->query(sprintf(
+                "UPDATE `%s` SET partially_refunded = 1 WHERE entity_id='%s'",
+                $this->getPrefixTableName('pagseguro_orders'),
+                $orderId
+            ));
+    }
+
+    /**
+     * Get all pagseguro partially refunded orders id
+     *
+     * @return array
+     */
+    protected function getPartiallyRefundedOrders()
+    {
+        $pagseguroOrdersIdArray = array();
+
+        $connection = $this->getConnection();
+        $select = $connection->select()
+            ->from( ['ps' => $this->getPrefixTableName('pagseguro_orders')], ['order_id'] )
+            ->where('ps.partially_refunded = ?', '1');
+
+        if ($this->_scopeConfig->getValue('payment/pagseguro/environment')) {
+            $select = $select->where('ps.environment = ?', $this->_scopeConfig->getValue('payment/pagseguro/environment'));
+        }
+
+        $connection->prepare($select);
+
+        foreach ($connection->fetchAll($select) as $value) {
+            $pagseguroOrdersIdArray[] = $value['order_id'];
+        }
+
+        return $pagseguroOrdersIdArray;
     }
 
     /**

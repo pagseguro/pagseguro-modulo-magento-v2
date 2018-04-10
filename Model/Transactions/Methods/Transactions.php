@@ -163,7 +163,7 @@ class Transactions extends Method
                     'magento_id'     => $transaction['increment_id'],
                     'pagseguro_id'   => $transaction['transaction_code'],
                     'environment'    => $transaction['environment'],
-                    'magento_status' => $this->formatMagentoStatus($transaction['status']),
+                    'magento_status' => $this->formatMagentoStatus($transaction['status'], $transaction['partially_refunded']),
                     'order_id'       => $transaction['entity_id']
                 );
             }

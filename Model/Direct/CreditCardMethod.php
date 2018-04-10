@@ -303,7 +303,7 @@ class CreditCardMethod
     private function setItemsInformation($product)
     {
         $this->_paymentRequest->addItems()->withParameters(
-            $product->getId(), //id
+            $product->getProduct()->getId(), //id
             \UOL\PagSeguro\Helper\Data::fixStringLength($product->getName(), 255), //description
             $product->getSimpleQtyToShip(), //quantity
             \UOL\PagSeguro\Helper\Data::toFloat($product->getPrice()), //amount

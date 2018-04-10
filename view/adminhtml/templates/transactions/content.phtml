@@ -34,7 +34,7 @@
                         <option value="5">Em disputa</option>
                         <option value="6">Devolvida</option>
                         <option value="7">Cancelada</option>
-                        <option value="8">Estornada Parcialmente</option>
+                        <option value="10">Estornada Parcialmente</option>
                     </select>
                 </th>
                 <th class="data-grid-th">
@@ -46,7 +46,7 @@
             </tbody>
         </table>
 
-        <div class="modals-overlay"></div>
+        <div class="modal-overlay"></div>
         <div id="modal-details" class="modal-popup">
             <div class="modal-inner-wrap">
                 <button class="action-close" type="button">
@@ -187,7 +187,7 @@
         }
 
         $(document).on('click', '.action-close', function(){
-            jQuery('.modals-overlay').css('display', 'none');
+            jQuery('.modal-overlay').css('display', 'none');
             jQuery('.modal-popup').removeClass('_show');
             clearListDetails();
         });
