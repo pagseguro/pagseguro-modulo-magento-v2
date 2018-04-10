@@ -401,11 +401,11 @@ var WS = {
                             response.payload.data.forEach(function(item){
                                 t.row.add( [
                                     item.date,
-                                    item.magento_id,
+                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">' + item.magento_id + '</a>',
                                     item.pagseguro_id,
                                     item.environment,
                                     item.magento_status,
-                                    '<a href="' + url + '/sales/order/view/order_id/' + item.order_id + '/key/' + window.FORM_KEY + '" target="_blank">Ver detalhes</a><br/><a class="link" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'">Ver detalhes da transação</a>'
+                                    '<a class="link" data-transaction="'+ item.pagseguro_id +'" data-order="'+ item.order_id +'">Ver detalhes do pagamento</a>'
                                 ] );
 
                                 //Adjust column width

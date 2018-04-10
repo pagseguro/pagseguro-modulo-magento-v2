@@ -280,12 +280,15 @@ abstract class Method
     }
 
     /**
-     * @param $order
+     * @param string $status
+     * @param integer $isPartiallyRefunded
      * @return bool|string
      */
-    protected function formatMagentoStatus($order)
+    protected function formatMagentoStatus($status, $isPartiallyRefunded = 0)
     {
-        return $this->getStatusString($this->getKeyFromOrderStatus($order));
+        return $isPartiallyRefunded
+            ? $this->getStatusString($this->getKeyFromOrderStatus($status)) . '(estornada parcialmente)'
+            : $this->getStatusString($this->getKeyFromOrderStatus($status));
     }
 
     /**
