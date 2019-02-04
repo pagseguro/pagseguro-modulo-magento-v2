@@ -40,7 +40,7 @@ class PaymentMethod
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
-    
+
     /**
      *
      * @var \PagSeguro\Domains\Requests\Payment
@@ -142,7 +142,7 @@ class PaymentMethod
             $senderName == (string)__('Guest')
             || $senderName == 'Convidado'
             || $senderName == 'Visitante'
-                
+
         ) {
             $address = $this->getBillingAddress();
             $senderName = $address->getFirstname() . ' ' . $address->getLastname();
@@ -151,7 +151,7 @@ class PaymentMethod
         $this->_paymentRequest->setSender()->setEmail($this->_checkoutSession
             ->getLastRealOrder()->getCustomerEmail());
         $this->setSenderPhone();
-        
+
     }
     /**
      * Get the shipping information and set in the attribute $_paymentRequest
@@ -206,7 +206,7 @@ class PaymentMethod
      */
     private function getShippingAddress($address, $shipping = null)
     {
-        if (!is_null($address) or !empty($adress)) {
+        if (!is_null($address) or !empty($address)) {
             return $address;
         }
         if ($shipping) {
@@ -249,7 +249,7 @@ class PaymentMethod
             $this->_checkoutSession->getLastRealOrder()->getEntityId()
         );
     }
-    
+
     /**
      * Get a brazilian region name and return the abbreviation if it exists
      *
@@ -268,7 +268,7 @@ class PaymentMethod
             $regionAbbreviation->getType($shipping->getRegion()) :
             $shipping->getRegion();
     }
-    
+
     /**
      * Get the store notification url
      *
@@ -278,7 +278,7 @@ class PaymentMethod
     {
         return $this->_scopeConfig->getValue('payment/pagseguro/notification');
     }
-    
+
     /**
      * Get the store redirect url
      *
@@ -288,7 +288,7 @@ class PaymentMethod
     {
         return $this->_scopeConfig->getValue('payment/pagseguro/redirect');
     }
-    
+
     /**
      * Set the sender phone if it exist
      */
@@ -306,7 +306,7 @@ class PaymentMethod
             );
         }
     }
-    
+
     /**
      * Get the billing address data of the Order
      *
@@ -319,7 +319,7 @@ class PaymentMethod
 
 	/**
      * Get the country name based on the $countryId
-     * 
+     *
      * @param string $countryId
      * @return string
      */
