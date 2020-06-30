@@ -16,8 +16,9 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 Requisitos
 ----------
 ---
- - [Magento] Community 2.0.8 | 2.1.0
- - [PHP] 5.5.0+
+ - [Magento] Community 2.0 | 2.1
+ - [PHP] 5.5+
+
  - [SPL]
  - [cURL]
  - [DOM]
@@ -37,10 +38,10 @@ Navegue até o diretório raíz da sua instalação do Magento 2 e siga os segui
 2. Execute os comandos:
    - ```php bin/magento setup:upgrade```
    - ```php bin/magento setup:static-content:deploy``` ou ```php bin/magento setup:static-content:deploy pt_BR```, de acordo com as configurações da sua loja.
-3. Cheque e, caso necessário, configure as permissões corretas para seus diretórios. Por exemplo, para configrar a permissão 777 para as pastas var/ pub/ execute:
-   - ```chmod 777 -R var/ pub/```
-4. Pode ser necessário atualizar o cache da sua loja ao finalizar o processo.
-5. Acesse a seção do PagSeguro através da interface administrativa da sua loja e configure suas credenciais e meios de pagamento.
+
+3. Dê permissões as pastas var/ pub/
+   - ```chmod -R 777 var/ pub/```
+
 
 
 Atualização
