@@ -32,7 +32,7 @@ use UOL\PagSeguro\Model\Transactions\Methods\Transactions;
  */
 class Transaction extends Ajaxable
 {
-
+    protected $transactionsFactory;
     /**
      * Transaction constructor.
      *
@@ -41,8 +41,10 @@ class Transaction extends Ajaxable
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \UOL\PagSeguro\Model\Transactions\Methods\TransactionsFactory $transactionsFactory
     ) {
+        $this->transactionsFactory = $transactionsFactory;
         parent::__construct($context, $resultJsonFactory);
     }
 
@@ -51,15 +53,7 @@ class Transaction extends Ajaxable
      */
     public function execute()
     {
-        $transactions = new Transactions(
-            $this->_objectManager->create('Magento\Framework\App\Config\ScopeConfigInterface'),
-            $this->_objectManager->create('\Magento\Framework\App\ResourceConnection'),
-            $this->_objectManager->create('Magento\Framework\Model\ResourceModel\Db\Context'),
-            $this->_objectManager->create('Magento\Backend\Model\Session'),
-            $this->_objectManager->create('Magento\Sales\Model\Order'),
-            $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
-            $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt')
-        );
+        $transactions = $this->transactionsFactory->create();
 
         try {
             return $this->whenSuccess(

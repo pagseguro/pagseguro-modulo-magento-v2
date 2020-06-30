@@ -23,11 +23,14 @@
 
 namespace UOL\PagSeguro\Controller\Notification;
 
+use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\RequestInterface;
+
 /**
  * Class Checkout
  * @package UOL\PagSeguro\Controller\Payment
  */
-class Response extends \Magento\Framework\App\Action\Action
+class Response extends \Magento\Framework\App\Action\Action implements \Magento\Framework\App\CsrfAwareActionInterface
 {
 
     /**
@@ -59,5 +62,31 @@ class Response extends \Magento\Framework\App\Action\Action
             //log already written in your pagseguro log file if pagseguro log is enabled in admin
             exit;
         }
+    }
+
+    /**
+     * Create exception in case CSRF validation failed.
+     * Return null if default exception will suffice.
+     *
+     * @param RequestInterface $request
+     *
+     * @return InvalidRequestException|null
+     */
+    public function createCsrfValidationException(
+        RequestInterface $request
+    ): ?InvalidRequestException {
+        return null;
+    }
+
+    /**
+     * Perform custom request validation.
+     * Return null if default validation is needed.
+     *
+     * @param RequestInterface $request
+     *createCsrfValidationException
+     * @return bool|null
+     */
+    public function validateForCsrf(RequestInterface $request): ?bool {
+        return true;
     }
 }
