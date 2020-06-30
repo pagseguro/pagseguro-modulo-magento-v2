@@ -44,7 +44,8 @@ class Data
         6 => "pagseguro_devolvida",
         7 => "pagseguro_cancelada",
         8 => "pagseguro_chargeback_debitado",
-        9 => "pagseguro_em_contestacao"
+        9 => "pagseguro_em_contestacao",
+        10 => "partially_refunded"
     );
 
     /**
@@ -322,4 +323,213 @@ class Data
     {
         return preg_replace('/[^0-9]/', '', $data);
     }
+
+    /**
+     * @param $type
+     * @return bool|string
+     */
+    public static function getTitleCancellationSourceTransaction($cancellationSource)
+    {
+        if (!is_null($cancellationSource)) {
+            switch ($cancellationSource) {
+                case "INTERNAL":
+                    return 'PagSeguro';
+                    break;
+                case "EXTERNAL":
+                    return 'Instituições Financeiras';
+                    break;
+                default:
+                    return $cancellationSource;
+                    break;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Translates the transaction type name to his respective name, according with the api
+     *
+     * @param int $transactionTypeCode
+     * @return mixed string | int
+     */
+    public static function getTransactionTypeName($transactionTypeCode)
+    {
+        if ($transactionTypeCode) {
+            switch ($transactionTypeCode) {
+                case 1:
+                    return 'Venda';
+                    break;
+                case 2:
+                    return 'Transferência';
+                    break;
+                case 3:
+                    return 'Adição de fundos';
+                    break;
+                case 4:
+                    return 'Saque';
+                    break;
+                case 5:
+                    return 'Cobrança';
+                    break;
+                case 6:
+                    return 'Doação';
+                    break;
+                case 7:
+                    return 'Bônus';
+                    break;
+                case 8:
+                    return 'Repasse de bônus';
+                    break;
+                case 9:
+                    return 'Operacional';
+                    break;
+                case 10:
+                    return 'Doação pública';
+                    break;
+                case 11:
+                    return 'Pagamento pré aprovado';
+                    break;
+                case 12:
+                    return 'Campanha bônus';
+                    break;
+                case 13:
+                    return 'Secundária';
+                    break;
+                case 14:
+                    return 'Validador';
+                    break;
+                default:
+                    return $transactionTypeCode;
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Translates the transaction payment method type title to his respective name, according with the api
+     * @param $type
+     *
+     * @return bool|string
+     */
+    public static function getTitleTypePaymentMethod($type)
+    {
+        if (!is_null($type)) {
+            switch ($type) {
+                case 1:
+                    return 'Cartão de crédito';
+                    break;
+                case 2:
+                    return 'Boleto';
+                    break;
+                case 3:
+                    return 'Débito online(TEF)';
+                    break;
+                case 4:
+                    return 'Saldo PagSeguro';
+                    break;
+                case 7:
+                    return 'Depósito em conta';
+                    break;
+                default:
+                    return $type;
+                    break;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Translates the transaction payment method code title to his respective name, according with the api
+     * @param $code
+     *
+     * @return bool|string
+     */
+    public static function getTitleCodePaymentMethod($code)
+    {
+        if (!is_null($code)) {
+            switch ($code) {
+                case 101:
+                    return 'Cartão de crédito Visa';
+                    break;
+                case 102:
+                    return 'Cartão de crédito MasterCard';
+                    break;
+                case 103:
+                    return 'Cartão de crédito American Express';
+                    break;
+                case 104:
+                    return 'Cartão de crédito Diners';
+                    break;
+                case 105:
+                    return 'Cartão de crédito Hipercard';
+                    break;
+                case 106:
+                    return 'Cartão de crédito Aura';
+                    break;
+                case 107:
+                    return 'Cartão de crédito Elo';
+                    break;
+                case 109:
+                    return 'Cartão de crédito PersonalCard';
+                    break;
+                case 112:
+                    return 'Cartão de crédito BrasilCard';
+                    break;
+                case 113:
+                    return 'Cartão de crédito FORTBRASIL';
+                    break;
+                case 115:
+                    return 'Cartão de crédito VALECARD';
+                    break;
+                case 116:
+                    return 'Cartão de crédito Cabal';
+                    break;
+                case 117:
+                    return 'Cartão de crédito Mais!';
+                    break;
+                case 119:
+                    return 'Cartão de crédito GRANDCARD';
+                    break;
+                case 120:
+                    return 'Cartão de crédito Sorocred';
+                    break;
+                case 122:
+                    return 'Cartão de crédito Up Policard';
+                    break;
+                case 123:
+                    return 'Cartão de crédito Banese Card';
+                    break;
+                case 201:
+                    return 'Boleto Bradesco';
+                    break;
+                case 202:
+                    return 'Boleto Santander';
+                    break;
+                case 301:
+                    return 'Débito online Bradesco';
+                    break;
+                case 302:
+                    return 'Débito online Itaú';
+                    break;
+                case 304:
+                    return 'Débito online Banco do Brasil';
+                    break;
+                case 306:
+                    return 'Débito online Banrisul';
+                    break;
+                case 401:
+                    return 'Saldo PagSeguro';
+                    break;
+                case 701:
+                    return 'Depósito em conta - Banco do Brasil';
+                    break;
+                default:
+                    return $code;
+                    break;
+            }
+        }
+        return false;
+    }
+
 }

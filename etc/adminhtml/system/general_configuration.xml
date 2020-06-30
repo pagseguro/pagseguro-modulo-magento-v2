@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="pagseguro" translate="label" type="text" sortOrder="10" showInDefault="1"
+        showInWebsite="1" showInStore="1">
+        <label>Configurações Gerais</label>
+        <field id="environment" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>AMBIENTE</label>
+            <tooltip>Define o ambiente de uso</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Environment</source_model>
+            <config_path>payment/pagseguro/environment</config_path>
+        </field>
+        <field id="email" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>E-MAIL</label>
+            <comment>Clique &lt;a href=&quot;https://pagseguro.uol.com.br/registration/registration.jhtml?ep=7&amp;tipo=cadastro#!vendedor&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt; e cadastre-se gr&#225;tis.</comment>
+            <config_path>payment/pagseguro/email</config_path>
+            <validate>required-entry validate-email</validate>
+        </field>
+        <field id="token" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>TOKEN</label>
+            <tooltip>Acesse sua conta PagSeguro ou Sandbox para obter um token.</tooltip>
+            <config_path>payment/pagseguro/token</config_path>
+            <validate>required-entry</validate>
+        </field>
+        <field id="redirect" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>URL DE REDIRECIONAMENTO</label>
+            <tooltip>Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve acessar sua conta PagSeguro ou Sandbox e habilitar requisições de pagamentos gerados somente via API.</tooltip>
+            <config_path>payment/pagseguro/redirect</config_path>
+        </field>
+        <field id="notification" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>URL DE NOTIFICAÇÃO</label>
+            <tooltip>Sempre que uma transa&#231;&#227;o mudar de status, o PagSeguro envia uma notifica&#231;&#227;o para sua loja ou para a URL que voc&#234; informar neste campo.</tooltip>
+            <config_path>payment/pagseguro/notification</config_path>
+        </field>
+        <field id="charset" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>CHARSET</label>
+            <comment>Defina o charset de acordo com a codificação do seu sistema.</comment>
+            <source_model>UOL\PagSeguro\Model\System\Config\Charset</source_model>
+            <config_path>payment/pagseguro/charset</config_path>
+        </field>
+        <field id="log" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>ATIVAR LOG</label>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro/log</config_path>
+        </field>
+        <field id="log_file" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>NOME DO ARQUIVO DE LOG</label>
+            <depends>
+                <field id="log">1</field>
+            </depends>
+            <comment>
+                Nome do arquivo de log a ser utilizado, com caminho relativo ou absoluto, que tenha permissões de leitura e escrita (Ex.: var/log/pagseguro.log).
+            </comment>
+            <tooltip>
+                Para que ocorra normalmente a geração de logs é estritamente necessário que o diretório e o arquivo de log configurados tenham permissões de leitura e escrita.
+            </tooltip>
+            <config_path>payment/pagseguro/log_file</config_path>
+        </field>
+        <field id="abandoned_active" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>LISTAR TRANSAÇÕES ABANDONADAS?</label>
+            <tooltip>Deseja habilitar o módulo?</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro/abandoned_active</config_path>
+        </field>
+        <field id="shopping_cart_recovery" translate="label" type="select" sortOrder="125" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>HABILITAR RECUPERAÇÃO DE CARRINHO</label>
+            <tooltip>Habilita/desabilita a recuperação de carrinho do PagSeguro.</tooltip>
+             <comment>Para saber mais sobre a recuperação de carrinho do PagSeguro, clique &lt;a href=&quot;https://pagseguro.uol.com.br/para-seu-negocio/online/recuperacao-de-carrinho&quot; target=&quot;_blank&quot;&gt;aqui&lt;/a&gt;.</comment>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro/shopping_cart_recovery</config_path>
+        </field>
+        <field id="installments" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>LISTAR PARCELAMENTO</label>
+            <tooltip>Ativar a exibição da listagem de parcelas na tela de visualização do produto. (Irá exibir o maior parcelamento disponível para o produto no pagamento com cartão de crédito)</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro/installments</config_path>
+        </field>
+    </group>
+</include>

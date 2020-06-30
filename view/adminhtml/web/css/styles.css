@@ -2,6 +2,10 @@
     text-align: center!important;
 }
 
+.data-grid .data-grid-th input[type=date] {
+    width: 138px;
+}
+
 .page-wrapper {
     background: url(../images/background.png) no-repeat;
     -moz-background-size: 100% 40%;
@@ -9,7 +13,7 @@
     background-size: 100% 40%;
 }
 
-#conciliation-search, #abandoned-search, #cancellation-search, #refund-search {
+#conciliation-search, #abandoned-search, #cancellation-search, #refund-search, #transactions-filter, #partial-refund {
     background: #77B800!important;
     border: 1px #639900 solid;
 }
@@ -21,3 +25,177 @@
     margin-bottom: 20px;
 }
 
+.field-error {
+    border-color: #e74c3c !important;
+}
+
+.modal-overlay {
+    z-index: 899;
+    display:none;
+    background: rgba(0, 0, 0, 0.35);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+.hidden-groups {
+    display: none;
+}
+
+#pagseguro-datatable {
+    width: 100% !important;
+}
+
+/*#pagseguro-datatable thead tr th:first-child {
+    width: 120px;
+}
+
+#pagseguro-datatable thead tr th:nth-child(5) {
+    width: 230px;
+}*/
+
+#pagseguro-datatable thead tr th:first-child input:first-child {
+    margin-bottom: 5px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th input {
+    width: 97%;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(1) input {
+    max-width: 120px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(2) input {
+    max-width: 110px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(3) input {
+    max-width: 320px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th:nth-child(6) input {
+    max-width: 70px;
+}
+
+#pagseguro-datatable thead tr:nth-child(2) th {
+    text-align: center;
+}
+
+#modal-partial-refund .modal-inner-wrap {
+    width: 325px;
+}
+
+#modal-partial-refund .modal-inner-wrap .modal-content h2 {
+    margin-bottom: 20px;
+    padding-top: 5px;
+}
+
+#modal-partial-refund .modal-inner-wrap .modal-content h5 {
+    font-weight: bold;
+}
+
+#modal-partial-refund .modal-inner-wrap .modal-content form{
+    margin-bottom: 20px;
+}
+
+#modal-partial-refund .modal-inner-wrap .modal-content form p.error{
+    color: #e74c3c;
+    margin-left: 22px;
+}
+
+.link {
+    color: #025ec7;
+    cursor: pointer;
+    outline: medium none;
+    text-decoration: none;
+}
+
+button.align-right {
+    float: right;
+    margin-bottom: 20px;
+    margin-right: 15px;
+}
+
+/*List Details*/
+.list-datails .group {
+    border-bottom: solid 1px #DEDEDE;
+    margin: 0 40px; padding: 10px 0;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+.list-datails #payment-group {
+    margin-bottom: 15px;
+}
+
+.list-datails .group > div:not(:last-child) {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.list-datails .group h4 {
+    margin-bottom: 0;
+}
+
+.list-datails .group > div > dl:not(:last-child) {
+    margin-right: 40px;
+}
+
+.list-datails .group div dl:first-child {
+    width: 112px;
+}
+
+.list-datails .table {
+    background-color: #e9e9e9;
+    padding: 10px 25px;
+    margin-top: 5px;
+    max-height: 110px;
+    overflow: auto;
+    margin-bottom: 8px;
+}
+
+.list-datails .group-title {
+    font-weight: 700;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-top: 7px;
+}
+
+.list-datails .group-title > div:not(:first-child), .itens-line > div:not(:first-child) {
+    margin-right: 50px;
+}
+
+.list-datails .itens-cell {
+    width: 100px;
+}
+
+.list-datails .description-cell {
+    width: 200px; margin-right: 0 !important;
+}
+
+.list-datails .itens-line {
+    display:flex; flex-flow: row wrap; justify-content: flex-start;
+}
+
+.list-datails .group .table .rate {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.list-datails .group .table .rate dl {
+    width: 140px;
+    margin-top: 7px;
+    margin-right: 45px;
+}
+
+.list-datails .hidden-groups {
+    display: none;
+}
+
+.list-datails dl {
+    margin-bottom: 10px;
+}

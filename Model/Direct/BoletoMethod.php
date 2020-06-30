@@ -99,11 +99,13 @@ class BoletoMethod implements Checkout
         try {
             $this->currency();
             $this->reference();
+            $this->discounts();
             $this->shipping();
             $this->sender();
             $this->urls();
             $this->items();
             $this->config();
+            $this->setShoppingCartRecovery();
             return $this->register();
         } catch (\Exception $exception) {
             throw $exception;
@@ -162,17 +164,12 @@ class BoletoMethod implements Checkout
      */
     private function shipping()
     {
-        $this->setShippingInformation();
-        //Shipping Type
-        $this->_paymentRequest->setShipping()->setType()->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED);
-        //Shipping Coast
-        $this->_paymentRequest->setShipping()->setCost()->withParameters(number_format(
-                $this->getShippingAmount(),
-                2,
-                '.',
-                null //''
-            )
-        );
+        if ($this->_order->getIsVirtual()) {
+            $this->_paymentRequest->setShipping()->setAddressRequired()->withParameters('false');
+        } else {
+            $this->_paymentRequest->setShipping()->setAddressRequired()->withParameters('true');
+            $this->setShippingInformation();
+        }
     }
 
     /**
@@ -221,7 +218,7 @@ class BoletoMethod implements Checkout
     private function setItemsInformation($product)
     {
         $this->_paymentRequest->addItems()->withParameters(
-            $product->getId(), //id
+            $product->getProduct()->getId(), //id
             \UOL\PagSeguro\Helper\Data::fixStringLength($product->getName(), 255), //description
             $product->getSimpleQtyToShip(), //quantity
             \UOL\PagSeguro\Helper\Data::toFloat($product->getPrice()), //amount
@@ -271,9 +268,9 @@ class BoletoMethod implements Checkout
      */
     private function getEmail()
     {
-        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
-            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
-        }
+//        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
+//            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
+//        }
         return $this->_order->getCustomerEmail();
     }
 
@@ -282,9 +279,12 @@ class BoletoMethod implements Checkout
      */
     private function setSenderPhone()
     {
-        $shipping = $this->getShippingData();
-        if (! empty($shipping['telephone'])) {
-            $phone = \UOL\PagSeguro\Helper\Data::formatPhone($shipping['telephone']);
+        $addressData = ($this->getBillingAddress())
+            ? $this->getBillingAddress()
+            : $this->_order->getShippingAddress();
+
+        if (! empty($addressData['telephone'])) {
+            $phone = \UOL\PagSeguro\Helper\Data::formatPhone($addressData['telephone']);
             $this->_paymentRequest->setSender()->setPhone()->withParameters(
                 $phone['areaCode'],
                 $phone['number']
@@ -297,19 +297,38 @@ class BoletoMethod implements Checkout
      */
     private function setShippingInformation()
     {
-        $shipping = $this->getShippingData();
-        $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
-        
-        $this->_paymentRequest->setShipping()->setAddress()->withParameters(
-            $this->getShippingAddress($address[0], $shipping),
-            $this->getShippingAddress($address[1]),
-            $this->getShippingAddress($address[0]),
-            \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
-            $shipping->getCity(),
-            $this->getRegionAbbreviation($shipping),
-            $this->getCountryName($shipping['country_id']),
-            $this->getShippingAddress($address[2])
-        );
+        $shipping = $this->_order->getShippingAddress();
+        if ($shipping) {
+            if (count($shipping->getStreet()) === 4) {
+                $this->_paymentRequest->setShipping()->setAddress()->withParameters(
+                    $shipping->getStreetLine(1),
+                    $shipping->getStreetLine(2),
+                    $shipping->getStreetLine(4),
+                    \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
+                    $shipping->getCity(),
+                    $this->getRegionAbbreviation($shipping),
+                    $this->getCountryName($shipping['country_id']),
+                    $shipping->getStreetLine(3)
+                );
+            } else {
+                $address = \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
+                $this->_paymentRequest->setShipping()->setAddress()->withParameters(
+                    $this->getShippingAddress($address[0], $shipping),
+                    $this->getShippingAddress($address[1]),
+                    $this->getShippingAddress($address[3]),
+                    \UOL\PagSeguro\Helper\Data::fixPostalCode($shipping->getPostcode()),
+                    $shipping->getCity(),
+                    $this->getRegionAbbreviation($shipping),
+                    $this->getCountryName($shipping['country_id']),
+                    $this->getShippingAddress($address[2])
+                );
+            }
+
+            $this->_paymentRequest->setShipping()->setType()
+                ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED); //Shipping Type
+            $this->_paymentRequest->setShipping()->setCost()
+                ->withParameters(number_format($this->getShippingAmount(), 2, '.', '')); //Shipping Coast
+        }
     }
 
     /**
@@ -326,18 +345,6 @@ class BoletoMethod implements Checkout
         if ($shipping)
             return \UOL\PagSeguro\Helper\Data::addressConfig($shipping['street']);
         return null;
-    }
-
-    /**
-     * Get the shipping Data of the Order
-     *
-     * @return object $orderParams - Return parameters, of shipping of order
-     */
-    private function getShippingData()
-    {
-        if ($this->_order->getIsVirtual())
-            return $this->getBillingAddress();
-        return $this->_order->getShippingAddress();
     }
 
     /**
@@ -423,5 +430,27 @@ class BoletoMethod implements Checkout
         return (!empty($countryId)) ?
             $this->_countryInformation->getCountryInfo($countryId)->getFullNameLocale() :
             $countryId;
+    }
+
+    /**
+     * Set discounts using PagSeguro "extra amount" parameter
+     */
+    private function discounts()
+    {
+        $this->_paymentRequest->setExtraAmount(round($this->_order->getDiscountAmount(), 2));
+    }
+
+    /**
+     * Set PagSeguro recovery shopping cart value
+     *
+     * @return void
+     */
+    private function setShoppingCartRecovery()
+    {
+        if ($this->_scopeConfig->getValue('payment/pagseguro/shopping_cart_recovery') == true) {
+            $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'true');
+        } else {
+            $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'false');
+        }
     }
 }

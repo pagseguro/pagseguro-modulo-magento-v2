@@ -35,12 +35,19 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
     /**
      * Get payment method code for PagSeguro from Payment model.
      */
-    const PAYMENT_METHOD_PAGSEGURO_CODE = \UOL\PagSeguro\Model\Payment::PAYMENT_METHOD_PAGSEGURO_CODE;
+    const PAYMENT_METHOD_PAGSEGURO_CODE = 'pagseguro_default_lightbox';//\UOL\PagSeguro\Model\Payment::PAYMENT_METHOD_PAGSEGURO_CODE;
+    
+    const PAYMENT_METHOD_PAGSEGURO_BOLETO_CODE = 'pagseguro_boleto';
+    
+    const PAYMENT_METHOD_PAGSEGURO_ONLINE_DEBIT_CODE = 'pagseguro_oline_debit';
+    
 
     /**
      * @var
      */
     private $method;
+    
+    private $boletoMethod;
 
     /**
      * PaymentConfigProvider constructor.
@@ -49,6 +56,9 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
     public function __construct(PaymentHelper $helper)
     {
         $this->method = $helper->getMethodInstance(self::PAYMENT_METHOD_PAGSEGURO_CODE);
+        $this->boletoMethod = $helper->getMethodInstance(self::PAYMENT_METHOD_PAGSEGURO_BOLETO_CODE);
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $this->_library = $objectManager->create('\UOL\PagSeguro\Helper\Library');
     }
 
     /**
@@ -58,9 +68,16 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
      */
     public function getConfig()
     {
+        $this->_library->setEnvironment();
+        
         $config = [
+            'library' => [
+                'session' => $this->_library->getSession(),
+                'directPaymentJs' => $this->_library->getDirectPaymentUrl()
+            ],
+            'brazilFlagPath' => $this->_library->getImageUrl('UOL_PagSeguro::images/flag-origin-country.png'),
             'payment' => [
-                self::PAYMENT_METHOD_PAGSEGURO_CODE => [
+                'pagseguro' => [
                     'isDirect'   => $this->method->isDirectCheckout(),
                     'isLightbox' => $this->method->isLightboxCheckoutType(),
                     'checkout'   => [
@@ -69,7 +86,8 @@ class PaymentConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
                         'direct'   => $this->method->getDirectCheckoutPaymentUrl()
                     ]
                 ]
-            ]
+            ],
+            'pagseguro_boleto' => $this->boletoMethod->getStandardCheckoutPaymentUrl(),
         ];
         return $config;
     }

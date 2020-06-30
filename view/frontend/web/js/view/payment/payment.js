@@ -35,8 +35,20 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: 'pagseguro',
-                component: 'UOL_PagSeguro/js/view/payment/method-renderer/payment-method'
+                type: 'pagseguro_default_lightbox',
+                component: 'UOL_PagSeguro/js/view/payment/method-renderer/default_lightbox-method'
+            },
+            {
+                type: 'pagseguro_credit_card',
+                component: 'UOL_PagSeguro/js/view/payment/method-renderer/credit_card-method'
+            },
+            {
+                type: 'pagseguro_boleto',
+                component: 'UOL_PagSeguro/js/view/payment/method-renderer/boleto-method'
+            },
+            {
+                type: 'pagseguro_online_debit',
+                component: 'UOL_PagSeguro/js/view/payment/method-renderer/online_debit-method'
             }
         );
 

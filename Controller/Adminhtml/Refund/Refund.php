@@ -62,9 +62,8 @@ class Refund extends Ajaxable
             $this->_objectManager->create('UOL\PagSeguro\Helper\Library'),
             $this->_objectManager->create('UOL\PagSeguro\Helper\Crypt')
         );
-
         try {
-            return $this->whenSuccess($refund->execute($this->getRequest()->getParam('data')));
+            return $this->whenSuccess($refund->execute($this->getRequest()->getParam('data'), $this->getRequest()->getParam('value')));
         } catch (\Exception $exception) {
             return $this->whenError($exception->getMessage());
         }

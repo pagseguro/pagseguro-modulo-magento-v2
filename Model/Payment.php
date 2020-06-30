@@ -100,9 +100,9 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function isDirectCheckout()
     {
-        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::DIRECT) {
-            return true;
-        }
+//        if ($this->getConfigData('checkout') == \UOL\PagSeguro\Model\System\Config\Checkout::DIRECT) {
+//            return true;
+//        }
         return false;
     }
 
@@ -147,5 +147,10 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     public function getDirectCheckoutPaymentUrl()
     {
         return $this->_cart->getQuote()->getStore()->getUrl("pagseguro/direct/payment");
+    }
+    
+    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
+        return false
+        && parent::isAvailable($quote);
     }
 }

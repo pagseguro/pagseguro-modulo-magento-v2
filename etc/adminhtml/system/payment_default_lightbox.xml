@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="pagseguro_default_lightbox" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>PagSeguro (Padrão ou Lightbox)</label>
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>ATIVAR</label>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro_default_lightbox/active</config_path>
+        </field>
+        <field id="checkout" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>CHECKOUT</label>
+            <comment>Selecione o tipo de checkout desejado.</comment>
+            <source_model>UOL\PagSeguro\Model\System\Config\Checkout</source_model>
+            <config_path>payment/pagseguro_default_lightbox/checkout</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="title" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>NOME DE EXIBIÇÃO</label>
+            <tooltip>Informe o nome que deve ser apresentado para este meio de pagamento no checkout de sua loja.</tooltip>
+            <config_path>payment/pagseguro_default_lightbox/title</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+            <validate>required-entry</validate>
+        </field>
+         <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>POSIÇÃO NA TELA DE CHECKOUT (SORT ORDER)</label>
+            <tooltip>Irá aparecer depois de todos os meios de pagamento configurados na sua loja com valor menor e antes dos de valor maior.</tooltip>
+            <config_path>payment/pagseguro_default_lightbox/sort_order</config_path>
+            <validate>validate-zero-or-greater</validate>
+            <can_be_empty>1</can_be_empty>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <!-- Discount configuration -->
+        <field id="discount_credit_card" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>OFERECER DESCONTO PARA CARTÃO DE CRÉDITO?</label>
+            <tooltip>Ao ativar esta opção, seu comprador vai receber um desconto caso escolha pagar com este meio de pagamento. O desconto será aplicado com base no subtotal do checkout PagSeguro.</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro_default_lightbox/discount_credit_card</config_path>
+        </field>
+        <field id="discount_credit_card_value" translate="label" type="text" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PERCENTUAL DE DESCONTO</label>
+            <depends>
+                <field id="discount_credit_card">1</field>
+            </depends>
+            <validate>required-entry validate-number validate-number-range number-range-0.01-99.99</validate>
+            <tooltip>Informe o percentual de desconto a ser concedido para este meio de pagamento. Aceita valores de 0.01 à 99.99</tooltip>
+            <config_path>payment/pagseguro_default_lightbox/discount_credit_card_value</config_path>
+        </field>
+
+        <field id="discount_boleto" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>OFERECER DESCONTO PARA BOLETO?</label>
+            <tooltip>Ao ativar esta opção, seu comprador vai receber um desconto caso escolha pagar com este meio de pagamento. O desconto será aplicado com base no subtotal do checkout PagSeguro.</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro_default_lightbox/discount_boleto</config_path>
+        </field>
+        <field id="discount_boleto_value" translate="label" type="text" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PERCENTUAL DE DESCONTO</label>
+            <depends>
+                <field id="discount_boleto">1</field>
+            </depends>
+            <validate>required-entry validate-number validate-number-range number-range-0.01-99.99</validate>
+            <tooltip>Informe o percentual de desconto a ser concedido para este meio de pagamento. Aceita valores de 0.01 à 99.99</tooltip>
+            <config_path>payment/pagseguro_default_lightbox/discount_boleto_value</config_path>
+        </field>
+
+        <field id="discount_online_debit" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>OFERECER DESCONTO PARA DÉBITO ONLINE?</label>
+            <tooltip>Ao ativar esta opção, seu comprador vai receber um desconto caso escolha pagar com este meio de pagamento. O desconto será aplicado com base no subtotal do checkout PagSeguro.</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro_default_lightbox/discount_online_debit</config_path>
+        </field>
+        <field id="discount_online_debit_value" translate="label" type="text" sortOrder="75" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PERCENTUAL DE DESCONTO</label>
+            <depends>
+                <field id="discount_online_debit">1</field>
+            </depends>
+            <validate>required-entry validate-number validate-number-range number-range-0.01-99.99</validate>
+            <tooltip>Informe o percentual de desconto a ser concedido para este meio de pagamento. Aceita valores de 0.01 à 99.99</tooltip>
+            <config_path>payment/pagseguro_default_lightbox/discount_online_debit_value</config_path>
+        </field>
+
+        <field id="discount_deposit_account" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>OFERECER DESCONTO PARA DEPÓSITO EM CONTA?</label>
+            <tooltip>Ao ativar esta opção, seu comprador vai receber um desconto caso escolha pagar com este meio de pagamento. O desconto será aplicado com base no subtotal do checkout PagSeguro.</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro_default_lightbox/discount_deposit_account</config_path>
+        </field>
+        <field id="discount_deposit_account_value" translate="label" type="text" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PERCENTUAL DE DESCONTO</label>
+            <depends>
+                <field id="discount_deposit_account">1</field>
+            </depends>
+            <validate>required-entry validate-number validate-number-range number-range-0.01-99.99</validate>
+            <tooltip>Informe o percentual de desconto a ser concedido para este meio de pagamento. Aceita valores de 0.01 à 99.99</tooltip>
+            <config_path>payment/pagseguro_default_lightbox/discount_deposit_account_value</config_path>
+        </field>
+
+        <field id="discount_balance" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>OFERECER DESCONTO PARA SALDO PAGSEGURO?</label>
+            <tooltip>Ao ativar esta opção, seu comprador vai receber um desconto caso escolha pagar com este meio de pagamento. O desconto será aplicado com base no subtotal do checkout PagSeguro.</tooltip>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro_default_lightbox/discount_balance</config_path>
+        </field>
+        <field id="discount_balance_value" translate="label" type="text" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PERCENTUAL DE DESCONTO</label>
+            <depends>
+                <field id="discount_balance">1</field>
+            </depends>
+            <validate>required-entry validate-number validate-number-range number-range-0.01-99.99</validate>
+            <tooltip>Informe o percentual de desconto a ser concedido para este meio de pagamento. Aceita valores de 0.01 à 99.99</tooltip>
+            <config_path>payment/pagseguro_default_lightbox/discount_balance_value</config_path>
+        </field>
+        <!-- /Discount configuration -->
+    </group>
+</include>

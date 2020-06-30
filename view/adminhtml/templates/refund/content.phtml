@@ -17,10 +17,37 @@
             <tbody class="admin__table-secondary">
             </tbody>
         </table>
+
+        <div id="teste" class="modal-overlay"></div>
+        <div id="modal-partial-refund" class="modal-popup">
+            <div class="modal-inner-wrap">
+                <button class="action-close" type="button">
+                    <span>Close</span>
+                </button>
+                <div class="modal-content">
+                    <h2>Estorno parcial</h2>
+                    <h5 id="id-magento">ID magento: </h5>
+                    <h5 id="transaction-value">Valor total da venda:</h5>
+                    <form>
+                        <p>Informe o valor a ser estornado:</p>
+                        <div class="admin__scope-old">
+                            <label for="refund-value" >R$</label>
+                            <input type="text" onkeyup="formatRealInput(this)" onblur="valueHasThreeDigits(this)" name="refund-value" id="refund-value" placeholder="0,00"/>
+                            <p class="error"></p>
+                        </div>
+                        <p>Obs: O valor do estorno deve ser menor que o valor total da venda.</p>
+                        <button type="button" class="align-right action-secondary" id="partial-refund">Estornar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <input type="hidden" id="adminurl" data-target="<?=$this->getAdminurl(); ?>"/>
 <script type="text/javascript">
+    
+    var id, block, url, row, transactionValue;
+
     require(["jquery", 'Magento_Ui/js/modal/confirm', "datatables", "public"],function($, confirmation) {
 
         // DataTable config
@@ -53,16 +80,15 @@
                     $('#pagseguro-datatable_paginate')[0].style.display = "none";
                 }
 
-                jQuery('#pagseguro-datatable tbody tr').unbind('click');
-                jQuery('#pagseguro-datatable tbody tr').bind('click', function () {
-
-                    var id = jQuery(this).find('td')[1];
-                    var block = jQuery(this).find('.refund').attr('data-block');
-                    var url = $('#adminurl').attr('data-target');
-                    var row = $(this);
+                jQuery('#pagseguro-datatable tbody tr td .refund').unbind('click');
+                jQuery('#pagseguro-datatable tbody tr td .refund').bind('click', function () {
+                    id = jQuery(this).attr('data-id');
+                    block = jQuery(this).attr('data-block');
+                    url = $('#adminurl').attr('data-target');
+                    row = $(this).parents('tr');
                     confirmation({
                         title: 'Tem certeza que deseja estornar?',
-                        content: 'Order: ' + $(id).html() + '<br> Clique em OK para estornar.',
+                        content: 'Order: ' + id + '<br> Clique em OK para estornar.',
                         actions: {
                             confirm: function(){
                                 WS.Ajax.Refund.Refund(url, block, row);
@@ -72,6 +98,44 @@
                     });
 
                 });
+
+                jQuery('#pagseguro-datatable tbody tr td .partial-refund').unbind('click');
+                jQuery('#pagseguro-datatable tbody tr td .partial-refund').bind('click', function () {
+
+                    var idMagento = jQuery(this).attr('data-id');
+                    transactionValue = jQuery(this).attr('data-value');
+                    jQuery('#id-magento').text('ID magento: ' + idMagento);
+                    jQuery('#transaction-value').text('Valor total da venda: R$ ' + formatReal(transactionValue));
+                    jQuery('.modal-overlay').css('display','block');
+                    jQuery('#modal-partial-refund').addClass('_show');
+                    id = jQuery(this).find('td')[1];
+                    block = jQuery(this).attr('data-block');
+                    url = $('#adminurl').attr('data-target');
+                    row = $(this).parents('tr');
+                });
+            }
+        });
+
+        $('#partial-refund').click(function(){
+            var valueInput = $('#refund-value').val();
+            if(getMoney(valueInput) > transactionValue){
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Valor maior que o valor total da venda.');
+            } else if (getMoney(valueInput) == 0) {
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Valor de estorno não pode ser zero.');
+            } else if(valueInput == "") {
+                $('#refund-value').addClass('field-error');
+                $('.error').text('Informe o valor a ser estornado.');
+            } else {
+                if(valueIsNumber(valueInput)){
+                    valueInput = valueInput.replace(".", "");
+                    valueInput = valueInput.replace(",", ".");
+                    clearModal();
+                    $('.modal-overlay').css('display', 'none');
+                    $('.modal-popup').removeClass('_show');
+                    WS.Ajax.Refund.Refund(url, block, row, valueInput);
+                }
             }
         });
 
@@ -79,6 +143,31 @@
         $('#refund-search').on('click', function(){
             var url = $('#adminurl').attr('data-target');
             WS.Ajax.Refund.Search(url);
+        });
+
+        function clearModal(){
+            $('#refund-value').val('');
+            clearValueError();
+        }
+
+        function clearValueError(){
+            $('.error').text('');
+            $('#refund-value').removeClass('field-error');
+        }
+
+        window.onclick = function (event) {
+            var modal = document.getElementById('modal-partial-refund');
+            if (event.target == modal) {
+                clearModal();
+                $('.modal-overlay').css('display', 'none');
+                $('.modal-popup').removeClass('_show');
+            }
+        }
+
+        $(document).on('click', '.action-close', function(){
+            clearModal();
+            $('.modal-overlay').css('display', 'none');
+            $('.modal-popup').removeClass('_show');
         });
     });
 </script>

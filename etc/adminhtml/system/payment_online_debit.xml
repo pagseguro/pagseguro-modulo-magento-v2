@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="pagseguro_online_debit" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Checkout Transparente - Débito Online</label>
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>ATIVAR</label>
+            <source_model>UOL\PagSeguro\Model\System\Config\Yesno</source_model>
+            <config_path>payment/pagseguro_online_debit/active</config_path>
+        </field>
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>NOME DE EXIBIÇÃO</label>
+            <tooltip>Informe o nome que deve ser apresentado para este meio de pagamento no checkout de sua loja.</tooltip>
+            <config_path>payment/pagseguro_online_debit/title</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+            <validate>required-entry</validate>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>POSIÇÃO NA TELA DE CHECKOUT (SORT ORDER)</label>
+            <tooltip>Irá aparecer depois de todos os meios de pagamento configurados na sua loja com valor menor e antes dos de valor maior.</tooltip>
+            <config_path>payment/pagseguro_online_debit/sort_order</config_path>
+            <validate>validate-zero-or-greater</validate>
+            <can_be_empty>1</can_be_empty>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+    </group>
+</include>
