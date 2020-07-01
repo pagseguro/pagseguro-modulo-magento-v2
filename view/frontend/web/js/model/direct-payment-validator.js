@@ -24,7 +24,6 @@
  * This file have all the pagseguro direct payment common functions, like
  * form input masks and  validations and calls to the pagseguro js api
  */
-
 function mascaraMutuario(o,f){
   v_obj=o
   v_fun=f
@@ -250,7 +249,7 @@ function displayError(target, error = true) {
 
 /**
  * Add mask for document (cpf or cnpj)
- * Important: Called on keyup event
+ * Important: Called on keyup 
  * @param {this} document
  * @returns {bool}
  */
@@ -276,7 +275,7 @@ function documentMask(document) {
  */
 function MascaraCNPJ(cnpj) {
   if (mascaraInteiro(cnpj) == false) {
-    event.returnValue = false;
+    event.return = false;
   }
   return formataCampo(cnpj, '00.000.000/0000-00', event);
 }
@@ -286,11 +285,20 @@ function MascaraCNPJ(cnpj) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function MascaraData(data) {
+if (navigator.userAgent.search("Firefox") >= 0) {
+function MascaraData(data, event) {
   if (mascaraInteiro(data) == false) {
-    event.returnValue = false;
+    event.return = false;
   }
   return formataCampo(data, '00/00/0000', event);
+  }
+}else{
+function MascaraData(data) {
+  if (mascaraInteiro(data) == false) {
+    event.return = false;
+  }
+  return formataCampo(data, '00/00/0000', event);
+  }
 }
 
 /**
@@ -300,7 +308,7 @@ function MascaraData(data) {
  */
 function MascaraCPF(cpf) {
   if (mascaraInteiro(cpf) == false) {
-    event.returnValue = false;
+    event.return = false;
   }
   return formataCampo(cpf, '000.000.000-00', event);
 }
@@ -310,21 +318,36 @@ function MascaraCPF(cpf) {
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function creditCardMask(cc) {
-  if (mascaraInteiro(cc) == false) {
-    event.returnValue = false;
-  }
-  return formataCampo(cc, '0000 0000 0000 0000', event);
+
+if (navigator.userAgent.search("Firefox") >= 0) {
+   function creditCardMask(cc, event) {
+  
+  	if (mascaraInteiro(cc) == false) {
+    	event.return = false;
+  	}
+  	return formataCampo(cc, '0000 0000 0000 0000', event);
+	}
+} else { 
+    function creditCardMask(cc) {
+  
+  	if (mascaraInteiro(cc) == false) {
+    	event.return = false;
+  	}
+  	return formataCampo(cc, '0000 0000 0000 0000', event);
+	}  
 }
+
+
+  
 
 /**
  * Add not number mask to input
  * @param {type} cnpj
  * @returns {Boolean}
  */
-function notNumberMask(someString) {
+function notNumberMask(someString, event) {
   if (maskNotNumber(someString) == false) {
-    event.returnValue = false;
+    event.return = false;
   }
   return true;
 }
@@ -333,8 +356,8 @@ function notNumberMask(someString) {
  * Validate and prevent key typed event if it is a numbers
  * @returns {Boolean}
  */
-function maskNotNumber() {
-  if (event.keyCode == 8
+function maskNotNumber(event) {
+  if (event.keyCode == 8 
           || event.keyCode == 9
           || event.keyCode == 46
           || event.keyCode < 48
@@ -343,8 +366,9 @@ function maskNotNumber() {
 
     return true;
   }
-  event.returnValue = false;
+  event.return = false;
   return false;
+ 
 }
 
 /**
@@ -352,17 +376,23 @@ function maskNotNumber() {
  * backspace(8), tab(9), or del(46)
  * @returns {Boolean}
  */
+
+
 function mascaraInteiro() {
-  if (event.keyCode == 8
-          || event.keyCode == 9
-          || event.keyCode == 46
-          || (event.keyCode > 47 && event.keyCode < 58)
-          || (event.keyCode > 95 && event.keyCode < 106)) {
+function tecla(event){
+var e = event.keyCode || e.which;
+
+if ( e == 8
+          || e == 9
+          || e == 46
+          || (e > 47 && e < 58)
+          || (e > 95 && e < 106)) {
 
     return true;
   }
-  event.returnValue = false;
+  event.return = false;
   return false;
+}
 }
 
 /**
@@ -376,8 +406,8 @@ function formataCampo(campo, Mascara, evento) {
   var boleanoMascara;
 
   var Digitato = evento.keyCode;
-  exp = /\-|\.|\/|\(|\)| /g
-  campoSoNumeros = campo.value.toString().replace(exp, "");
+  var exp = /\-|\.|\/|\(|\)| /g
+  var campoSoNumeros = campo.value.toString().replace(exp, "");
 
   var posicaoCampo = 0;
   var NovoValorCampo = "";
@@ -412,7 +442,7 @@ function formataCampo(campo, Mascara, evento) {
  */
 function creditCardCodeMask(code) {
   if (mascaraInteiro(code) == false) {
-    event.returnValue = false;
+    event.return = false;
   }
   return true;
 }
