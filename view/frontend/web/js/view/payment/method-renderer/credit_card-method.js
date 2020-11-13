@@ -49,7 +49,6 @@ define(
             },
 
             initObservable: function () {
-
                 this._super()
                     .observe([
                         'creditCardDocument'
@@ -81,8 +80,9 @@ define(
               var maxYear = thisYear + 20;
               var years = [];
               var i = thisYear;
+
               for (i = thisYear; i < maxYear; i++) {
-                years.push(i);
+                  years.push(i);
               }
 
               return _.map(years, function (value, key) {
@@ -114,9 +114,9 @@ define(
                 this.isPlaceOrderActionAllowed(false);
 
                 if (! self.validatePlaceOrder()) {
-                  fullScreenLoader.stopLoader();
-                  this.isPlaceOrderActionAllowed(true);
-                  return;
+                    fullScreenLoader.stopLoader();
+                    this.isPlaceOrderActionAllowed(true);
+                    return;
                 } else {
                     var pagseguroHash = PagSeguroDirectPayment.getSenderHash();
                     var param = {
@@ -159,10 +159,11 @@ define(
                 }
               })).done(function () {
                   delete paymentData['title'];
+                  delete paymentData['__disableTmpl'];
+
                   $.when(placeOrder(paymentData, messageContainer)).done(function () {
                     $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
                   });
-                  //return;
               }).fail(function () {
                   self.isPlaceOrderActionAllowed(true);
               }).always(function(){

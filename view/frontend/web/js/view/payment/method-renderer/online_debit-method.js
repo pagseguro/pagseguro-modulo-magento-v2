@@ -87,10 +87,12 @@ define(
                         'online_debit_bank' : self.checkedBank()
                     }
                 })).done(function () {
-                        delete paymentData['title'];
-                        $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                          $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
-                        });
+                    delete paymentData['title'];
+                    delete paymentData['__disableTmpl'];
+
+                    $.when(placeOrder(paymentData, messageContainer)).done(function () {
+                      $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
+                    });
                 }).fail(function () {
                     self.isPlaceOrderActionAllowed(true);
                 }).always(function(){
@@ -106,7 +108,7 @@ define(
               }
               return validateDocumentFinal(document.getElementById('pagseguro_online_debit_online_debit_document')) && ! invalidBank;
             },
-            
+
             hideBankError: function() {
               document.getElementById('debitbankNameError').style.display = 'none';
               return false;

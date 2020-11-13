@@ -52,7 +52,6 @@ define(
              * @override
              */
             placeOrder: function () {
-
                 var self = this;
                 var paymentData = quote.paymentMethod();
                 var messageContainer = this.messageContainer;
@@ -61,14 +60,16 @@ define(
                 $.when(setPaymentInformationAction(this.messageContainer, {
                     'method': self.getCode()
                 })).done(function () {
-                        delete paymentData['title'];
-                        $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                           if (window.checkoutConfig.payment.pagseguro.isLightbox){
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
-                            } else {
-                                $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);
-                            }
-                        });
+                    delete paymentData['title'];
+                    delete paymentData['__disableTmpl'];
+
+                    $.when(placeOrder(paymentData, messageContainer)).done(function () {
+                       if (window.checkoutConfig.payment.pagseguro.isLightbox){
+                            $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
+                        } else {
+                            $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);
+                        }
+                    });
                 }).fail(function () {
                     self.isPlaceOrderActionAllowed(true);
                 }).always(function(){

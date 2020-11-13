@@ -51,7 +51,7 @@ define(
                     ]);
                 return this;
             },
-            
+
             context: function() {
                 return this;
             },
@@ -59,7 +59,7 @@ define(
             getCode: function() {
                 return "pagseguro_boleto"
             },
-            
+
              getData: function() {
                 return {
                     'method': this.item.method,
@@ -101,17 +101,19 @@ define(
                         'boleto_hash': PagSeguroDirectPayment.getSenderHash()
                     }
                 })).done(function () {
-                        delete paymentData['title'];                        
-                        $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                          $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
-                        });
+                    delete paymentData['title'];
+                    delete paymentData['__disableTmpl'];
+
+                    $.when(placeOrder(paymentData, messageContainer)).done(function () {
+                      $.mage.redirect(window.checkoutConfig.pagseguro_boleto);
+                    });
                 }).fail(function () {
                     self.isPlaceOrderActionAllowed(true);
                 }).always(function(){
                     fullScreenLoader.stopLoader();
                 });
             },
-            
+
             validatePlaceOrder: function() {
               return validateDocumentFinal(document.getElementById('pagseguro_boleto_boleto_document'));
             }
