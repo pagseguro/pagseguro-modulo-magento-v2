@@ -60,7 +60,7 @@ class Response extends \Magento\Framework\App\Action\Action implements \Magento\
             $nofitication->init();
         } catch (\Exception $ex) {
             //log already written in your pagseguro log file if pagseguro log is enabled in admin
-            exit;
+            return;
         }
     }
 
