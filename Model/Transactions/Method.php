@@ -91,7 +91,7 @@ abstract class Method
             $select = $connection->select()
                 ->from( ['order' => 'sales_order'], ['status', 'created_at', 'increment_id', 'store_id', 'entity_id'] )
                 ->join( ['ps' => 'pagseguro_orders'], 'order.entity_id = ps.order_id')
-                ->where('ps.transaction_code != ?', '')
+                ->where('ps.transaction_code !== ?', '')
                 ->order('order.created_at DESC');
 
             if (!is_null($this->_session->getData('store_id'))) {

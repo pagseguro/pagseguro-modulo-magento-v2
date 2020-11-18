@@ -355,7 +355,7 @@ class PaymentMethod
         $storeId = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_credit_card', $storeId) == 1) {
             $creditCard = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_credit_card_value', $storeId);
-            if ($creditCard && $creditCard != 0.00) {
+            if ($creditCard && $creditCard !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(
                     \PagSeguro\Enum\PaymentMethod\Group::CREDIT_CARD,
                     \PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
@@ -365,7 +365,7 @@ class PaymentMethod
         }
         if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_online_debit', $storeId) == 1) {
             $eft = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_online_debit_value', $storeId);
-            if ($eft && $eft != 0.00) {
+            if ($eft && $eft !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(
                     \PagSeguro\Enum\PaymentMethod\Group::EFT,
                     \PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
@@ -375,7 +375,7 @@ class PaymentMethod
         }
         if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_boleto', $storeId) == 1) {
             $boleto = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_boleto_value', $storeId);
-            if ($boleto && $boleto != 0.00) {
+            if ($boleto && $boleto !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(
                     \PagSeguro\Enum\PaymentMethod\Group::BOLETO,
                     \PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
@@ -385,7 +385,7 @@ class PaymentMethod
         }
         if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_deposit_account', $storeId)) {
             $deposit = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_deposit_account_value', $storeId);
-            if ($deposit && $deposit != 0.00) {
+            if ($deposit && $deposit !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(
                     \PagSeguro\Enum\PaymentMethod\Group::DEPOSIT,
                     \PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
@@ -395,7 +395,7 @@ class PaymentMethod
         }
         if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_balance', $storeId)) {
             $balance = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_balance_value', $storeId);
-            if ($balance && $balance != 0.00) {
+            if ($balance && $balance !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(
                     \PagSeguro\Enum\PaymentMethod\Group::BALANCE,
                     \PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,

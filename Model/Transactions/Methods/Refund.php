@@ -136,7 +136,7 @@ class Refund extends Method
     public function execute($data, $value = null) {
         try {
             $config = $this->sanitizeConfig($data);
-            if ($value != null)
+            if ($value !== null)
                 $config->value = number_format(floatval($value), 2, '.', '');
             $this->isConciliate($config);
             if (!$this->doRefund($config))
@@ -369,7 +369,7 @@ class Refund extends Method
      */
     private function compareStore($payment)
     {
-        if ($this->getStoreReference() != $this->decryptReference($payment))
+        if ($this->getStoreReference() !== $this->decryptReference($payment))
             return false;
         return true;
     }

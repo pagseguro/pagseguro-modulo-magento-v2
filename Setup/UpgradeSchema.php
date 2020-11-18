@@ -69,7 +69,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         // Get pagseguro orders table
         $tableName = $setup->getTable(self::PAGSEGURO_ORDERS);
         // Check if the table already exists
-        if ($setup->getConnection()->isTableExists($tableName) != true) {
+        if ($setup->getConnection()->isTableExists($tableName) !== true) {
             // Create pagseguro orders table
             $table = $setup->getConnection()
                 ->newTable($tableName)

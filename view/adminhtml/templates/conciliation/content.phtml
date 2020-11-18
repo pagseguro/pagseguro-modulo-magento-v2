@@ -96,7 +96,7 @@
                 var hasOne = false;
                 jQuery.each($('[data-target="conciliation"]'), function(index, value) {
                     if ( $(value).is(':checked') ) {
-                        if (hasOne != true) hasOne = true;
+                        if (hasOne !== true) hasOne = true;
                     }
                 });
                 if (hasOne === false) {

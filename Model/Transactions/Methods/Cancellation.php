@@ -345,7 +345,7 @@ class Cancellation extends Method
      */
     private function compareStore($payment)
     {
-        if ($this->getStoreReference() != $this->decryptReference($payment))
+        if ($this->getStoreReference() !== $this->decryptReference($payment))
             return false;
         return true;
     }
