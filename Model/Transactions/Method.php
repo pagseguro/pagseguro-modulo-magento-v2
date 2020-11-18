@@ -50,12 +50,12 @@ abstract class Method
     protected function getTransactions($page = null)
     {
         //check if has a page, if doesn't have one then start at the first.
-        if (is_null($page)) $page = 1;
+        if ($page===null) $page = 1;
 
         try {
 
             //check if is the first step, if is just add the response object to local var
-            if (is_null($this->_PagSeguroPaymentList)) {
+            if ($this->_PagSeguroPaymentList===null) {
                 $this->_PagSeguroPaymentList = $this->requestPagSeguroPayments($page);
             } else {
                 $response = $this->requestPagSeguroPayments($page);

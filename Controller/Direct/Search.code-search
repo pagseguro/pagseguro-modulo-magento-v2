@@ -1,0 +1,63 @@
+# Query: is_null(
+
+30 results - 15 files
+
+pagseguro-modulo-magento-v2\Controller\Direct\Boleto.php:
+  84:             if (!is_null($this->order)) {
+
+pagseguro-modulo-magento-v2\Controller\Direct\Debit.php:
+   85:             if (!is_null($this->order)) {
+  237:         if ($lastRealOrderId=== null) {
+
+pagseguro-modulo-magento-v2\Controller\Direct\Installments.php:
+   87:             if (!is_null($this->order)) {
+  188:         if (is_null($lastRealOrderId)) {
+
+pagseguro-modulo-magento-v2\Controller\Payment\Request.php:
+   93:         if (is_null($lastRealOrder->getPayment())) {
+  102:                 if (is_null($this->orderId)) {
+  128:                 if (!is_null($this->order)) {
+  142:                 if (is_null($this->orderId)) {
+  172:                 if (!is_null($this->order)) {
+  185:                 if (is_null($this->orderId)) {
+  228:                 if (!is_null($this->order)) {
+
+pagseguro-modulo-magento-v2\Helper\Data.php:
+  333:         if (!is_null($cancellationSource)) {
+  417:         if (!is_null($type)) {
+  450:         if (!is_null($code)) {
+
+pagseguro-modulo-magento-v2\Model\PaymentMethod.php:
+  209:         if (!is_null($address) or !empty($adress)) {
+
+pagseguro-modulo-magento-v2\Model\Direct\BoletoMethod.php:
+  343:         if (!is_null($address) or !empty($adress))
+
+pagseguro-modulo-magento-v2\Model\Direct\CreditCardMethod.php:
+  428:         if (!is_null($address) or !empty($adress))
+
+pagseguro-modulo-magento-v2\Model\Direct\DebitMethod.php:
+  349:         if (!is_null($address) or !empty($adress))
+
+pagseguro-modulo-magento-v2\Model\Transactions\Method.php:
+  53:         if (is_null($page)) $page = 1;
+  58:             if (is_null($this->_PagSeguroPaymentList)) {
+  97:             if (!is_null($this->_session->getData('store_id'))) {
+
+pagseguro-modulo-magento-v2\Model\Transactions\Methods\Abandoned.php:
+  194:                     if (!is_null($this->_session->getData('store_id'))) {
+  274:         if (is_null($page)) $page = 1;
+  278:             if (is_null($this->_PagSeguroPaymentList)) {
+
+pagseguro-modulo-magento-v2\Model\Transactions\Methods\Cancellation.php:
+  231:         if (! is_null($this->_PagSeguroPaymentList->getTransactions())) {
+
+pagseguro-modulo-magento-v2\Model\Transactions\Methods\Conciliation.php:
+  136:         if (! is_null($this->_PagSeguroPaymentList->getTransactions())) {
+
+pagseguro-modulo-magento-v2\Model\Transactions\Methods\Refund.php:
+  246:         if (! is_null($this->_PagSeguroPaymentList->getTransactions())) {
+
+pagseguro-modulo-magento-v2\view\frontend\templates\success.phtml:
+  28:                 <?php if(!is_null($this->getPaymentLink())): ?>
+  38:                 <?php if(!is_null($this->getPaymentLink())): ?>

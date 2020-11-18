@@ -234,7 +234,7 @@ class Debit extends \Magento\Framework\App\Action\Action
     {   
         $lastRealOrderId = $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
 
-        if (is_null($lastRealOrderId)) {
+        if ($lastRealOrderId===null) {
             throw new \Exception("There is no order associated with this session.");
         } 
         

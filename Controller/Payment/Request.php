@@ -90,7 +90,7 @@ class Request extends \Magento\Framework\App\Action\Action
     {
         $lastRealOrder = $this->_checkoutSession->getLastRealOrder();
 
-        if (is_null($lastRealOrder->getPayment())) {
+        if ($lastRealOrder->getPayment()===null) {
             throw new \Magento\Framework\Exception\NotFoundException(__('No order associated.'));
         }
 
@@ -99,7 +99,7 @@ class Request extends \Magento\Framework\App\Action\Action
         if ($paymentData['method'] === 'pagseguro_boleto') {
             try {
                 $this->orderId = $lastRealOrder->getId();
-                if (is_null($this->orderId)) {
+                if ($this->orderId===null) {
                     throw new \Exception("There is no order associated with this session.");
                 }
 
@@ -139,7 +139,7 @@ class Request extends \Magento\Framework\App\Action\Action
             try {
                 $this->orderId = $lastRealOrder->getId();
 
-                if (is_null($this->orderId)) {
+                if ($this->orderId===null) {
                     throw new \Exception("There is no order associated with this session.");
                 }
                 
@@ -182,7 +182,7 @@ class Request extends \Magento\Framework\App\Action\Action
             try {
                 $this->orderId = $lastRealOrder->getId();
 
-                if (is_null($this->orderId)) {
+                if ($this->orderID===null) {
                     throw new \Exception("There is no order associated with this session.");
                 }
 

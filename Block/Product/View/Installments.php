@@ -88,6 +88,6 @@ class Installments extends Template
      */
     public function isEnabled() {
         $status = $this->_scopeConfig->getValue('payment/pagseguro/installments');
-        return (! is_null($status) && $status == 1) ? true : false;
+        return (! ($status=== null) && $status == 1) ? true : false;
     }
 }
