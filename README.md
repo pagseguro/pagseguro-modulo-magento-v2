@@ -1,4 +1,4 @@
-Módulo de integração PagSeguro para Magento 2.x
+Módulo de integração PagSeguro para Magento 2.4.x
 ====================================================
 
 [![Code Climate](https://codeclimate.com/github/pagseguro/magento2/badges/gpa.svg)](https://codeclimate.com/github/pagseguro/magento2)
@@ -17,9 +17,9 @@ Requisitos
 ----------
 ---
 
- - [Magento] Community 2.0.8 | 2.1.0 até a versão 2.1.9
- - [PHP] 5.5+
-
+ - [Magento] Community 2.0.8 | 2.1.0 até a versão 2.4.0
+ - [PHP] 7.2+
+ - [Versões Magento] Para versões anteriores, usar outras tags
  - [SPL]
  - [cURL]
  - [DOM]
