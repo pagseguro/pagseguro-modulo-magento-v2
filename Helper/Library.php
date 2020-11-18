@@ -84,7 +84,7 @@ class Library
     public function isLightboxCheckoutType()
     {
         if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/checkout')
-            == \UOL\PagSeguro\Model\System\Config\Checkout::LIGHTBOX) {
+           === \UOL\PagSeguro\Model\System\Config\Checkout::LIGHTBOX) {
             return true;
         }
         return false;
@@ -172,7 +172,7 @@ class Library
      */
     public function getDirectPaymentUrl()
     {
-        if ($this->getEnvironment() == 'sandbox') {
+        if ($this->getEnvironment()=== 'sandbox') {
             return Library::DIRECT_PAYMENT_URL_SANDBOX;
         } else {
             return Library::DIRECT_PAYMENT_URL;

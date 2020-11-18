@@ -87,7 +87,7 @@ class Checkout extends \Magento\Framework\App\Action\Action
      */
     private function getPagSeguroPaymentJs()
     {
-        if (\PagSeguro\Configuration\Configure::getEnvironment()->getEnvironment() == 'sandbox') {
+        if (\PagSeguro\Configuration\Configure::getEnvironment()->getEnvironment()=== 'sandbox') {
             return \UOL\PagSeguro\Helper\Library::SANDBOX_JS;
         } else {
             return \UOL\PagSeguro\Helper\Library::STANDARD_JS;

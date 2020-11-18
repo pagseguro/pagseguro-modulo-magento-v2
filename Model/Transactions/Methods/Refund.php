@@ -205,7 +205,7 @@ class Refund extends Method
      */
     private function doRefund($config)
     {
-        if ($this->requestRefund($config)->getResult() == "OK")
+        if ($this->requestRefund($config)->getResult()=== "OK")
             return true;
         throw new \Exception("an error occurred");
     }
@@ -337,7 +337,7 @@ class Refund extends Method
      */
     private function checkConciliation($payment, $order)
     {
-        if ($order->getStatus() == $this->getStatusFromPaymentKey($payment->getStatus()))
+        if ($order->getStatus()=== $this->getStatusFromPaymentKey($payment->getStatus()))
             return true;
         return false;
     }
@@ -355,7 +355,7 @@ class Refund extends Method
                 $this->getStatusFromPaymentKey(3),
                 $this->getStatusFromPaymentKey(4),
                 $this->getStatusFromPaymentKey(5),
-            ]) == 1 && in_array($payment->getStatus(), [3, 4, 5]) == 1)) {
+            ])=== 1 && in_array($payment->getStatus(), [3, 4, 5])=== 1)) {
             return true;
         }
         return false;

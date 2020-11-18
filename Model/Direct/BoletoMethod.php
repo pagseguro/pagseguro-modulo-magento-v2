@@ -232,9 +232,9 @@ class BoletoMethod implements Checkout
     private function setSenderInformation()
     {
         if (
-            $this->_order->getCustomerName() == (string)__('Guest') 
-            || $this->_order->getCustomerName() == 'Convidado'
-            || $this->_order->getCustomerName() == 'Visitante'
+            $this->_order->getCustomerName()=== (string)__('Guest') 
+            || $this->_order->getCustomerName()=== 'Convidado'
+            || $this->_order->getCustomerName()=== 'Visitante'
         ) {
             $this->guest();
         } else {
@@ -268,7 +268,7 @@ class BoletoMethod implements Checkout
      */
     private function getEmail()
     {
-//        if ($this->_scopeConfig->getValue('payment/pagseguro/environment') == "sandbox") {
+//        if ($this->_scopeConfig->getValue('payment/pagseguro/environment')=== "sandbox") {
 //            return "magento2@sandbox.pagseguro.com.br"; //mock for sandbox
 //        }
         return $this->_order->getCustomerEmail();
@@ -378,7 +378,7 @@ class BoletoMethod implements Checkout
      */
     private function getRegionAbbreviation($shipping)
     {
-        if (strlen($shipping->getRegionCode()) == 2) {
+        if (strlen($shipping->getRegionCode())=== 2) {
             return $shipping->getRegionCode();
         }
 
@@ -447,7 +447,7 @@ class BoletoMethod implements Checkout
      */
     private function setShoppingCartRecovery()
     {
-        if ($this->_scopeConfig->getValue('payment/pagseguro/shopping_cart_recovery') == true) {
+        if ($this->_scopeConfig->getValue('payment/pagseguro/shopping_cart_recovery')=== true) {
             $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'true');
         } else {
             $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'false');

@@ -273,7 +273,7 @@ class Conciliation extends Method
      */
     private function compareStatus($order, $payment)
     {
-        if ($order->getStatus() == $this->getStatusFromPaymentKey($payment->getStatus()))
+        if ($order->getStatus()=== $this->getStatusFromPaymentKey($payment->getStatus()))
             return false;
         return true;
     }

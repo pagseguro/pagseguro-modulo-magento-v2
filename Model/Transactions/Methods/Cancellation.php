@@ -192,7 +192,7 @@ class Cancellation extends Method
      */
     private function doCancel($config)
     {
-        if ($this->requestCancel($config)->getResult() == "OK")
+        if ($this->requestCancel($config)->getResult()=== "OK")
             return true;
         throw new \Exception("an error occurred.");
     }
@@ -314,7 +314,7 @@ class Cancellation extends Method
      */
     private function checkConciliation($payment, $order)
     {
-        if ($order->getStatus() == $this->getStatusFromPaymentKey($payment->getStatus()))
+        if ($order->getStatus()=== $this->getStatusFromPaymentKey($payment->getStatus()))
             return true;
         return false;
     }

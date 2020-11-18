@@ -139,9 +139,9 @@ class PaymentMethod
         $senderName = $this->_checkoutSession->getLastRealOrder()->getCustomerName();
         // If Guest
         if (
-            $senderName == (string)__('Guest')
-            || $senderName == 'Convidado'
-            || $senderName == 'Visitante'
+            $senderName=== (string)__('Guest')
+            || $senderName=== 'Convidado'
+            || $senderName=== 'Visitante'
                 
         ) {
             $address = $this->getBillingAddress();
@@ -258,7 +258,7 @@ class PaymentMethod
      */
     private function getRegionAbbreviation($shipping)
     {
-        if (strlen($shipping->getRegionCode()) == 2) {
+        if (strlen($shipping->getRegionCode())=== 2) {
             return $shipping->getRegionCode();
         }
 
@@ -337,7 +337,7 @@ class PaymentMethod
      */
     private function setShoppingCartRecovery()
     {
-        if ($this->_scopeConfig->getValue('payment/pagseguro/shopping_cart_recovery') == true) {
+        if ($this->_scopeConfig->getValue('payment/pagseguro/shopping_cart_recovery')=== true) {
             $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'true');
         } else {
             $this->_paymentRequest->addParameter()->withParameters('enableRecovery', 'false');
@@ -353,7 +353,7 @@ class PaymentMethod
     private function setPagSeguroDiscountsByPaymentMethod()
     {
         $storeId = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_credit_card', $storeId) == 1) {
+        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_credit_card', $storeId)=== 1) {
             $creditCard = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_credit_card_value', $storeId);
             if ($creditCard && $creditCard !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(
@@ -363,7 +363,7 @@ class PaymentMethod
                 );
             }
         }
-        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_online_debit', $storeId) == 1) {
+        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_online_debit', $storeId)=== 1) {
             $eft = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_online_debit_value', $storeId);
             if ($eft && $eft !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(
@@ -373,7 +373,7 @@ class PaymentMethod
                 );
             }
         }
-        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_boleto', $storeId) == 1) {
+        if ($this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_boleto', $storeId)=== 1) {
             $boleto = (double)$this->_scopeConfig->getValue('payment/pagseguro_default_lightbox/discount_boleto_value', $storeId);
             if ($boleto && $boleto !== 0.00) {
                 $this->_paymentRequest->addPaymentMethod()->withParameters(

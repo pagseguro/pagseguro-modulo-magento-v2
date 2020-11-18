@@ -157,7 +157,7 @@ class NotificationMethod
      */
     private function compareStatus($pagseguro, $magento)
     {
-        if ($pagseguro == $magento) {
+        if ($pagseguro=== $magento) {
             return true;
         }
         return false;

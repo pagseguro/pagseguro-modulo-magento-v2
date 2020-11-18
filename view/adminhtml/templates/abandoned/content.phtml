@@ -79,10 +79,10 @@
 
         // Check/Uncheck all checkboxes.
         $('#abandoned-mass-select-checkbox').on('click', function () {
-            if (this.checked == true) {
+            if (this.checked=== true) {
                 $('[data-target="abandoned"]').prop('checked', true);
             }
-            if (this.checked == false) {
+            if (this.checked=== false) {
                 $('[data-target="abandoned"]').prop('checked', false);
             }
         })

@@ -80,10 +80,10 @@
 
         // Check/Uncheck all checkboxes.
         $('#conciliation-mass-select-checkbox').on('click', function () {
-            if (this.checked == true) {
+            if (this.checked=== true) {
                 $('[data-target="conciliation"]').prop('checked', true);
             }
-            if (this.checked == false) {
+            if (this.checked=== false) {
                 $('[data-target="conciliation"]').prop('checked', false);
             }
         })

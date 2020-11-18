@@ -98,7 +98,7 @@ function validateDocument(self) {
         displayError(self)
         return false
     }
-    if (status == "true") {
+    if (status === "true") {
         //displayError(self, false)
         return false;
     } else {
@@ -255,7 +255,7 @@ function displayError(target, error = true) {
  */
 function documentMask(document) {
     if (document.value.length < 14 ||
-        (document.value.length == 14 && (event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 46))
+        (document.value.length === 14 && (event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 46))
     ) {
         MascaraCPF(document);
     } else {
@@ -274,7 +274,7 @@ function documentMask(document) {
  * @returns {Boolean}
  */
 function MascaraCNPJ(cnpj) {
-    if (mascaraInteiro(cnpj) == false) {
+    if (mascaraInteiro(cnpj) === false) {
         event.return = false;
     }
     return formataCampo(cnpj, '00.000.000/0000-00', event);
@@ -287,14 +287,14 @@ function MascaraCNPJ(cnpj) {
  */
 if (navigator.userAgent.search("Firefox") >= 0) {
     function MascaraData(data, event) {
-        if (mascaraInteiro(data) == false) {
+        if (mascaraInteiro(data) === false) {
             event.return = false;
         }
         return formataCampo(data, '00/00/0000', event);
     }
 } else {
     function MascaraData(data) {
-        if (mascaraInteiro(data) == false) {
+        if (mascaraInteiro(data) === false) {
             event.return = false;
         }
         return formataCampo(data, '00/00/0000', event);
@@ -307,7 +307,7 @@ if (navigator.userAgent.search("Firefox") >= 0) {
  * @returns {Boolean}
  */
 function MascaraCPF(cpf) {
-    if (mascaraInteiro(cpf) == false) {
+    if (mascaraInteiro(cpf) === false) {
         event.return = false;
     }
     return formataCampo(cpf, '000.000.000-00', event);
@@ -322,7 +322,7 @@ function MascaraCPF(cpf) {
 if (navigator.userAgent.search("Firefox") >= 0) {
     function creditCardMask(cc, event) {
 
-        if (mascaraInteiro(cc) == false) {
+        if (mascaraInteiro(cc) === false) {
             event.return = false;
         }
         return formataCampo(cc, '0000 0000 0000 0000', event);
@@ -330,7 +330,7 @@ if (navigator.userAgent.search("Firefox") >= 0) {
 } else {
     function creditCardMask(cc) {
 
-        if (mascaraInteiro(cc) == false) {
+        if (mascaraInteiro(cc) === false) {
             event.return = false;
         }
         return formataCampo(cc, '0000 0000 0000 0000', event);
@@ -346,7 +346,7 @@ if (navigator.userAgent.search("Firefox") >= 0) {
  * @returns {Boolean}
  */
 function notNumberMask(someString, event) {
-    if (maskNotNumber(someString) == false) {
+    if (maskNotNumber(someString) === false) {
         event.return = false;
     }
     return true;
@@ -357,9 +357,9 @@ function notNumberMask(someString, event) {
  * @returns {Boolean}
  */
 function maskNotNumber(event) {
-    if (event.keyCode == 8 ||
-        event.keyCode == 9 ||
-        event.keyCode == 46 ||
+    if (event.keyCode === 8 ||
+        event.keyCode === 9 ||
+        event.keyCode === 46 ||
         event.keyCode < 48 ||
         (event.keyCode > 57 && event.keyCode < 96) ||
         (event.keyCode > 105)) {
@@ -382,9 +382,9 @@ function mascaraInteiro() {
     function tecla(event) {
         var e = event.keyCode || e.which;
 
-        if (e == 8 ||
-            e == 9 ||
-            e == 46 ||
+        if (e === 8 ||
+            e === 9 ||
+            e === 46 ||
             (e > 47 && e < 58) ||
             (e > 95 && e < 106)) {
 
@@ -415,10 +415,10 @@ function formataCampo(campo, Mascara, evento) {
 
     if (Digitato !== 8) { // backspace 
         for (i = 0; i <= TamanhoMascara; i++) {
-            boleanoMascara = ((Mascara.charAt(i) == "-") || (Mascara.charAt(i) == ".") ||
-                (Mascara.charAt(i) == "/"))
-            boleanoMascara = boleanoMascara || ((Mascara.charAt(i) == "(") ||
-                (Mascara.charAt(i) == ")") || (Mascara.charAt(i) == " "))
+            boleanoMascara = ((Mascara.charAt(i) === "-") || (Mascara.charAt(i) === ".") ||
+                (Mascara.charAt(i) === "/"))
+            boleanoMascara = boleanoMascara || ((Mascara.charAt(i) === "(") ||
+                (Mascara.charAt(i) === ")") || (Mascara.charAt(i) === " "))
             if (boleanoMascara) {
                 NovoValorCampo += Mascara.charAt(i);
                 TamanhoMascara++;
@@ -440,7 +440,7 @@ function formataCampo(campo, Mascara, evento) {
  * @returns {Boolean}
  */
 function creditCardCodeMask(code) {
-    if (mascaraInteiro(code) == false) {
+    if (mascaraInteiro(code) === false) {
         event.return = false;
     }
     return true;

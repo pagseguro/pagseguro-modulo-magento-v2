@@ -97,7 +97,7 @@ class CreatePagSeguroOrder implements ObserverInterface
         $order = $observer->getEvent()->getOrder();
 
         //verify pagseguro transaction
-        if ($order->getStatus() == 'pagseguro_iniciado') {
+        if ($order->getStatus()=== 'pagseguro_iniciado') {
             $orderId = $order->getId();
             $environment = $this->_scopeConfig->getValue('payment/pagseguro/environment');
             

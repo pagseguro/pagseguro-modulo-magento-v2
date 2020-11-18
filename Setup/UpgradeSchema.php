@@ -185,7 +185,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $tableName = $setup->getTable(self::PAGSEGURO_ORDERS);
 
         // Check if the table already exists
-        if ($setup->getConnection()->isTableExists($tableName) == true && $setup->getConnection()->tableColumnExists($tableName, 'partially_refunded') === false) {
+        if ($setup->getConnection()->isTableExists($tableName)=== true && $setup->getConnection()->tableColumnExists($tableName, 'partially_refunded') === false) {
             $setup->getConnection()
                 ->addColumn(
                     $tableName,

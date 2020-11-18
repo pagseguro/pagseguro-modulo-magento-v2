@@ -95,12 +95,12 @@ var WS = {
 
                     if (response.success) {
 
-                        if (response.success == true) {
+                        if (response.success === true) {
                             //Alert
                             Modal.Load('Conciliação', 'Transações conciliadas com sucesso!');
                         }
 
-                        if (response.success == false) {
+                        if (response.success === false) {
                             //Alert
                             Modal.Load('Conciliação', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
                         }
@@ -181,7 +181,7 @@ var WS = {
 
                     if (response.success) {
 
-                        if (response.success == true) {
+                        if (response.success === true) {
 
                             //Cleans up the table
                             t.clear().draw();
@@ -191,7 +191,7 @@ var WS = {
                             Modal.Load('Abandonadas', 'Código de recuperação enviado com sucesso!');
 
                         }
-                        if (response.success == false) {
+                        if (response.success === false) {
                             //Alert
                             Modal.Load('Abandonadas', 'Não foi possível executar esta ação. Utilize a recuperação de transações primeiro ou tente novamente mais tarde.');
                         }
@@ -266,7 +266,7 @@ var WS = {
                         Modal.Load('Cancelamento', 'Transações cancelada com sucesso!');
 
                     } else {
-                        if (response.payload.error == 'Need to conciliate') {
+                        if (response.payload.error === 'Need to conciliate') {
                             //Alert
                             Modal.Load('Cancelamento', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
                         } else {
@@ -337,23 +337,23 @@ var WS = {
                         t.row(row).remove().draw();
                         Modal.Load('Estorno', 'Transações estornada com sucesso!');
                     } else {
-                        if (response.payload.error == 'Need to conciliate') {
+                        if (response.payload.error === 'Need to conciliate') {
                             Modal.Load('Estorno', 'Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.');
-                        } else if (response.payload.error == '14002' || response.payload.error == '14013') {
+                        } else if (response.payload.error === '14002' || response.payload.error === '14013') {
                             Modal.Load('Estorno', 'Valor do estorno está em um formato inválido!');
-                        } else if (response.payload.error == '14003') {
+                        } else if (response.payload.error === '14003') {
                             Modal.Load('Estorno', 'Valor do estorno inválido! O valor não pode ser negativo.');
-                        } else if (response.payload.error == '14004') {
+                        } else if (response.payload.error === '14004') {
                             Modal.Load('Estorno', 'Valor do estorno é menor do que o permitido.');
-                        } else if (response.payload.error == '14005') {
+                        } else if (response.payload.error === '14005') {
                             Modal.Load('Estorno', 'Valor do estorno é maior do que o permitido.');
-                        } else if (response.payload.error == '14006') {
+                        } else if (response.payload.error === '14006') {
                             Modal.Load('Estorno', 'Saldo insuficiente para estornar a transação.');
-                        } else if (response.payload.error == '14007') {
+                        } else if (response.payload.error === '14007') {
                             Modal.Load('Estorno', 'Status da transação é inválido para ser estornada.');
-                        } else if (response.payload.error == '14008') {
+                        } else if (response.payload.error === '14008') {
                             Modal.Load('Estorno', 'Transação não encontrada.');
-                        } else if (response.payload.error == '14009') {
+                        } else if (response.payload.error === '14009') {
                             Modal.Load('Estorno', "Sua conta PagSeguro não tem permissão para realizar esta ação. Em caso de dúvidas acesse <a href='http://forum.pagseguro.uol.com.br' target='_blank'>http://forum.pagseguro.uol.com.br</a>");
                         } else {
                             Modal.Load('Estorno', 'Não foi possível executar esta ação. Tente novamente mais tarde.');
@@ -574,7 +574,7 @@ var WS = {
                         jQuery('#modal-details').addClass('_show');
 
                     } else {
-                        if (result.payload.error == "need to conciliate") {
+                        if (result.payload.error === "need to conciliate") {
                             Modal.Load('Atenção', 'É necessário utilizar a conciliação de transações primeiro.');
                         }
                     }
@@ -594,19 +594,19 @@ function dateMask(date, fieldName) {
     var mydate = '';
     var field = document.getElementById(fieldName);
     mydate = mydate + date;
-    if (mydate.length == 2 && event.keyCode !== 8) {
+    if (mydate.length === 2 && event.keyCode !== 8) {
         mydate = mydate + '/';
         field.value = mydate;
     }
-    if (mydate.length == 5 && event.keyCode !== 8) {
+    if (mydate.length === 5 && event.keyCode !== 8) {
         mydate = mydate + '/';
         field.value = mydate;
     }
-    if (mydate.length == 10) {
+    if (mydate.length === 10) {
         dateVerify(field);
     }
 
-    if (field.value == "") {
+    if (field.value === "") {
         field.classList.remove('field-error');
     }
 }
@@ -619,7 +619,7 @@ function dateVerify(fieldName) {
 
     situacao = "";
 
-    if (isNaN(day) || ((day < 01) || (day < 01 || day > 30) && (month == 04 || month == 06 || month == 09 || month == 11) || day > 31)) {
+    if (isNaN(day) || ((day < 01) || (day < 01 || day > 30) && (month === 04 || month === 06 || month === 09 || month === 11) || day > 31)) {
         situacao = "false";
     }
 
@@ -627,11 +627,11 @@ function dateVerify(fieldName) {
         situacao = "false";
     }
 
-    if (isNaN(year) || month == 2 && (day < 01 || day > 29 || (day > 28 && (parseInt(year / 4) !== year / 4)))) {
+    if (isNaN(year) || month === 2 && (day < 01 || day > 29 || (day > 28 && (parseInt(year / 4) !== year / 4)))) {
         situacao = "false";
     }
 
-    if (situacao == "false") {
+    if (situacao === "false") {
         fieldName.classList.add('field-error');
     } else {
         fieldName.classList.remove('field-error');
@@ -645,7 +645,7 @@ function dateVerifyOnLosesFocus(fieldName) {
 
     if (mydate.length > 0 && mydate.length < 10) {
         fieldName.classList.add('field-error');
-    } else if (mydate.length == 0) {
+    } else if (mydate.length === 0) {
         fieldName.classList.remove('field-error');
     } else {
         dateVerify(fieldName);
@@ -656,7 +656,7 @@ function validateSearchByDate() {
     var fieldDateFromValue = document.getElementById('date_begin').value;
     var fieldDateToValue = document.getElementById('date_end').value;
 
-    if ((fieldDateFromValue.length > 0 && fieldDateToValue.length == 0) || (fieldDateFromValue.length == 0 && fieldDateToValue.length > 0)) {
+    if ((fieldDateFromValue.length > 0 && fieldDateToValue.length === 0) || (fieldDateFromValue.length === 0 && fieldDateToValue.length > 0)) {
         Modal.Load('Erro ao filtrar!', 'Data de início e fim devem ser informadas!');
         return false;
     }
@@ -711,7 +711,7 @@ function formatRealInput(field) {
 
 function valueHasThreeDigits(field) {
     var tmp = field.value;
-    if (tmp.length == 1) {
+    if (tmp.length === 1) {
         field.value = tmp + "00";
     }
     formatRealInput(field)
@@ -719,7 +719,7 @@ function valueHasThreeDigits(field) {
 
 function valueIsNumber(tmp) {
 
-    if (tmp.indexOf(",") == 0) {
+    if (tmp.indexOf(",") === 0) {
         jQuery('#refund-value').addClass('field-error');
         jQuery('.error').text('Valor inválido.');
         return false;

@@ -188,7 +188,7 @@ class Abandoned extends Method
                 date_default_timezone_set('UTC');
                 $order = \UOL\PagSeguro\Helper\Data::getReferenceDecryptOrderID($payment->getReference());
                 $order = $this->_order->load($order);
-                if ($this->getStoreReference() == \UOL\PagSeguro\Helper\Data::getReferenceDecrypt(
+                if ($this->getStoreReference()=== \UOL\PagSeguro\Helper\Data::getReferenceDecrypt(
                         $payment->getReference())
                 ) {
                     if (!is_null($this->_session->getData('store_id'))) {
@@ -401,7 +401,7 @@ class Abandoned extends Method
     private function abandonedRecoveryUrl($recoveryCode)
     {
 
-        if (strtolower($this->_library->getEnvironment()) == "sandbox") {
+        if (strtolower($this->_library->getEnvironment())=== "sandbox") {
             return 'https://sandbox.pagseguro.uol.com.br/checkout/v2/resume.html?r=' . $recoveryCode;
         }
         return 'https://pagseguro.uol.com.br/checkout/v2/resume.html?r=' . $recoveryCode;

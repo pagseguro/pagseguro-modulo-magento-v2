@@ -215,7 +215,7 @@ class InstallmentsMethod
      */
     private function getInterestFreeText($insterestFree)
     {
-        return ($insterestFree == 'true') ? 'sem' : 'com';
+        return ($insterestFree=== 'true') ? 'sem' : 'com';
     }
     
     /**

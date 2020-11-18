@@ -121,10 +121,10 @@
             if(getMoney(valueInput) > transactionValue){
                 $('#refund-value').addClass('field-error');
                 $('.error').text('Valor maior que o valor total da venda.');
-            } else if (getMoney(valueInput) == 0) {
+            } else if (getMoney(valueInput)=== 0) {
                 $('#refund-value').addClass('field-error');
                 $('.error').text('Valor de estorno não pode ser zero.');
-            } else if(valueInput == "") {
+            } else if(valueInput=== "") {
                 $('#refund-value').addClass('field-error');
                 $('.error').text('Informe o valor a ser estornado.');
             } else {
@@ -157,7 +157,7 @@
 
         window.onclick = function (event) {
             var modal = document.getElementById('modal-partial-refund');
-            if (event.target == modal) {
+            if (event.target=== modal) {
                 clearModal();
                 $('.modal-overlay').css('display', 'none');
                 $('.modal-popup').removeClass('_show');

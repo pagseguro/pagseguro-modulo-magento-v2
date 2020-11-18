@@ -21,21 +21,20 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 -->
-<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+<div class="payment-method" data-bind="css: {'_active': (getCode()=== isChecked())}">
     <div class="payment-method-title field choice">
-        <input type="radio"
-               name="payment[method]"
-               class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <input type="radio" name="payment[method]" class="radio" data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content">
         <!-- ko foreach: getRegion('messages') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- ko template: getTemplate() -->
+        <!-- /ko -->
         <!--/ko-->
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
             <!--/ko-->
         </div>
 
@@ -44,8 +43,8 @@
             <input type="hidden" id="creditCardBrand" value="">
             <input type="hidden" id="creditCardInstallment" name="payment[credit_card_installment]">
             <input type="hidden" id="creditCardInstallmentValue" name="payment[credit_card_installment_value]">
-            <input type="hidden" id="grand_total" value="" data-bind="attr: {value: getGrandTotal()}" >
-            <input type="hidden" id="pagseguroCcSessionId" value="" data-bind="attr: {value: pagseguroCcSessionId}" >
+            <input type="hidden" id="grand_total" value="" data-bind="attr: {value: getGrandTotal()}">
+            <input type="hidden" id="pagseguroCcSessionId" value="" data-bind="attr: {value: pagseguroCcSessionId}">
             <!--cc number-->
             <div class="field _required">
                 <label data-bind="attr: {for: getCode() + 'number'}" class="label">
@@ -53,14 +52,7 @@
                 </label>
 
                 <div class="control">
-                    <input
-                        class="input-text required"
-                        name="payment[credit_card_number]"
-                        type="text"
-                        maxlength="19"
-                        minlength="16"
-                        data-validate="{required:true}"
-                        data-bind="attr: {
+                    <input class="input-text required" name="payment[credit_card_number]" type="text" maxlength="19" minlength="16" data-validate="{required:true}" data-bind="attr: {
                             id: getCode() + '_number',
                             'data-container': getCode() + '_number'},
                             enable: true,
@@ -69,11 +61,11 @@
                                 blur : getBrand.bind($data, document.getElementById('pagseguro_credit_card_number')),
                                 keydown: creditCardMask.bind($data, document.getElementById('pagseguro_credit_card_number'))
                             }
-                    "/>
+                    " />
                     <div style="display: none;" class="display-none validation-advice pagseguro_credit_card_number-error-message" data-bind="attr: {generated: true}">Insira um número de cartão válido</div>
                 </div>
             </div>
-            
+
             <!--cc name-->
             <div class="field _required">
                 <label data-bind="attr: {for: getCode() + 'number'}" class="label">
@@ -81,14 +73,7 @@
                 </label>
 
                 <div class="control">
-                    <input
-                        class="input-text required"
-                        name="payment[credit_card_holder]"
-                        type="text"
-                        minlength="3"
-                        data-validate="{required:true}"
-                        required
-                        data-bind="attr: {
+                    <input class="input-text required" name="payment[credit_card_holder]" type="text" minlength="3" data-validate="{required:true}" required data-bind="attr: {
                             id: 'creditCardHolder'},
                             enable: true,
                             valueUpdate: 'input',
@@ -96,11 +81,11 @@
                                 blur : validateCardHolder.bind($data, document.getElementById('creditCardHolder')),
                                 keydown: notNumberMask.bind($data, document.getElementById('creditCardHolder'))
                             }
-                    "/>
+                    " />
                     <div style="display: none;" class="display-none validation-advice creditCardHolder-error-message" data-bind="attr: {generated: true}">Insira um nome válido</div>
                 </div>
             </div>
-            
+
             <!--cc expiration date-->
             <div class="field date required" data-bind="attr: {id: getCode() + '_cc_type_exp_div'}">
                 <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
@@ -110,9 +95,7 @@
                     <div class="fields group group-2">
                         <div class="field no-label month">
                             <div class="control">
-                                <select  name="payment[cc_exp_month]"
-                                    class="select select-month"
-                                    data-bind="attr: {id: 'creditCardExpirationMonth'},
+                                <select name="payment[cc_exp_month]" class="select select-month" data-bind="attr: {id: 'creditCardExpirationMonth'},
                                         enable: true,
                                         options: getPagSeguroCcMonthsValues(),
                                         optionsValue: 'value',
@@ -127,9 +110,7 @@
                         </div>
                         <div class="field no-label year">
                             <div class="control">
-                                <select name="payment[cc_exp_year]"
-                                    class="select select-year"
-                                    data-bind="attr: {id: 'creditCardExpirationYear', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
+                                <select name="payment[cc_exp_year]" class="select select-year" data-bind="attr: {id: 'creditCardExpirationYear', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
                                         enable: true,
                                         options: getPagSeguroCcYearsValues(),
                                         optionsValue: 'value',
@@ -153,7 +134,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!--cc code -->
             <div class="field _required">
                 <label data-bind="attr: {for: 'creditCardCode'}" class="label">
@@ -161,15 +142,7 @@
                 </label>
 
                 <div class="control">
-                    <input
-                        class="input-text required-entry required"
-                        name="payment[creditCardCode]"
-                        type="text"
-                        maxlength="4"
-                        minlength="1"
-                        required
-                        data-validate="{required:true}"
-                        data-bind="attr: {
+                    <input class="input-text required-entry required" name="payment[creditCardCode]" type="text" maxlength="4" minlength="1" required data-validate="{required:true}" data-bind="attr: {
                             id: 'creditCardCode'},
                             enable: true,
                             valueUpdate: 'input',
@@ -177,7 +150,7 @@
                                 blur: validateCreditCardCode.bind($data,document.getElementById('creditCardCode')),
                                 keydown: creditCardCodeMask.bind($data,document.getElementById('creditCardCode'))
                             }
-                    "/>
+                    " />
                     <div style="display: none;" class="display-none validation-advice creditCardCode-error-message" data-bind="attr: {generated: true}">Insira um código válido</div>
                 </div>
             </div>
@@ -189,15 +162,7 @@
                 </label>
 
                 <div class="control">
-                    <input
-                        class="input-text required-entry required"
-                        name="payment[credit_card_document]"
-                        type="text"
-                        maxlength="18"
-                        minlength="11"
-                        data-validate="{required:true}"
-                        required
-                        data-bind="attr: {
+                    <input class="input-text required-entry required" name="payment[credit_card_document]" type="text" maxlength="18" minlength="11" data-validate="{required:true}" required data-bind="attr: {
                             id: 'creditCardDocument'},
                             enable: true,
                             textInput: creditCardDocument,
@@ -206,7 +171,7 @@
                                 blur: validateDocumentFinal.bind($data, document.getElementById('creditCardDocument')),
                                 keydown: mascaraMutuario(document.getElementById('creditCardDocument'), cpfCnpj)
                             }
-                    "/>
+                    " />
                     <div style="display: none;" class="display-none validation-advice creditCardDocument-error-message" data-bind="attr: {generated: true}">Insira um CPF ou CNPJ válido</div>
                 </div>
             </div>
@@ -218,17 +183,7 @@
                 </label>
 
                 <div class="control">
-                    <input
-                        class="input-text required-entry required"
-                        value=""
-                        name="payment[creditCardHolderBirthdate]"
-                        type="text"
-                        maxlength="10"
-                        minlength="1"
-                        data-validate="{required:true}"
-                        placeholder="dd/mm/aaaa"
-                        required
-                        data-bind="attr: {
+                    <input class="input-text required-entry required" value="" name="payment[creditCardHolderBirthdate]" type="text" maxlength="10" minlength="1" data-validate="{required:true}" placeholder="dd/mm/aaaa" required data-bind="attr: {
                             id: 'creditCardHolderBirthdate'},
                             enable: true,
                             valueUpdate: 'input',
@@ -236,11 +191,11 @@
                                 blur: validateCreditCardHolderBirthdate.bind($data,document.getElementById('creditCardHolderBirthdate')),
                                 keydown: MascaraData.bind($data,document.getElementById('creditCardHolderBirthdate'))
                             }
-                    "/>
+                    " />
                     <div style="display: none;" class="display-none validation-advice creditCardHolderBirthdate-error-message" data-bind="attr: {generated: true}">Insira uma data de nascimento válida</div>
                 </div>
             </div>
-            
+
             <!--cc installments-->
             <div class="field _required">
                 <label data-bind="attr: {for: 'card_installment_option'}" class="label">
@@ -248,9 +203,7 @@
                 </label>
 
                 <div class="control">
-                   <select class="pagseguro-cc-select required-entry" id="card_installment_option" title="Nº de parcelas" required
-                        disabled
-                        data-bind="
+                    <select class="pagseguro-cc-select required-entry" id="card_installment_option" title="Nº de parcelas" required disabled data-bind="
                             event: {
                                 click : validateCreditCardInstallment.bind($data, document.getElementById('card_installment_option')),
                                 change: cardInstallmentOnChange.bind($data, document.getElementById('card_installment_option'))
@@ -261,7 +214,7 @@
                     <div style="display: none;" class="display-none validation-advice card_installment_option-error-message" data-bind="attr: {generated: true}">Escolha uma opção de parcelamento</div>
                 </div>
             </div>
-            
+
             <!--cc total-->
             <div class="field _required">
                 <label data-bind="attr: {for: 'card_total'}" class="label">
@@ -269,17 +222,14 @@
                 </label>
 
                 <!--<div class="control">-->
-                    <span>
+                <span>
                         <span id="card_total">selecione o número de parcelas</span>
-                    </span>
+                </span>
                 <!--</div>-->
             </div>
-            
+
             <div class="credit-card-error-ps pagseguro-label-spacing pagseguro-cc-group-div" style="font-weight: bold; text-align: center;">
-                <div style="display: none; font-weight: bold; text-align: center;"
-                    class="display-none validation-advice creditCardToken-error-message"
-                    data-bind="attr: {generated: true}"
-                >
+                <div style="display: none; font-weight: bold; text-align: center;" class="display-none validation-advice creditCardToken-error-message" data-bind="attr: {generated: true}">
                     Dados do cartão inválidos. Verifique o número, a validade e o código de segurança do cartão inseridos e tente novamente.
                 </div>
             </div>
@@ -291,23 +241,21 @@
                 </div>
             </div>
         </fieldset>
-        
+
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
-                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
             <!--/ko-->
         </div>
         <div class="actions-toolbar">
             <div class="primary">
-                <button class="action primary checkout"
-                        type="submit"
-                        data-bind="
+                <button class="action primary checkout" type="submit" data-bind="
                         click: placeOrder,
                         attr: {title: $t('Place Order')},
                         css: {disabled: !isPlaceOrderActionAllowed()},
-                        enable: (getCode() == isChecked())
-                        "
-                        disabled>
+                        enable: (getCode()=== isChecked())
+                        " disabled>
                     <span data-bind="i18n: 'Place Order'"></span>
                 </button>
             </div>

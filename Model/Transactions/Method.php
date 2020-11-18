@@ -111,7 +111,7 @@ abstract class Method
             }
 
             if (!empty($this->_status)) {
-                $select = $this->getStatusFromPaymentKey($this->_status) == 'partially_refunded'
+                $select = $this->getStatusFromPaymentKey($this->_status)=== 'partially_refunded'
                     ? $select->where('ps.partially_refunded = ?', 1)
                     : $select->where('order.status = ?', $this->getStatusFromPaymentKey($this->_status));
             }
@@ -140,8 +140,8 @@ abstract class Method
         if(!empty($this->_detailsTransactionByCode)){
             $order = $this->decryptOrderById($this->_detailsTransactionByCode);
 
-            if ($this->getStoreReference() == $this->decryptReference($this->_detailsTransactionByCode)) {
-                if ($this->_detailsTransactionByCode->getStatus() == $this->getKeyFromOrderStatus($order->getStatus())) {
+            if ($this->getStoreReference()=== $this->decryptReference($this->_detailsTransactionByCode)) {
+                if ($this->_detailsTransactionByCode->getStatus()=== $this->getKeyFromOrderStatus($order->getStatus())) {
                     $this->_detailsTransactionByCode = $this->buildDetailsTransaction();
                     $this->_needConciliate = false;
                 }

@@ -87,11 +87,11 @@ class Data
         $complement = '';
         $district = '';
         $broken = preg_split('/[-,\\n]/', $fullAddress);
-        if (sizeof($broken) == 4) {
+        if (sizeof($broken)=== 4) {
             list($address, $number, $complement, $district) = $broken;
-        } elseif (sizeof($broken) == 3) {
+        } elseif (sizeof($broken)=== 3) {
             list($address, $number, $complement) = $broken;
-        } elseif (sizeof($broken) == 2 || sizeof($broken) == 1) {
+        } elseif (sizeof($broken)=== 2 || sizeof($broken)=== 1) {
             list($address, $number, $complement) = self::sortData($fullAddress);
         } else {
             $address = $fullAddress;
@@ -270,7 +270,7 @@ class Data
         $phone = self::keepOnlyNumbers($phone);
 
         // removes leading zero
-        if (substr($phone, 0, 1) == 0) {
+        if (substr($phone, 0, 1)=== 0) {
             $phone = substr($phone, 1);
         }
 
