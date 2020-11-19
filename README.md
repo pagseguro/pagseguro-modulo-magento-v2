@@ -19,6 +19,8 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 ---
 
 - [Magento] Community 2.0.8 | 2.1.0 até a versão 2.1.9
+- [Versões Magento] Para versões anteriores, usar outras tags
+
 - [PHP] 5.5+
 
 - [SPL]
