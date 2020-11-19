@@ -134,7 +134,7 @@ function getInstallments(brand) {
       cardInstallment(response.installments);
     },
     error: function (response) {
-      console.log('erro ao gerar parcelamento');
+      console.error('erro ao gerar parcelamento');
     },
   });
 }
