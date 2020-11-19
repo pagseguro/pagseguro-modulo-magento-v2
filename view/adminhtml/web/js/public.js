@@ -955,7 +955,7 @@ function dateVerify(fieldName) {
   if (
     isNaN(year) ||
     (month === 2 &&
-      (day < 01 || day > 29 || (day > 28 && parseInt(year / 4) !== year / 4)))
+      (day < 01 || day > 29 || (day > 28 && parseInt((year / 4),10) !== year / 4)))
   ) {
     situacao = 'false';
   }
