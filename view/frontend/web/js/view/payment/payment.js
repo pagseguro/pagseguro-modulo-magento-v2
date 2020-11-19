@@ -23,35 +23,32 @@
  * browser:true
  * global define
  */
-define(
-    [
-        'uiComponent',
-        'Magento_Checkout/js/model/payment/renderer-list'
-    ],
-    function (
-        Component,
-        rendererList
-    ) {
-        'use strict';
-        rendererList.push(
-            {
-                type: 'pagseguro_default_lightbox',
-                component: 'UOL_PagSeguro/js/view/payment/method-renderer/default_lightbox-method'
-            },
-            {
-                type: 'pagseguro_credit_card',
-                component: 'UOL_PagSeguro/js/view/payment/method-renderer/credit_card-method'
-            },
-            {
-                type: 'pagseguro_boleto',
-                component: 'UOL_PagSeguro/js/view/payment/method-renderer/boleto-method'
-            },
-            {
-                type: 'pagseguro_online_debit',
-                component: 'UOL_PagSeguro/js/view/payment/method-renderer/online_debit-method'
-            }
-        );
-
-        return Component.extend({});
+define([
+  'uiComponent',
+  'Magento_Checkout/js/model/payment/renderer-list',
+], function (Component, rendererList) {
+  'use strict';
+  rendererList.push(
+    {
+      type: 'pagseguro_default_lightbox',
+      component:
+        'UOL_PagSeguro/js/view/payment/method-renderer/default_lightbox-method',
+    },
+    {
+      type: 'pagseguro_credit_card',
+      component:
+        'UOL_PagSeguro/js/view/payment/method-renderer/credit_card-method',
+    },
+    {
+      type: 'pagseguro_boleto',
+      component: 'UOL_PagSeguro/js/view/payment/method-renderer/boleto-method',
+    },
+    {
+      type: 'pagseguro_online_debit',
+      component:
+        'UOL_PagSeguro/js/view/payment/method-renderer/online_debit-method',
     }
-);
+  );
+
+  return Component.extend({});
+});

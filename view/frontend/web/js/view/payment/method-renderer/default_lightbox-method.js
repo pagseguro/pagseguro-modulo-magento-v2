@@ -23,59 +23,72 @@
  * browser:true
  * global define
  */
-define(
-    [
-        'jquery',
-        'Magento_Checkout/js/view/payment/default',
-        'Magento_Checkout/js/model/quote',
-        'Magento_Checkout/js/model/full-screen-loader',
-        'Magento_Checkout/js/action/set-payment-information',
-        'Magento_Checkout/js/action/place-order',
-    ],
-    function ($, Component, quote, fullScreenLoader, setPaymentInformationAction, placeOrder) {
-        'use strict';
+define([
+  'jquery',
+  'Magento_Checkout/js/view/payment/default',
+  'Magento_Checkout/js/model/quote',
+  'Magento_Checkout/js/model/full-screen-loader',
+  'Magento_Checkout/js/action/set-payment-information',
+  'Magento_Checkout/js/action/place-order',
+], function (
+  $,
+  Component,
+  quote,
+  fullScreenLoader,
+  setPaymentInformationAction,
+  placeOrder
+) {
+  'use strict';
 
-        return Component.extend({
-            defaults: {
-                template: 'UOL_PagSeguro/payment/default-lightbox-form'
-            },
+  return Component.extend({
+    defaults: {
+      template: 'UOL_PagSeguro/payment/default-lightbox-form',
+    },
 
-            context: function() {
-                return this;
-            },
+    context: function () {
+      return this;
+    },
 
-            getCode: function() {
-                return "pagseguro_default_lightbox"
-            },
+    getCode: function () {
+      return 'pagseguro_default_lightbox';
+    },
 
-            /**
-             * @override
-             */
-            placeOrder: function () {
-                var self = this;
-                var paymentData = quote.paymentMethod();
-                var messageContainer = this.messageContainer;
-                fullScreenLoader.startLoader();
-                this.isPlaceOrderActionAllowed(false);
-                $.when(setPaymentInformationAction(this.messageContainer, {
-                    'method': self.getCode()
-                })).done(function () {
-                    delete paymentData['title'];
-                    delete paymentData['__disableTmpl'];
+    /**
+     * @override
+     */
+    placeOrder: function () {
+      var self = this;
+      var paymentData = quote.paymentMethod();
+      var messageContainer = this.messageContainer;
+      fullScreenLoader.startLoader();
+      this.isPlaceOrderActionAllowed(false);
+      $.when(
+        setPaymentInformationAction(this.messageContainer, {
+          method: self.getCode(),
+        })
+      )
+        .done(function () {
+          delete paymentData['title'];
+          delete paymentData['__disableTmpl'];
 
-                    $.when(placeOrder(paymentData, messageContainer)).done(function () {
-                       if (window.checkoutConfig.payment.pagseguro.isLightbox){
-                            $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.lightbox);
-                        } else {
-                            $.mage.redirect(window.checkoutConfig.payment.pagseguro.checkout.standard);
-                        }
-                    });
-                }).fail(function () {
-                    self.isPlaceOrderActionAllowed(true);
-                }).always(function(){
-                    fullScreenLoader.stopLoader();
-                });
+          $.when(placeOrder(paymentData, messageContainer)).done(function () {
+            if (window.checkoutConfig.payment.pagseguro.isLightbox) {
+              $.mage.redirect(
+                window.checkoutConfig.payment.pagseguro.checkout.lightbox
+              );
+            } else {
+              $.mage.redirect(
+                window.checkoutConfig.payment.pagseguro.checkout.standard
+              );
             }
+          });
+        })
+        .fail(function () {
+          self.isPlaceOrderActionAllowed(true);
+        })
+        .always(function () {
+          fullScreenLoader.stopLoader();
         });
-    }
-);
+    },
+  });
+});

@@ -4,10 +4,10 @@
  */
 
 var config = {
-    map: {
-        '*': {
-            "datatables": "UOL_PagSeguro/js/jquery.dataTables.min",
-            "public": "UOL_PagSeguro/js/public",
-        }
-    }
+  map: {
+    '*': {
+      datatables: 'UOL_PagSeguro/js/jquery.dataTables.min',
+      public: 'UOL_PagSeguro/js/public',
+    },
+  },
 };

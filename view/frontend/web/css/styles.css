@@ -1,175 +1,186 @@
 #payment-method-pagseguro button {
-    overflow: visible;
+  overflow: visible;
 }
 #payment-method-pagseguro button,
 #payment-method-pagseguro select {
-    text-transform: none;
+  text-transform: none;
 }
 #payment-method-pagseguro button {
-    -webkit-appearance: button;
-    cursor: pointer;
+  -webkit-appearance: button;
+  cursor: pointer;
 }
 #payment-method-pagseguro button::-moz-focus-inner,
 #payment-method-pagseguro input::-moz-focus-inner {
-    border: 0;
-    padding: 0;
+  border: 0;
+  padding: 0;
 }
 #payment-method-pagseguro input {
-    line-height: normal;
+  line-height: normal;
 }
-#payment-method-pagseguro input[type="radio"] {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 0;
+#payment-method-pagseguro input[type='radio'] {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
 }
 #payment-method-pagseguro .row {
-    margin-left: -15px;
-    margin-right: -15px;
+  margin-left: -15px;
+  margin-right: -15px;
 }
-#payment-method-pagseguro .col-sm-2, #payment-method-pagseguro .col-sm-5, #payment-method-pagseguro .col-sm-6, #payment-method-pagseguro .col-md-8, #payment-method-pagseguro .col-sm-10, #payment-method-pagseguro .col-xs-12 {
-    position: relative;
-    min-height: 1px;
-    padding-left: 15px;
-    padding-right: 15px;
+#payment-method-pagseguro .col-sm-2,
+#payment-method-pagseguro .col-sm-5,
+#payment-method-pagseguro .col-sm-6,
+#payment-method-pagseguro .col-md-8,
+#payment-method-pagseguro .col-sm-10,
+#payment-method-pagseguro .col-xs-12 {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 #payment-method-pagseguro .col-xs-12 {
-    float: left;
+  float: left;
 }
 #payment-method-pagseguro .col-xs-12 {
-    width: 100%;
+  width: 100%;
 }
 @media (min-width: 768px) {
-    #payment-method-pagseguro .col-sm-2, #payment-method-pagseguro .col-sm-5, #payment-method-pagseguro .col-sm-6, #payment-method-pagseguro .col-sm-10 {
-        float: left;
-    }
-    #payment-method-pagseguro .col-sm-10 {
-        width: 83.33333333%;
-    }
-    #payment-method-pagseguro .col-sm-6 {
-        width: 50%;
-    }
-    #payment-method-pagseguro .col-sm-5 {
-        width: 41.66666667%;
-    }
-    #payment-method-pagseguro .col-sm-2 {
-        width: 16.66666667%;
-    }
-    #payment-method-pagseguro .col-sm-offset-1 {
-        margin-left: 8.33333333%;
-    }
+  #payment-method-pagseguro .col-sm-2,
+  #payment-method-pagseguro .col-sm-5,
+  #payment-method-pagseguro .col-sm-6,
+  #payment-method-pagseguro .col-sm-10 {
+    float: left;
+  }
+  #payment-method-pagseguro .col-sm-10 {
+    width: 83.33333333%;
+  }
+  #payment-method-pagseguro .col-sm-6 {
+    width: 50%;
+  }
+  #payment-method-pagseguro .col-sm-5 {
+    width: 41.66666667%;
+  }
+  #payment-method-pagseguro .col-sm-2 {
+    width: 16.66666667%;
+  }
+  #payment-method-pagseguro .col-sm-offset-1 {
+    margin-left: 8.33333333%;
+  }
 }
 @media (min-width: 992px) {
-    #payment-method-pagseguro .col-md-8 {
-        float: left;
-    }
-    #payment-method-pagseguro .col-md-8 {
-        width: 66.66666667%;
-    }
-    #payment-method-pagseguro .col-md-offset-2 {
-        margin-left: 16.66666667%;
-    }
+  #payment-method-pagseguro .col-md-8 {
+    float: left;
+  }
+  #payment-method-pagseguro .col-md-8 {
+    width: 66.66666667%;
+  }
+  #payment-method-pagseguro .col-md-offset-2 {
+    margin-left: 16.66666667%;
+  }
 }
 #payment-method-pagseguro label {
-    display: inline-block;
-    max-width: 100%;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
-#payment-method-pagseguro input[type="radio"] {
-    margin: 4px 0 0;
-    margin-top: 1px \9;
-    line-height: normal;
+#payment-method-pagseguro input[type='radio'] {
+  margin: 4px 0 0;
+  margin-top: 1px \9;
+  line-height: normal;
 }
-#payment-method-pagseguro input[type="radio"]:focus {
-    outline: 5px auto -webkit-focus-ring-color;
-    outline-offset: -2px;
+#payment-method-pagseguro input[type='radio']:focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
 }
-#payment-method-pagseguro input[type="text"],
+#payment-method-pagseguro input[type='text'],
 #payment-method-pagseguro .form-control {
-    display: block;
-    width: 100%;
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: #555555;
-    background-color: #ffffff;
-    background-image: none;
-    border: 1px solid #cccccc;
-    /*border-radius: 4px;*/
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555555;
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #cccccc;
+  /*border-radius: 4px;*/
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s,
+    -webkit-box-shadow ease-in-out 0.15s;
+  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
 #payment-method-pagseguro select {
-    -webkit-appearance: menulist;
-    -moz-appearance: menulist;
-    appearance: menulist;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+  appearance: menulist;
 }
 #payment-method-pagseguro .form-control:focus {
-    border-color: #66afe9;
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
 }
 #payment-method-pagseguro .form-control::-moz-placeholder {
-    color: #999999;
-    opacity: 1;
+  color: #999999;
+  opacity: 1;
 }
 #payment-method-pagseguro .form-control:-ms-input-placeholder {
-    color: #999999;
+  color: #999999;
 }
 #payment-method-pagseguro .form-control::-webkit-input-placeholder {
-    color: #999999;
+  color: #999999;
 }
 #payment-method-pagseguro .form-control::-ms-expand {
-    border: 0;
-    background-color: transparent;
+  border: 0;
+  background-color: transparent;
 }
 #payment-method-pagseguro .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 #payment-method-pagseguro .radio {
-    position: relative;
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  position: relative;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
-#payment-method-pagseguro .radio input[type="radio"] {
-    position: absolute;
-    margin-left: -20px;
-    margin-top: 4px \9;
+#payment-method-pagseguro .radio input[type='radio'] {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: 4px \9;
 }
 #payment-method-pagseguro .radio + .radio {
-    margin-top: -5px;
+  margin-top: -5px;
 }
 #payment-method-pagseguro .help-block {
-    display: block;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    color: #737373;
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #737373;
 }
 #payment-method-pagseguro .form-horizontal .radio {
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-top: 7px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 7px;
 }
 #payment-method-pagseguro .form-horizontal .radio {
-    min-height: 27px;
+  min-height: 27px;
 }
 #payment-method-pagseguro .form-horizontal .form-group {
-    margin-left: -15px;
-    margin-right: -15px;
+  margin-left: -15px;
+  margin-right: -15px;
 }
 @media (min-width: 768px) {
-    #payment-method-pagseguro .form-horizontal .control-label {
-        text-align: right;
-        margin-bottom: 0;
-        padding-top: 7px;
-    }
+  #payment-method-pagseguro .form-horizontal .control-label {
+    text-align: right;
+    margin-bottom: 0;
+    padding-top: 7px;
+  }
 }
 #payment-method-pagseguro .clearfix:before,
 #payment-method-pagseguro .clearfix:after,
@@ -177,193 +188,197 @@
 #payment-method-pagseguro .row:after,
 #payment-method-pagseguro .form-horizontal .form-group:before,
 #payment-method-pagseguro .form-horizontal .form-group:after {
-    content: " ";
-    display: table;
+  content: ' ';
+  display: table;
 }
 #payment-method-pagseguro .clearfix:after,
 #payment-method-pagseguro .row:after,
 #payment-method-pagseguro .form-horizontal .form-group:after {
-    clear: both;
+  clear: both;
 }
 #payment-method-pagseguro *,
 #payment-method-pagseguro *::before,
 #payment-method-pagseguro *::after {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 #payment-method-pagseguro .tabs-pagseguro {
-    width: 100%;
+  width: 100%;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items {
-    width: 100%;
+  width: 100%;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item {
-    position: relative;
-    float: left;
-    width: 33.33%;
-    /* borders */
-    border-color: #827e7e;
-    border-top-style: solid;
-    border-top-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+  position: relative;
+  float: left;
+  width: 33.33%;
+  /* borders */
+  border-color: #827e7e;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
 }
 @media (max-width: 767px) {
-    #payment-method-pagseguro .tabs-pagseguro > .items > .item {
-        height: 125px;
-    }
+  #payment-method-pagseguro .tabs-pagseguro > .items > .item {
+    height: 125px;
+  }
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item:first-child {
-    border-left-style: solid;
-    border-left-width: 1.5px;
+  border-left-style: solid;
+  border-left-width: 1.5px;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item:nth-child(2) {
-    border-left-style: solid;
-    border-left-width: 1.5px;
-    border-right-style: solid;
-    border-right-width: 1.5px;
+  border-left-style: solid;
+  border-left-width: 1.5px;
+  border-right-style: solid;
+  border-right-width: 1.5px;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item:last-child {
-    border-right-style: solid;
-    border-right-width: 1.5px;
+  border-right-style: solid;
+  border-right-width: 1.5px;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item.--active > .action {
-    color: #FFF;
-    background-color: #4F7743;
+  color: #fff;
+  background-color: #4f7743;
 }
-#payment-method-pagseguro .tabs-pagseguro > .items > .item.--active > .action::after {
-    bottom: -15px;
-    /* subtract the height unit this element */
-    opacity: 1;
-    border-top-color: #4F7743;
-    -webkit-transition-duration: .25s;
-    -moz-transition-duration: .25s;
-    transition-duration: .25s;
+#payment-method-pagseguro
+  .tabs-pagseguro
+  > .items
+  > .item.--active
+  > .action::after {
+  bottom: -15px;
+  /* subtract the height unit this element */
+  opacity: 1;
+  border-top-color: #4f7743;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action {
-    padding: .75em 1em;
-    height: 100%;
+  padding: 0.75em 1em;
+  height: 100%;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 0px;
-    height: 0px;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-top: 15px solid #827e7e;
-    /* style of animation */
-    opacity: 0;
-    bottom: -5px;
-    -webkit-transition: all linear;
-    -moz-transition: all linear;
-    transition: all linear;
-    -webkit-transition-duration: 0s;
-    -moz-transition-duration: 0s;
-    transition-duration: 0s;
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 0px;
+  height: 0px;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 15px solid #827e7e;
+  /* style of animation */
+  opacity: 0;
+  bottom: -5px;
+  -webkit-transition: all linear;
+  -moz-transition: all linear;
+  transition: all linear;
+  -webkit-transition-duration: 0s;
+  -moz-transition-duration: 0s;
+  transition-duration: 0s;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action,
 #payment-method-pagseguro .btn-pagseguro {
-    text-align: center;
-    display: block;
-    background-color: transparent;
-    -webkit-transition: all 0.25s linear;
-    -moz-transition: all 0.25s linear;
-    transition: all 0.25s linear;
+  text-align: center;
+  display: block;
+  background-color: transparent;
+  -webkit-transition: all 0.25s linear;
+  -moz-transition: all 0.25s linear;
+  transition: all 0.25s linear;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action {
-    color: #827e7e;
+  color: #827e7e;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action:hover,
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action:focus {
-    text-decoration: none;
+  text-decoration: none;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action:hover,
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action:focus,
 #payment-method-pagseguro .btn-pagseguro:hover,
 #payment-method-pagseguro .btn-pagseguro:focus {
-    color: #FFF;
-    background-color: #4F7743;
+  color: #fff;
+  background-color: #4f7743;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action > .fa {
-    display: block;
+  display: block;
 }
 #payment-method-pagseguro .tabs-pagseguro > .items > .item > .action > .name {
-    display: block;
-    margin-top: .5em;
+  display: block;
+  margin-top: 0.5em;
 }
 #payment-method-pagseguro .tabs-content {
-    padding: 1em;
+  padding: 1em;
 }
 #payment-method-pagseguro .title-tab {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 #payment-method-pagseguro .tabs-content > .item-tab {
-    /* active tab current */
-    display: none;
-    width: 100%;
+  /* active tab current */
+  display: none;
+  width: 100%;
 }
 #payment-method-pagseguro .tabs-content > .item-tab.--current {
-    display: block;
+  display: block;
 }
 #payment-method-pagseguro button:not(.primary),
 #payment-method-pagseguro .btn-pagseguro {
-    color: #4F7743;
-    font-size: 1.2em;
-    white-space: nowrap;
-    vertical-align: middle;
-    outline: inherit;
-    cursor: pointer;
-    padding: 1em 2em;
-    background: none;
-    background-image: none;
-    border: 1px solid #4F7743;
-    border-radius: 0px;
-    /* fix native magento style - box-shadow */
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    -ms-touch-action: manipulation;
-    touch-action: manipulation;
+  color: #4f7743;
+  font-size: 1.2em;
+  white-space: nowrap;
+  vertical-align: middle;
+  outline: inherit;
+  cursor: pointer;
+  padding: 1em 2em;
+  background: none;
+  background-image: none;
+  border: 1px solid #4f7743;
+  border-radius: 0px;
+  /* fix native magento style - box-shadow */
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
 }
 #payment-method-pagseguro .btn-pagseguro.--align-right {
-    float: right;
-    margin-top: 1.5em;
+  float: right;
+  margin-top: 1.5em;
 }
 #payment-method-pagseguro .btn-pagseguro:hover,
 #payment-method-pagseguro .btn-pagseguro:focus {
-    /* fix native magento style - border hover button */
-    border: 1px solid #4F7743;
+  /* fix native magento style - border hover button */
+  border: 1px solid #4f7743;
 }
 #payment-method-pagseguro .list-warning {
-    display: block;
-    margin-top: 2em;
-    width: 100%;
+  display: block;
+  margin-top: 2em;
+  width: 100%;
 }
 #payment-method-pagseguro .credit-total > .control-label {
-    font-size: 1.4em;
+  font-size: 1.4em;
 }
 #payment-method-pagseguro .credit-total > div > span {
-    font-size: 1.15em;
-    line-height: 34px;
-    display: block;
-    padding-top: 5px;
-    /* diferece font-size value at label */
+  font-size: 1.15em;
+  line-height: 34px;
+  display: block;
+  padding-top: 5px;
+  /* diferece font-size value at label */
 }
 @media (max-width: 767px) {
-    #payment-method-pagseguro {
-        /* form inline custom config */
-    }
-    #payment-method-pagseguro .form-inline-childs > div {
-        margin-bottom: 15px;
-    }
+  #payment-method-pagseguro {
+    /* form inline custom config */
+  }
+  #payment-method-pagseguro .form-inline-childs > div {
+    margin-bottom: 15px;
+  }
 }
 #payment-method-pagseguro .display-none {
-    display: none;
+  display: none;
 }

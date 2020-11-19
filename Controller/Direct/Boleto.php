@@ -197,7 +197,7 @@ class Boleto extends \Magento\Framework\App\Action\Action
     {
         $lastRealOrderId = $this->_objectManager->create('\Magento\Checkout\Model\Session')->getLastRealOrder()->getId();
 
-        if ($lastRealOrderId)) {
+        if ($lastRealOrderId) {
             throw new \Exception("There is no order associated with this session.");
         } 
         
