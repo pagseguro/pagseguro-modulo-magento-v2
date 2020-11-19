@@ -9,7 +9,7 @@ var Modal = {
       alert({
         title: title,
         content: content,
-        clickableOverlay: true,
+        clickableOverlay: true
       });
     });
   },
