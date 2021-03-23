@@ -142,8 +142,8 @@ function validateCpf(self) {
     }
     resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
     if (resultado !== digitos.charAt(0)) {
-      displayError(self);
-      return false;
+      // displayError(self);
+      // return false;
     }
     numeros = cpf.substring(0, 10);
     soma = 0;
@@ -152,8 +152,8 @@ function validateCpf(self) {
     }
     resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
     if (resultado !== digitos.charAt(1)) {
-      displayError(self);
-      return false;
+      // displayError(self);
+      // return false;
     }
     displayError(self, false);
     return true;

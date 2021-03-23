@@ -127,7 +127,6 @@ function validateCreditCardInstallment(self) {
 }
 
 function getInstallments(brand) {
-<<<<<<< HEAD
     PagSeguroDirectPayment.getInstallments({
         amount: document.getElementById('grand_total').value,
         brand: brand,
@@ -138,7 +137,6 @@ function getInstallments(brand) {
             console.error("Log an error level message.");
         },
     });
-=======
   PagSeguroDirectPayment.getInstallments({
     amount: document.getElementById('grand_total').value,
     brand: brand,
@@ -149,7 +147,6 @@ function getInstallments(brand) {
       console.error("Log an error level message.");
     },
   });
->>>>>>> 00c9809cd1e9048918f60340f414edbe5b7a1748
 }
 
 function getBrand(self) {

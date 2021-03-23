@@ -182,7 +182,7 @@ class Request extends \Magento\Framework\App\Action\Action
             try {
                 $this->orderId = $lastRealOrder->getId();
 
-                if ($this->orderID===null) {
+                if ($this->orderId===null) {
                     throw new \Exception("There is no order associated with this session.");
                 }
 
