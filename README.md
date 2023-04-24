@@ -1,4 +1,11 @@
-Módulo de integração PagSeguro para Magento 2.x
+# Esse módulo foi DEPRECIADO!!!!!
+**Recomendamos usar o novo módulo Magento 2 PagSeguro** na url: https://github.com/pagseguro/payment-magento
+
+-----
+
+
+#  [DEPRECIADO] Módulo de integração PagSeguro para Magento 2.x
+
 ====================================================
 
 [![Code Climate](https://codeclimate.com/github/pagseguro/magento2/badges/gpa.svg)](https://codeclimate.com/github/pagseguro/magento2)
